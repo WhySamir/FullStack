@@ -1,7 +1,6 @@
 import express from "express";
-
 import cors from "cors";
-import cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser"; //middleware simply creates obj of cookie
 
 const app = express();
 
@@ -15,6 +14,12 @@ app.use(
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
-app.use(express.cookieParser());
+app.use(cookieParser());
+
+//routes
+import userRouter from "./routes/user.routes.js";
+
+//routes declaration .usefor middleware and controller access not provided segmently by app.get as routeris accessed customly
+app.use("/api/v1/users", userRouter); //router,controller
 
 export { app };
