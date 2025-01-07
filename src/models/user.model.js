@@ -79,6 +79,7 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 userSchema.methods.generateRefreshToken = function () {
+  //for longerspan,not required to login everytime
   return jwt.sign(
     {
       _id: this.id,
