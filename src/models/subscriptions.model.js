@@ -3,10 +3,12 @@ import mongoose from "mongoose";
 const subscriptionSchema = new mongoose.Schema(
   {
     subscriber: {
+      //no of particular channels in a document
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     channel: {
+      //find total channels that i subscribed->subandch
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
@@ -14,7 +16,4 @@ const subscriptionSchema = new mongoose.Schema(
   { timestamp: true }
 );
 
-export const subscriptions = mongoose.model(
-  "subscriptions",
-  subscriptionSchema
-);
+export const Subscription = mongoose.model("Subscription", subscriptionSchema);
