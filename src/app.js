@@ -19,9 +19,11 @@ app.use(cookieParser()); //access  req.cookie
 //routes
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
+import subscriptionRouter from "./routes/subscription.routes.js";
 
 //routes declaration .usefor middleware and controller access not provided segmently by app.get as routeris accessed customly
 app.use("/api/v1/users", userRouter); //router,controller
-app.use("/api/v1/video", videoRouter); //router,controller
+app.use("/api/v1/videos", videoRouter); //router,controller
+app.use("/api/v1/subscriptions", subscriptionRouter); //router,controller
 
 export { app };
