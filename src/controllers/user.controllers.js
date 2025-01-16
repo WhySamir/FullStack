@@ -199,7 +199,7 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
       await generateAccessAndRefreshToken(findUser._id);
     return res
       .status(200)
-      .cookie("accessToken", newaccessToken, options)
+      .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", newrefreshToken, options)
       .json(
         new ApiResponds(
@@ -221,8 +221,11 @@ const changeCurrentpassword = asyncHandler(async (req, res) => {
   if (!isPasswordCorrect) {
     throw new ApiError(400, "Invalid old Password");
   }
+  if (oldPassword === newPassword) {
+    throw new ApiError(401, "Old and new Password same");
+  }
   user.password = newPassword;
-  await user.save({ validateBeforeSave: False });
+  await user.save({ validateBeforeSave: false });
   return res
     .status(200)
     .json(new ApiResponds(200, {}, "Password changed successfully"));
@@ -234,19 +237,39 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { email, fullName } = req.body;
-  if (!email || !fullName) {
-    throw new ApiError(401, "Email or FullName is required. ");
-  }
-  const user = await User.findByIdAndUpdate(
-    req.user?._id,
-    { $set: { fullName: fullName, email: email } },
-    { new: true }
-  ).select("-password");
 
-  return res
-    .status(200)
-    .json(new ApiResponds(200, user, "User details updated successfully"));
-}); //files update through multer  who is loggedin
+  if (!(email || fullName)) {
+    throw new ApiError(401, "Email or FullName is required.");
+  }
+
+  const updateFields = {};
+  if (email) updateFields.email = email;
+  if (fullName) updateFields.fullName = fullName;
+
+  if (Object.keys(updateFields).length === 0) {
+    throw new ApiError(400, "No fields to update");
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponds(200, user, "User details updated successfully"));
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(400, error.message || "Error updating user details");
+  }
+});
+//files update through multer  who is loggedin
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
@@ -268,6 +291,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponds(200, user, "Avatar Updated Sucessfully"));
 });
 const updateCoverImage = asyncHandler(async (req, res) => {
+  console.log("File:", req.file?.path);
+  console.log("Body:", req.body);
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
@@ -280,7 +305,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
   const user = await User.findByIdAndUpdate(
     req.user?._id,
-    { $set: { avatar: avatar.url } }, //only one so set or also more than two
+    { $set: { coverImage: coverImage.url } }, //only one so set or also more than two
     { new: true }
   ).select("-password");
 
@@ -360,10 +385,14 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponds(200, channel[0], "User channel fetched sucessfully"));
 });
 const getWatchHistory = asyncHandler(async (req, res) => {
-  const user = User.aggregate([
+  if (!mongoose.isValidObjectId(req.user._id)) {
+    throw new ApiError(400, "Invalid user ID");
+  }
+
+  const user = await User.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id), //aggretion pipeline directly to db so created mongoseobjId
+        _id: new mongoose.Types.ObjectId(String(req.user._id)), //aggretion pipeline directly to db so created mongoseobjId
       },
     },
     {
