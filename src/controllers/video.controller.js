@@ -14,7 +14,7 @@ import { uploadonCloudinary } from "../utlis/cloudinary.js";
 
 const publishaVideo = asyncHandler(async (req, res) => {
   const { title, description, duration } = req.body;
-  if ([title, description].some((feild) => feild?.trim() === "")) {
+  if (!title || !description || !duration) {
     throw new ApiError(400, "All feild are required");
   }
   const videoLocalPath = req.files?.videoFile[0]?.path;
@@ -168,7 +168,58 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 });
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    query,
+    sortBy = "title",
+    sortType = "asc",
+    userId,
+  } = req.query;
+
+  const pageNumber = parseInt(page, 10);
+  const limitNumber = parseInt(limit, 10);
+
+  try {
+    // Build the search filter
+    const filter = {};
+    if (query) {
+      filter.$or = [
+        { title: { $regex: query, $options: "i" } }, // Search in the `title`
+        { description: { $regex: query, $options: "i" } }, // Search in the `description`
+        { userId: { $regex: query, $options: "i" } }, // Search in the `userId`
+      ];
+    }
+    // Build the sort object
+    const sort = {};
+    if (sortBy) {
+      sort[sortBy] = sortType === "asc" ? 1 : -1; // Descending (-1) or ascending (1)
+    }
+
+    // Fetch videos from the database with filters, pagination, and sorting
+    const videos = await Video.find(filter)
+      .sort(sort) // Apply sorting
+      // .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
+      .limit(limitNumber); // Limit the number of documents
+
+    // Count total documents for pagination metadata
+    const totalVideos = await Video.countDocuments(filter);
+
+    // Send the response
+    res.status(200).json({
+      data: videos,
+      totalPages: Math.ceil(totalVideos / limitNumber),
+      currentPage: pageNumber,
+      totalVideos,
+    });
+  } catch (error) {
+    // Handle any errors
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch videos",
+      error: error.message,
+    });
+  }
 });
 export {
   getAllVideos,
