@@ -1,5 +1,4 @@
 import { asyncHandler } from "../utlis/asyncHandler.js";
-import mongoose from "mongoose";
 import { ApiError } from "../utlis/ApiError.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import { User } from "../models/user.model.js";
