@@ -21,11 +21,12 @@ import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
 import subscriptionRouter from "./routes/subscription.routes.js";
 import playlistsRouter from "./routes/playlists.routes.js";
-
+import commentsRouter from "./routes/comment.route.js";
 //routes declaration .usefor middleware and controller access not provided segmently by app.get as routeris accessed customly
 app.use("/api/v1/users", userRouter); //router,controller
 app.use("/api/v1/videos", videoRouter); //router,controller
 app.use("/api/v1/subscriptions", subscriptionRouter); //router,controller
 app.use("/api/v1/playlist", playlistsRouter);
+app.use("/api/v1/comments", commentsRouter);
 
 export { app };
