@@ -7,12 +7,12 @@ import { Tweet } from "../models/tweets.js";
 const createTweets = asyncHandler(async (req, res) => {
   const { content } = req.body;
 
-  console.log("Tweet Content:", content);
+  //   console.log("Tweet Content:", content);
 
   if (!content) {
     throw new ApiError(400, "Tweet content cannot be empty.");
   }
-  console.log("User ID:", req.user?._id);
+  //   console.log("User ID:", req.user?._id);
   const twitter = await Video.findById(req.user?._id);
 
   try {
@@ -41,7 +41,7 @@ const createTweets = asyncHandler(async (req, res) => {
 const deleteTweet = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
 
-  console.log("Tweet ID:", tweetId);
+  //   console.log("Tweet ID:", tweetId);
 
   // Validate input
   if (!tweetId) {
@@ -98,7 +98,7 @@ const editUserTweet = asyncHandler(async (req, res) => {
 const getUserTweets = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
-  console.log("User ID:", req.user?._id);
+  //   console.log("User ID:", req.user?._id);
 
   // Parse query parameters
   const pageNumber = parseInt(page, 10);
