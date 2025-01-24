@@ -3,7 +3,7 @@ import { asyncHandler } from "../utlis/asyncHandler.js";
 import { ApiError } from "../utlis/ApiError.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import { uploadonCloudinary } from "../utlis/cloudinary.js";
-
+import mongoose from "mongoose";
 //getallVideos get all videos based on query, sort, pagination
 // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
 //publishaVid  get video, upload to cloudinary, create video
@@ -39,9 +39,10 @@ const publishaVideo = asyncHandler(async (req, res) => {
     description: description,
     duration: duration,
     isPublished: true,
+    owner: req.user._id,
   });
-  await uploadVideo.save();
-
+  const savedVideo = await uploadVideo.save();
+  console.log("Video saved successfully:", savedVideo);
   return res
     .status(200)
     .json(new ApiResponds(200, uploadVideo, "Uploaded video sucessfully."));
@@ -174,22 +175,33 @@ const getAllVideos = asyncHandler(async (req, res) => {
     query,
     sortBy = "title",
     sortType = "asc",
-    userId,
   } = req.query;
+  console.log("User ID from request:", req.user._id);
 
   const pageNumber = parseInt(page, 10);
   const limitNumber = parseInt(limit, 10);
 
   try {
+    // Ensure `req.user._id` is set by authentication middleware
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access: User ID not provided.",
+      });
+    }
+
     // Build the search filter
     const filter = {};
     if (query) {
       filter.$or = [
         { title: { $regex: query, $options: "i" } }, // Search in the `title`
         { description: { $regex: query, $options: "i" } }, // Search in the `description`
-        { userId: { $regex: query, $options: "i" } }, // Search in the `userId`
       ];
+      if (mongoose.isValidObjectId(query)) {
+        filter.$or.push({ owner: new mongoose.Types.ObjectId(query) }); // Match the `owner` as an ObjectId
+      }
     }
+
     // Build the sort object
     const sort = {};
     if (sortBy) {
@@ -199,11 +211,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
     // Fetch videos from the database with filters, pagination, and sorting
     const videos = await Video.find(filter)
       .sort(sort) // Apply sorting
-      // .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
+      .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
       .limit(limitNumber); // Limit the number of documents
 
     // Count total documents for pagination metadata
     const totalVideos = await Video.countDocuments(filter);
+    console.log({ videos, totalVideos, pageNumber });
 
     // Send the response
     res.status(200).json({
@@ -221,6 +234,42 @@ const getAllVideos = asyncHandler(async (req, res) => {
     });
   }
 });
+const incrementViews = asyncHandler(async (req, res) => {
+  const { videoById } = req.params;
+
+  if (!mongoose.isValidObjectId(videoById)) {
+    throw new ApiError(400, "Invalid video ID");
+  }
+
+  try {
+    const exitsvideo = await Video.findById(videoById);
+    if (!exitsvideo) {
+      throw new ApiError(400, " video  doesnot exits");
+    }
+    const updatedVideo = await Video.findByIdAndUpdate(
+      videoById,
+      { $inc: { views: 1 } }, // Increment the `views` field by 1
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedVideo) {
+      throw new ApiError(404, "Video not found");
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponds(
+          200,
+          updatedVideo,
+          "Video view count updated successfully"
+        )
+      );
+  } catch (error) {
+    throw new ApiError(500, "Failed to update video views", error.message);
+  }
+});
+
 export {
   getAllVideos,
   publishaVideo,
@@ -228,4 +277,5 @@ export {
   updateVideodetails,
   deleteVideo,
   togglePublishStatus,
+  incrementViews,
 };

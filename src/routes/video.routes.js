@@ -5,6 +5,7 @@ import {
   deleteVideo,
   getAllVideos,
   getVideosbyid,
+  incrementViews,
   publishaVideo,
   togglePublishStatus,
   updateVideodetails,
@@ -38,5 +39,6 @@ router.route("/update-videodetails/:videoById").patch(
 );
 router.route("/deletevid/:videoById").delete(deleteVideo);
 router.route("/togglepublish/:videoById").patch(togglePublishStatus);
+router.route("/increaseviews/:videoById").post(incrementViews);
 
 export default router;
