@@ -2,12 +2,13 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; //middleware simply creates obj of cookie
 import { globalErrorHandler } from "./middlewares/jsonErrorHandle.js";
-
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: process.env.CORS_ORIGIN || "http://localhost:5174",
     credentials: true,
   })
 ); //middleware or configuration
