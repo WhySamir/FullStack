@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; //middleware simply creates obj of cookie
+import { globalErrorHandler } from "./middlewares/jsonErrorHandle.js";
 
 const app = express();
 
@@ -10,7 +11,6 @@ app.use(
     credentials: true,
   })
 ); //middleware or configuration
-
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
@@ -37,5 +37,5 @@ app.use("/api/v1/tweets", tweetsRouter);
 app.use("/api/v1/likes", likesRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/healthcheck", healthRouter);
-
+app.use(globalErrorHandler);
 export { app };
