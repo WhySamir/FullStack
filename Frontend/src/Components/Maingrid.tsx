@@ -1,0 +1,172 @@
+import { useRef, useEffect, useState } from "react";
+import Video from "./Video";
+import { PlaySquare, User } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../Redux/auth";
+
+interface ObjItem {
+  text: string;
+}
+const objectPlay: ObjItem[] = [
+  { text: "All" },
+  { text: "Music" },
+  { text: "Gaming" },
+  { text: "T-Series" },
+  { text: "APIs" },
+  { text: "Thrillers" },
+  { text: "AI" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+  { text: "Movies" },
+];
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  fullName: string;
+  avatar: string;
+  coverImage: string;
+  createdAt: string;
+  updatedAt: string;
+  watchHistory: [];
+}
+interface MaingridProps {
+  isCollapsed: boolean;
+}
+const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState<Boolean>(false);
+  const [showRightArrow, setShowRightArrow] = useState<Boolean>(true);
+  const checkScroll = () => {
+    if (containerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 1);
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", checkScroll);
+      checkScroll(); // Initial check
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", checkScroll);
+      }
+    };
+  }, []);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({
+        left: -150,
+        behavior: "smooth",
+      });
+      setTimeout(checkScroll, 300);
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({
+        left: 150,
+        behavior: "smooth",
+      });
+      setTimeout(checkScroll, 300);
+    }
+  };
+
+  return (
+    <>
+      {isAuthenticated ? (
+        <>
+          <div className="relative w-full    sm:flex hidden">
+            {showLeftArrow && (
+              <div className="absolute flex  -left-2 top-1/2  -translate-y-1/2 bg-gradient-to-r from-[#16181b] to-transparent/80 w-20  z-20 ">
+                <button
+                  onClick={scrollLeft}
+                  className=" flex items-center justify-center    text-xl   bg-[#16181b]  text-white h-14 w-14 rounded-full z-10 hover:bg-neutral-600"
+                >
+                  &lt;
+                </button>
+                {/* <div className="absolute top-1/8 left-9 rounded-[0.22rem] bg-[#16181b]   w-8 h-10"></div> */}
+              </div>
+            )}
+            <div
+              ref={containerRef}
+              className={`relative  flex space-x-4 overflow-x-scroll scrollbar-hidden ${
+                isCollapsed
+                  ? "sm:max-w-[80vw] md:max-w-[85vw] lg:max-w-[86vw] xl:max-w-[90vw]"
+                  : "sm:max-w-[56vw] md:max-w-[65vw] lg:max-w-[72vw] xl:max-w-[80vw]"
+              }`}
+            >
+              {objectPlay.map((e, id) => (
+                <div
+                  key={id}
+                  className=" text-white  flex-shrink-0  whitespace-nowrap  bg-neutral-700 cursor-pointer   hover:bg-neutral-400 py-1.5 px-4 font-[500] rounded-lg "
+                >
+                  {e.text}
+                </div>
+              ))}
+            </div>
+            {showRightArrow && (
+              <div className="absolute -right-2 top-1/2 -translate-y-1/2  bg-gradient-to-l from-[#16181b] to-transparent/80   h-12 w-20 rounded-full z-20 ">
+                <button
+                  onClick={scrollRight}
+                  className="absolute right-0 top-1/2  items-center text-2xl -translate-y-1/2 bg-[#16181b] text-white  h-12 w-12 rounded-full z-10 hover:bg-neutral-600"
+                >
+                  &gt;
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="mt-8 flex flex-col sm:grid grid-cols-12 gap-2  ">
+            {[...new Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="border border-amber-100 3xl:col-span-3 lg:col-span-4  md:col-span-6  col-span-12 "
+              >
+                <Video />
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="flex w-full h-full flex-col justify-center my-[8vh] sm:mt-0 space-y-6 items-center">
+          <div className="icon text-white">
+            <PlaySquare size={100} />
+          </div>
+          <h1 className="text-white text-center align-middle text-2xl">
+            Enjoy your favorite videos
+          </h1>
+          <h2>Sign in to access videos that you’ve liked or saved</h2>
+          <Link
+            to="/signin"
+            className="signin cursor-pointer gap-1 hover:bg-blue-400 rounded-full border-[0.1px] flex items-center px-3 py-1 border-gray-600"
+          >
+            <div className="border  flex items-center justify-center border-blue-900 text-blue-900 rounded-full circle w-5 h-5">
+              <User size={16} />
+            </div>
+            <div className="text-blue-900 font-semibold tracking-[-0.01em]">
+              Sign in
+            </div>
+          </Link>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Maingrid;
