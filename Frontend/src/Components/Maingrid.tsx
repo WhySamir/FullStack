@@ -106,11 +106,13 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
             )}
             <div
               ref={containerRef}
-              className={`relative  flex space-x-4 overflow-x-scroll scrollbar-hidden ${
-                isCollapsed
-                  ? "sm:max-w-[80vw] md:max-w-[85vw] lg:max-w-[86vw] xl:max-w-[90vw]"
-                  : "sm:max-w-[56vw] md:max-w-[65vw] lg:max-w-[72vw] xl:max-w-[80vw]"
-              }`}
+              className={`relative  flex space-x-4 overflow-x-scroll scrollbar-hidden 
+                ${
+                  isCollapsed
+                    ? "sm:max-w-[80vw] md:max-w-[85vw] lg:max-w-[86vw] xl:max-w-[90vw]"
+                    : "sm:max-w-[56vw] md:max-w-[65vw] lg:max-w-[72vw] xl:max-w-[80vw]"
+                }
+                  `}
             >
               {objectPlay.map((e, id) => (
                 <div

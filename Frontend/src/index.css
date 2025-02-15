@@ -4,8 +4,8 @@
   box-sizing: border-box;
 }
 body {
-  background-color: #16181b;
   background-attachment: fixed;
+  background-color: #16181b;
   color: #b1bdb4;
   letter-spacing: 0.1px;
 }

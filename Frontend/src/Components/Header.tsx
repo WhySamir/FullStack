@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, RootState } from "../Redux/auth.ts";
 
 import { AlignJustify, Bell, Mic, Plus, Search, User } from "lucide-react";
+import { RootState2 } from "../Redux/darkmode.ts";
+import { darkTheme, lightTheme } from "../Theme.ts";
 
 interface User {
   _id: string;
@@ -26,6 +28,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { isAuthenticated, authUser } = useSelector(
     (state: RootState) => state.auth
   );
+  const { darkMode } = useSelector((state: RootState2) => state.theme);
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -67,7 +70,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 />
               </div>
 
-              <div className="absolute top-0 right-[-1.2rem] text-white text-[8px] sm:text-[.6em] opacity-80 px-1 rounded-sm">
+              <div
+                className="absolute top-0 right-[-1.2rem]  text-[8px] sm:text-[.6em] opacity-80 px-1 rounded-sm"
+                style={darkMode ? darkTheme : lightTheme}
+              >
                 NP
               </div>
             </div>
@@ -76,20 +82,32 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <div className="relative">
               <input
                 type="text"
-                className="bg-transparent w-[20vw] sm:w-[36vw]  sm:h-full border border-neutral-700 rounded-4xl mx-2 pl-4 pr-2 py-[0.6rem]  text-white focus:outline-none focus:border-blue-700"
+                className="bg-transparent w-[20vw] sm:w-[36vw]  sm:h-full border border-neutral-700 rounded-4xl mx-2 pl-4 pr-2 py-[0.6rem]   focus:outline-none focus:border-blue-700"
                 placeholder={"Search"}
               />
               <span className="absolute inset-y-0 right-6 sm:right-8 flex items-center pl-2">
-                <Search className="text-white " size={24} />
+                <Search
+                  className={`${darkMode ? "text-black" : "text-white"}`}
+                  size={24}
+                />
               </span>
             </div>
 
-            <div className=" relative microphone w-8  h-8 items-center flex justify-center rounded-full bg-neutral-700">
+            <div
+              className={`relative microphone w-8  h-8 items-center flex justify-center rounded-full   ${
+                darkMode
+                  ? "text-white border-0 bg-neutral-700"
+                  : "text-black border-2"
+              } `}
+            >
               <Mic />
             </div>
           </div>
           {authUser !== null && isAuthenticated ? (
-            <div className="relative user ml-1 flex justify-center gap-2 md:gap-4 items-center text-white">
+            <div
+              className="relative user ml-1 flex justify-center gap-2 md:gap-4 items-center"
+              style={darkMode ? darkTheme : lightTheme}
+            >
               <div className="justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600">
                 <Plus />
                 <span className=" flex text-xs md:font-medium">Create</span>
@@ -108,12 +126,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
               <div className="flex sm:hidden">
                 {" "}
-                <Search className="text-white ml-1 " size={24} />
+                <Search
+                  className=" ml-1 "
+                  style={darkMode ? darkTheme : lightTheme}
+                  size={24}
+                />
               </div>
               {isOpen && (
                 <div
                   ref={menuRef}
-                  className=" absolute right-[4vw]  top-0 w-64 bg-[#282828] text-white shadow-lg rounded-lg p-4 z-50"
+                  className=" absolute right-[4vw]  top-0 w-64 bg-[#282828] shadow-lg rounded-lg p-4 z-50"
+                  style={darkMode ? darkTheme : lightTheme}
                 >
                   {" "}
                   <div className="flex space-x-2 items-start justify-start">

@@ -67,9 +67,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
         top: "3rem",
         maxHeight: "calc(100vh - 4rem)",
       }}
-      className={`h-[90vh] hidden sm:flex  flex-col bg-[#16181b] text-white  ${
+      className={`h-[90vh] hidden sm:flex   flex-col bg-[#16181b] text-white  ${
         isCollapsed ? "w-20 " : "pl-2 pr-2 w-56"
-      } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  scrollbar-thin scrollbar-thumb-[#4a4a4a] scrollbar-track-[#16181b]`}
+      } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar`}
     >
       <div className="rounded-lg flex flex-col justify-center space-y-2 ">
         {sidebarItems.map(
