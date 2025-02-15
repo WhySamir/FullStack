@@ -9,6 +9,7 @@ interface User {
     createdAt: string;
     updatedAt: string;
     watchHistory: [];
+    __v: number;
   }
 interface AuthState {
     isAuthenticated: boolean;
@@ -42,6 +43,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.authUser = action.payload;
       },
+      
    
     },
   });

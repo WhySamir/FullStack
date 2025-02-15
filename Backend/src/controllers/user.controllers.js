@@ -5,6 +5,7 @@ import { uploadonCloudinary } from "../utlis/cloudinary.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -244,6 +245,55 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponds(200, req.user, "Current user fetched successfully"));
 });
+const checkSession = asyncHandler(async (req, res) => {
+  try {
+    // Step 1: Get the access token from cookies or Authorization header
+    const token =
+      req.cookies?.accessToken ||
+      req.header("Authorization")?.replace("Bearer ", "");
+
+    // Step 2: If no token, return unauthenticated
+    if (!token) {
+      return res.status(200).json({
+        success: false,
+        isAuthenticated: false,
+        message: "No session found",
+      });
+    }
+
+    // Step 3: Verify the access token
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    // Step 4: Fetch the user from the database
+    const user = await User.findById(decodedToken?._id).select(
+      "-password -refreshToken"
+    );
+
+    // Step 5: If user not found, return unauthenticated
+    if (!user) {
+      return res.status(200).json({
+        success: false,
+        isAuthenticated: false,
+        message: "User not found",
+      });
+    }
+
+    // Step 6: Session is valid, return user data
+    return res.status(200).json({
+      success: true,
+      isAuthenticated: true,
+      message: "Session is valid",
+      user, // Include user details
+    });
+  } catch (error) {
+    // Step 7: Handle token verification errors
+    return res.status(200).json({
+      success: false,
+      isAuthenticated: false,
+      message: "Invalid session",
+    });
+  }
+});
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { email, fullName } = req.body;
 
@@ -452,6 +502,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 export {
   registerUser,
   loginUser,
+  checkSession,
   logoutUser,
   refreshAcessToken,
   changeCurrentpassword,

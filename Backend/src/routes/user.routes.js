@@ -11,6 +11,7 @@ import {
   updateCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  checkSession,
 } from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -24,6 +25,7 @@ router.route("/register").post(
 );
 router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/check-session").get(checkSession);
 router.route("/refresh-token").post(refreshAcessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentpassword);
 router.route("/current-user").get(verifyJWT, getCurrentUser);

@@ -31,13 +31,15 @@ const Signin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     setErrorMessage("");
     e.preventDefault();
-    const data = await loginUser({ username, password }, setErrorMessage);
-    if (data) {
-      console.log("User logged in:", data);
-      dispatch(login(data));
-      navigate("/");
-    } else {
-      console.log("Login failed, not navigating");
+    try {
+      const data = await loginUser({ username, password }, setErrorMessage);
+      if (data) {
+        console.log("User logged in:", data);
+        dispatch(login(data));
+        navigate("/");
+      }
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message || "Login failed");
     }
   };
 
