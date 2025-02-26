@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../Api/authApi.ts";
+import { loginUser } from "../../Api/authApi.ts";
 
 import { useDispatch } from "react-redux";
-import { login } from "../Redux/auth.ts";
+import { login } from "../../Redux/auth.ts";
 
 const Signin = () => {
   const [username, setUsername] = useState("");
@@ -71,12 +71,16 @@ const Signin = () => {
             className="flex flex-col space-y-4"
           >
             <div className="flex flex-col">
-              <label htmlFor="username" className="text-sm mb-3 font-medium">
+              <label
+                htmlFor="emailorusername"
+                className="text-sm mb-3 font-medium"
+              >
                 Email or Username:
               </label>
               <input
                 type="text"
                 required
+                id="emailorusername"
                 name="emailorusername"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -85,10 +89,11 @@ const Signin = () => {
             </div>
 
             <div className="flex flex-col">
-              <label htmlFor="Password" className="mb-3 text-sm font-medium">
+              <label htmlFor="password" className="mb-3 text-sm font-medium">
                 Password:
               </label>
               <input
+                id="password"
                 type="password"
                 required
                 name="password"

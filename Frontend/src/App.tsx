@@ -2,19 +2,18 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "./Theme.ts";
-import { fetchCurrentUser, refreshAccessToken } from "./Api/authApi.ts";
 import "./index.css";
 //use skeleton instead of spinner and uselayout effect interceptors use axios than fetch
 // import { useDispatch } from "react-redux";
 //styled-components in some other project
-import { setUser, login } from "./Redux/auth.ts";
-import { setTheme, RootState2 } from "./Redux/darkmode.ts";
+import { setUser } from "./Redux/auth.ts";
+import { RootState2 } from "./Redux/darkmode.ts";
 
 import Header from "./Components/Header.tsx";
 import Maingrid from "./Components/Maingrid.tsx";
 import Sidebar2 from "./Components/Sidebar2.tsx";
-import Signin from "./Components/Signin.tsx";
-import Signup from "./Components/Signup.tsx";
+import Signin from "./Components/User/Signin.tsx";
+import Signup from "./Components/User/Signup.tsx";
 import { RootState } from "./Redux/auth.ts";
 import api from "./Api/axios.ts";
 function App() {
@@ -25,16 +24,11 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Step 1: Check if the user has a valid session
         const sessionResponse = await api.get("/users/check-session");
-        if (!sessionResponse.data.isAuthenticated) {
-          return; // No valid session, skip fetching user data
+        if (sessionResponse.data.isAuthenticated) {
+          dispatch(setUser(sessionResponse.data.user));
         }
-
-        // Step 2: Update Redux store with user data
-        dispatch(setUser(sessionResponse.data.user));
       } catch (error: any) {
-        // Handle errors silently if not logged in
         if (error.response?.status !== 401) {
           console.error("Auth check failed:", error);
         }

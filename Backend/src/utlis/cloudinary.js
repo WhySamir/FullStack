@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { response } from "express";
 import fs from "fs";
 
 // Configuration
@@ -15,6 +14,7 @@ const uploadonCloudinary = async (localfilepath) => {
     //return file on cloudinary
     const uploadResult = await cloudinary.uploader.upload(localfilepath, {
       resource_type: "auto",
+      chunk_size: 9000000,
     });
     fs.unlinkSync(localfilepath);
     console.log(uploadResult);

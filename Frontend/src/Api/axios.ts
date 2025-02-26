@@ -7,9 +7,10 @@ const api = axios.create({
   baseURL: "http://localhost:8000/api/v1", 
   withCredentials: true, 
 });
-
+//not understood properly
 api.interceptors.response.use(
   (response) => {
+    // console.log('Request Headers:', response.headers);
     return response;
   },
   async (error) => {

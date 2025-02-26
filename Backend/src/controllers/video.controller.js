@@ -13,39 +13,52 @@ import mongoose from "mongoose";
 //togglePublishStatus
 
 const publishaVideo = asyncHandler(async (req, res) => {
-  const { title, description, duration } = req.body;
-  if (!title || !description || !duration) {
-    throw new ApiError(400, "All feild are required");
-  }
-  const videoLocalPath = req.files?.videoFile[0]?.path;
-  const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
-  if (!videoLocalPath) {
-    throw new ApiError(400, "Please Upload videoFile ");
-  }
-  if (!thumbnailLocalPath) {
-    throw new ApiError(400, "Please Upload thumbnailfile ");
-  }
+  try {
+    const { title, description, duration } = req.body;
+    if (!title || !description || !duration) {
+      throw new ApiError(400, "All feild are required");
+    }
+    const videoLocalPath = req.files?.videoFile[0]?.path;
+    const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
+    if (!videoLocalPath) {
+      throw new ApiError(400, "Please Upload videoFile ");
+    }
+    if (!thumbnailLocalPath) {
+      throw new ApiError(400, "Please Upload thumbnailfile ");
+    }
+    console.log("Video File Path:", videoLocalPath);
+    console.log("Thumbnail Path:", thumbnailLocalPath);
+    console.log("Uploading to Cloudinary...");
+    const videoFile = await uploadonCloudinary(videoLocalPath);
+    const thumbnail = await uploadonCloudinary(thumbnailLocalPath);
+    if (!videoFile || !thumbnail) {
+      throw new ApiError(400, "File upload to Cloudinary failed.");
+    }
 
-  const videoFile = await uploadonCloudinary(videoLocalPath);
-  const thumbnail = await uploadonCloudinary(thumbnailLocalPath);
-  if (!videoFile || !thumbnail) {
-    throw new ApiError(400, "File upload to Cloudinary failed.");
+    const uploadVideo = new Video({
+      title: title,
+      thumbnail: thumbnail.url,
+      videoFile: videoFile.url,
+      description: description,
+      duration: duration,
+      isPublished: true,
+      owner: req.user._id,
+    });
+    const savedVideo = await uploadVideo.save();
+    console.log("Video saved successfully:", savedVideo);
+    return res
+      .status(200)
+      .json(new ApiResponds(200, uploadVideo, "Uploaded video sucessfully."));
+  } catch (error) {
+    console.error("publishaVideo error:", error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
   }
-
-  const uploadVideo = new Video({
-    title: title,
-    thumbnail: thumbnail.url,
-    videoFile: videoFile.url,
-    description: description,
-    duration: duration,
-    isPublished: true,
-    owner: req.user._id,
-  });
-  const savedVideo = await uploadVideo.save();
-  console.log("Video saved successfully:", savedVideo);
-  return res
-    .status(200)
-    .json(new ApiResponds(200, uploadVideo, "Uploaded video sucessfully."));
 });
 const getVideosbyid = asyncHandler(async (req, res) => {
   const { videoById } = req.params;

@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState } from "react";
-import Video from "./Video";
+import Video from "./VideoComponents/AllVideos";
 import { PlaySquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/auth";
+
+import { userAllvideo } from "../Api/videoApis";
 
 interface ObjItem {
   text: string;
@@ -28,25 +30,31 @@ const objectPlay: ObjItem[] = [
   { text: "Movies" },
   { text: "Movies" },
 ];
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  fullName: string;
-  avatar: string;
-  coverImage: string;
-  createdAt: string;
+interface VideoProps {
+  thumbnail: string;
+  title: string;
+  description: string;
+  duration: number;
+  videoFile: string;
+  isPublished: string;
+  views: number;
+  owner: string;
   updatedAt: string;
-  watchHistory: [];
+  createdAt: string;
+  _id: string;
 }
+
 interface MaingridProps {
   isCollapsed: boolean;
 }
 const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, authUser } = useSelector(
+    (state: RootState) => state.auth
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState<Boolean>(false);
   const [showRightArrow, setShowRightArrow] = useState<Boolean>(true);
+  const [userVideos, setUserVideos] = useState<VideoProps[]>([]);
   const checkScroll = () => {
     if (containerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
@@ -67,6 +75,17 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const getAllUserVideos = async () => {
+      if (authUser?._id) {
+        const response = await userAllvideo({ userId: authUser._id });
+        // console.log(response.data);
+        setUserVideos(response.data);
+      }
+    };
+    getAllUserVideos();
+  }, [isAuthenticated]);
 
   const scrollLeft = () => {
     if (containerRef.current) {
@@ -135,14 +154,16 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
             )}
           </div>
           <div className="mt-8 flex flex-col sm:grid grid-cols-12 gap-2  ">
-            {[...new Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="border border-amber-100 3xl:col-span-3 lg:col-span-4  md:col-span-6  col-span-12 "
-              >
-                <Video />
-              </div>
-            ))}
+            {userVideos?.length > 0
+              ? userVideos.map((video, i) => (
+                  <div
+                    key={video._id || i}
+                    className="border border-amber-100 2xl:col-span-3 lg:col-span-4  md:col-span-6  col-span-12 "
+                  >
+                    <Video video={video} />
+                  </div>
+                ))
+              : ""}
           </div>
         </>
       ) : (

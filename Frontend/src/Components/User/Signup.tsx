@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../Api/authApi.ts";
+import { registerUser } from "../../Api/authApi.ts";
 
 import { useDispatch } from "react-redux";
-import { register } from "../Redux/auth.ts";
+import { register } from "../../Redux/auth.ts";
 
 const Signin = () => {
   const [credentials, setcredentials] = useState({
@@ -90,9 +90,10 @@ const Signin = () => {
               type="text"
               required
               name="email"
+              id="email"
               value={credentials.email}
               onChange={onchange}
-              className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className=" w-full px-4 py-1 text-lg bg-white/20 autofill:bg-transparent backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex flex-col">
@@ -103,6 +104,7 @@ const Signin = () => {
               type="text"
               required
               name="username"
+              id="username"
               value={credentials.username}
               onChange={onchange}
               className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -115,7 +117,8 @@ const Signin = () => {
             <input
               type="text"
               required
-              name="fullName"
+              name="fullname"
+              id="fullname"
               value={credentials.fullName}
               onChange={onchange}
               className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -123,20 +126,21 @@ const Signin = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="Password" className="mb-1 text-sm font-medium">
+            <label htmlFor="password" className="mb-1 text-sm font-medium">
               Password:
             </label>
             <input
               type="password"
               required
               name="password"
+              id="password"
               value={credentials.password}
               onChange={onchange}
               className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex flex-col">
-            <label htmlFor="fullname" className="text-sm mb-1 font-medium">
+            <label htmlFor="avatar" className="text-sm mb-1 font-medium">
               Avatar:
             </label>
             <input
@@ -144,18 +148,20 @@ const Signin = () => {
               accept="image/*"
               required
               name="avatar"
+              id="avatar"
               onChange={onchange}
               className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex flex-col">
-            <label htmlFor="fullname" className="text-sm mb-1 font-medium">
+            <label htmlFor="coverImage" className="text-sm mb-1 font-medium">
               Cover Image:
             </label>
             <input
               type="file"
               accept="image/*"
               name="coverImage"
+              id="coverImage"
               //   value={credentials.coverImage}
               onChange={onchange}
               className=" w-full px-4 py-1 text-lg bg-white/20 backdrop-blur-md border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

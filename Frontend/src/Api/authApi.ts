@@ -21,7 +21,6 @@ export const loginUser = async (
   }
 };
 //register 
-// const userD  = { username:string; email;string,password:strings,fullName:string,avatar:File,coverImage:File}
 export const registerUser = async (
   userData: {
     username: string;
@@ -61,9 +60,6 @@ export const registerUser = async (
   }
 };
 
-
-
-
 //get current user
 export const fetchCurrentUser = async () => {
   try {
@@ -73,6 +69,7 @@ export const fetchCurrentUser = async () => {
     return null;
   }
 };
+
 //logout
 export const handleLogout = async () => {
   try {
@@ -83,6 +80,7 @@ export const handleLogout = async () => {
     throw error;
   }
 };
+
 export const refreshAccessToken = async () => {
   try {
     const response = await api.post("/users/refresh-token");

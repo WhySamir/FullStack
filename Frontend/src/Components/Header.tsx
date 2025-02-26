@@ -5,9 +5,20 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, RootState } from "../Redux/auth.ts";
 
-import { AlignJustify, Bell, Mic, Plus, Search, User } from "lucide-react";
+import {
+  AlignJustify,
+  Bell,
+  LifeBuoy,
+  Mic,
+  Pencil,
+  Plus,
+  Search,
+  Upload,
+  User,
+} from "lucide-react";
 import { RootState2 } from "../Redux/darkmode.ts";
 import { darkTheme, lightTheme } from "../Theme.ts";
+import UploadVideo from "./VideoComponents/UploadVideo.tsx";
 
 interface User {
   _id: string;
@@ -31,7 +42,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { darkMode } = useSelector((state: RootState2) => state.theme);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
+  const [uploadPopup, setUploadPopup] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef2 = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -39,12 +53,26 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
+      if (
+        menuRef2.current &&
+        !menuRef2.current.contains(event.target as Node)
+      ) {
+        setIsOpen2(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  const handleCreateClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Stop event propagation
+    setIsOpen2((prev) => !prev);
+  };
+  const handleAvatarClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Stop event propagation
+    setIsOpen((prev) => !prev);
+  };
 
   const handlelogout = async () => {
     await handleLogout();
@@ -108,20 +136,110 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
               className="relative user ml-1 flex justify-center gap-2 md:gap-4 items-center"
               style={darkMode ? darkTheme : lightTheme}
             >
-              <div className="justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600">
-                <Plus />
-                <span className=" flex text-xs md:font-medium">Create</span>
+              <div className="relative " ref={menuRef2}>
+                <div
+                  onClick={handleCreateClick}
+                  className="cursor-pointer justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600"
+                >
+                  <Plus />
+                  <span className=" flex text-white/90 text-xs md:font-medium">
+                    Create
+                  </span>
+                </div>
+                {isOpen2 && (
+                  <div
+                    className=" absolute cursor-pointer -right-[4vw]  top-[6.2vh] w-[11rem] shadow-lg rounded-lg  bg-[#282828]  z-50"
+                    // style={darkMode ? darkTheme : lightTheme}
+                  >
+                    {" "}
+                    <ul className="cursor-pointer hidden sm:flex flex-col  space-y-3 py-2">
+                      <li
+                        onClick={() => setUploadPopup(!uploadPopup)}
+                        className="mt-1 py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded"
+                      >
+                        <Upload />
+                        <span> Upload video</span>
+                      </li>
+                      <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
+                        <LifeBuoy />
+                        <span>Go live</span>
+                      </li>
+                      <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
+                        <Pencil />
+                        <span className="cursor-pointer"> Create Post </span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
               <Bell />
-              <div
-                onClick={() => setIsOpen(!isOpen)}
-                className="md:ml-3 relative microphone  w-9 h-9 items-center hidden sm:flex justify-center rounded-full bg-neutral-700"
-              >
-                <img
-                  className="rounded-full object-cover w-full h-full"
-                  src={`${authUser?.avatar}`}
-                  alt=""
-                />
+              <div className="relative" ref={menuRef}>
+                <div
+                  onClick={handleAvatarClick}
+                  className="md:ml-3 relative microphone  w-9 h-9 items-center hidden sm:flex justify-center rounded-full bg-neutral-700"
+                >
+                  <img
+                    className="rounded-full object-cover w-full h-full"
+                    src={authUser?.avatar}
+                    alt=""
+                  />
+                </div>
+                {isOpen && (
+                  <div
+                    className=" absolute cursor-pointer right-[4vw]  top-0 w-64 bg-[#282828] shadow-lg rounded-lg p-4 z-50"
+                    // style={darkMode ? darkTheme : lightTheme}
+                  >
+                    {" "}
+                    <div className="flex space-x-2 items-start justify-start">
+                      <div className=" relative  mt-1 w-12 h-12 items-center justify-center rounded-full ">
+                        <img
+                          className="rounded-full object-cover w-full h-full"
+                          src={`${authUser.avatar}`}
+                          alt=""
+                        />
+                      </div>
+                      <div className="cursor-pointer tracking-[-0.02em]">
+                        <p className=" leading-tight font-semibold capitalize text-white/90">
+                          {authUser.fullName}
+                        </p>
+                        <p className="  text-sm  text-white/90">
+                          @{authUser.username}
+                        </p>
+                        <p className="text-sm leading-[3] text-blue-400">
+                          View your channel
+                        </p>
+                      </div>
+                    </div>
+                    <hr className="my-2 border-gray-600" />
+                    <ul className="cursor-pointer text-white/90">
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        Google Account
+                      </li>
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        Switch Account
+                      </li>
+                      <li
+                        onClick={handlelogout}
+                        className="py-1 hover:bg-neutral-600 px-2 rounded"
+                      >
+                        Sign Out
+                      </li>
+                      <hr className="my-2 border-neutral-600" />
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        YouTube Studio
+                      </li>
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        Purchases and Memberships
+                      </li>
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        Your Data in YouTube
+                      </li>
+                      <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                        Settings
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <div className="flex sm:hidden">
@@ -132,63 +250,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   size={24}
                 />
               </div>
-              {isOpen && (
-                <div
-                  ref={menuRef}
-                  className=" absolute right-[4vw]  top-0 w-64 bg-[#282828] shadow-lg rounded-lg p-4 z-50"
-                  style={darkMode ? darkTheme : lightTheme}
-                >
-                  {" "}
-                  <div className="flex space-x-2 items-start justify-start">
-                    <div className=" relative  mt-1 w-12 h-12 items-center justify-center rounded-full ">
-                      <img
-                        className="rounded-full object-cover w-full h-full"
-                        src={`${authUser.avatar}`}
-                        alt=""
-                      />
-                    </div>
-                    <div className="cursor-pointer tracking-[-0.02em]">
-                      <p className=" leading-tight font-semibold capitalize text-white/90">
-                        {authUser.fullName}
-                      </p>
-                      <p className="  text-sm  text-white/90">
-                        @{authUser.username}
-                      </p>
-                      <p className="text-sm leading-[3] text-blue-400">
-                        View your channel
-                      </p>
-                    </div>
-                  </div>
-                  <hr className="my-2 border-gray-600" />
-                  <ul className="cursor-pointer">
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      Google Account
-                    </li>
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      Switch Account
-                    </li>
-                    <li
-                      onClick={handlelogout}
-                      className="py-1 hover:bg-gray-600 px-2 rounded"
-                    >
-                      Sign Out
-                    </li>
-                    <hr className="my-2 border-gray-600" />
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      YouTube Studio
-                    </li>
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      Purchases and Memberships
-                    </li>
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      Your Data in YouTube
-                    </li>
-                    <li className="py-1 hover:bg-gray-600 px-2 rounded">
-                      Settings
-                    </li>
-                  </ul>
-                </div>
-              )}
             </div>
           ) : (
             <Link
@@ -205,6 +266,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           )}
         </div>
       </nav>
+      {uploadPopup && <UploadVideo setUploadPopup={setUploadPopup} />}
     </>
   );
 };

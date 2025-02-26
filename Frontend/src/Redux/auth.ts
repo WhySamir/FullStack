@@ -8,7 +8,7 @@ interface User {
     coverImage: string;
     createdAt: string;
     updatedAt: string;
-    watchHistory: [];
+    watchHistory: any[];
     __v: number;
   }
 interface AuthState {
