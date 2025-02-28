@@ -86,7 +86,7 @@ const Details: React.FC<setUploadPopupprops> = ({
       <div className="relative mb-3 mx-[3vw]">
         <h1 className="md:text-2xl font-bold text-white">Details</h1>
       </div>
-      <div className="relative  grid grid-cols-8 mx-[3vw] gap-4 lg:gap-8 items-start overflow-scroll h-[46vh]">
+      <div className="relative  grid grid-cols-8 mx-[3vw] gap-4 lg:gap-8 items-start overflow-y-scroll h-[46vh]">
         <div
           ref={containerRef}
           className="videoRightCol col-span-4 order-2 sm:col-span-3 sticky top-0 "

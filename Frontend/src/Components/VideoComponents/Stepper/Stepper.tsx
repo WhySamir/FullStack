@@ -10,6 +10,7 @@ interface Step {
   highlighted: boolean;
   selected: boolean;
 }
+
 interface setUploadPopupprops {
   videoURL: string | null;
   video: File;
@@ -21,12 +22,24 @@ const Stepper: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
   const [newStep, setNewStep] = useState<Step[]>([]);
   const stepRef = useRef<Step[]>([]);
 
+  if (video) {
+    const url = URL.createObjectURL(video);
+    const videoElement = document.createElement("video");
+    videoElement.src = url;
+    videoElement.preload = "metadata";
+
+    videoElement.onloadedmetadata = () => {
+      const duration = videoElement.duration;
+      setVideoAttributes((prev) => ({ ...prev, duration }));
+    };
+  }
+
   const [videoAttributes, setVideoAttributes] = useState({
     title: video?.name || "",
     description: "",
     thumbnail: null,
     videoFile: video,
-    duration: 50,
+    duration: 0,
     isPublished: false,
   });
   const submit = async () => {

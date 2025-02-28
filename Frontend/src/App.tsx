@@ -3,24 +3,26 @@ import { Routes, Route } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "./Theme.ts";
 import "./index.css";
-//use skeleton instead of spinner and uselayout effect interceptors use axios than fetch
-// import { useDispatch } from "react-redux";
-//styled-components in some other project
+
 import { setUser } from "./Redux/auth.ts";
-import { RootState2 } from "./Redux/darkmode.ts";
+import { RootState } from "./Redux/store.ts";
 
 import Header from "./Components/Header.tsx";
 import Maingrid from "./Components/Maingrid.tsx";
-import Sidebar2 from "./Components/Sidebar2.tsx";
+import Sidebar from "./Components/Sidebar.tsx";
 import Signin from "./Components/User/Signin.tsx";
 import Signup from "./Components/User/Signup.tsx";
-import { RootState } from "./Redux/auth.ts";
 import api from "./Api/axios.ts";
+import WatchVideo from "./Components/WatchVideo.tsx";
+
 function App() {
   const dispatch = useDispatch();
-  const { darkMode } = useSelector((state: RootState2) => state.theme);
+  const { darkMode } = useSelector((state: RootState) => state.theme);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { vidId } = useSelector((state: RootState) => state.vid);
+
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -34,17 +36,17 @@ function App() {
         }
       }
     };
-
     checkAuth();
   }, [isAuthenticated, dispatch]);
+
   useEffect(() => {
     const theme = darkMode ? darkTheme : lightTheme;
     for (const [key, value] of Object.entries(theme)) {
       document.body.style[key as keyof typeof theme] = value;
     }
   }, [darkMode]);
-
   // dispatch(setTheme());
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -54,9 +56,9 @@ function App() {
       <div className="flex flex-col px-1 sm:pr-4 md:pr-8 w-full h-[100vh]">
         <Header toggleSidebar={toggleSidebar} />
 
-        <div className="relative flex   gap-0.5">
-          <Sidebar2 isCollapsed={isCollapsed} />
-          <div className="relative    w-full px-4 mt-3  ">
+        <div className=" flex   gap-0.5">
+          <Sidebar isCollapsed={isCollapsed} />
+          <div className="w-full px-4 mt-3  ">
             <Routes>
               <Route
                 path="/"
@@ -65,6 +67,7 @@ function App() {
 
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path={`/watch/${vidId}`} element={<WatchVideo />} />
             </Routes>
           </div>
         </div>

@@ -1,89 +1,135 @@
-import { AlignJustify } from "lucide-react";
+import React, { memo } from "react";
+import {
+  Home,
+  Clapperboard,
+  History,
+  PlaySquare,
+  Clock,
+  ThumbsUp,
+  Flame,
+  Music,
+  Gamepad2,
+  Trophy,
+  Settings,
+  HelpCircle,
+  User,
+  Compass,
+  Youtube,
+  ListVideo,
+} from "lucide-react";
 
-const Sidebar = () => {
-  return (
-    <div className="flex flex-col w-full my-[18px]">
-      <div className="items-center flex gap-4 ">
-        <AlignJustify />
-        <div className="relative inline-block group">
-          <div className="flex flex-shrink-0 items-center">
-            <img src="./MIcon.svg" alt="Logo" className="h-full w-full" />
-          </div>
-          <div className="absolute top-0 right-[-1.2rem] text-white text-[8px] sm:text-[.6em] opacity-80 px-1 rounded-sm">
-            NP
-          </div>
-        </div>
+interface SidebarItem {
+  icon: JSX.Element;
+  text: string;
+}
+
+interface SidebarProps {
+  isCollapsed: boolean;
+}
+
+const sidebarItems: SidebarItem[] = [
+  { icon: <Home />, text: "Home" },
+  { icon: <Clapperboard />, text: "Shorts" },
+  { icon: <Compass />, text: "Explore" },
+  { icon: <Youtube />, text: "Subscriptions" },
+  { icon: <ListVideo />, text: "All Subscriptions" },
+  { icon: <History />, text: "History" },
+  { icon: <PlaySquare />, text: "Playlist" },
+  { icon: <Clock />, text: "Watch Later" },
+  { icon: <ThumbsUp />, text: "Liked Videos" },
+  { icon: <Flame />, text: "Trending" },
+  { icon: <Music />, text: "Music" },
+  { icon: <Gamepad2 />, text: "Gaming" },
+  { icon: <Trophy />, text: "Sports" },
+  { icon: <Settings />, text: "Settings" },
+  { icon: <HelpCircle />, text: "Help" },
+];
+
+const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
+  ({ item }) => (
+    <div
+      className={` flex items-center py-2  hover:bg-neutral-800 rounded-lg cursor-pointer transition-all duration-300 justify-center" 
+        `}
+    >
+      <div className={` pl-4 flex items-center space-x-6`}>
+        <span className="w-6 h-6">{item.icon}</span>
+        <span className="w-32">{item.text}</span>
       </div>
-      <div
-        className={` transform transition-transform duration-500 ease-in-out w-64  hidden sm:flex flex-shrink-0   overflow-y-auto h-full p-2   flex-col space-y-4`}
-        style={{
-          position: "sticky",
-          top: "7rem",
-          maxHeight: "calc(100vh - 8rem)",
-        }}
-      >
-        <div className="mb-4">
-          <p className="text-white mb-2">Home</p>
-          <p className="text-white mb-2">Shorts</p>
-          <p className="text-white mb-2">Subscriptions</p>
-        </div>
-        {/* Divider */}
-        <hr className="mb-4" />
+    </div>
+  )
+);
 
-        {/* You Section */}
-        <div className="mb-4">
-          <button className="w-full text-left text-white flex justify-between items-center">
-            You {">"}
-          </button>
-
-          <div className="pt-2">
-            <p>History</p>
-            <p>Playlist</p>
-            <p>Your Videos</p>
-            <p>Watch Later</p>
-            <p>Liked Videos</p>
-          </div>
-        </div>
-        <hr />
-
-        <div className="mb-4">
-          <h1>Subscriptions</h1>
-          <button className="w-full text-left text-white flex justify-between items-center">
-            All Subscriptions
-          </button>
-
-          {/* )} */}
-        </div>
-        <hr />
-
-        <div className="mb-4 text-white">
-          <h1>Explore</h1>
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Trending
-          </button>
-
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Music
-          </button>
-
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Gaming
-          </button>
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Sports
-          </button>
-        </div>
-        <hr />
-
-        <div className="mb-4">
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Settings
-          </button>
-          <button className="w-full text-left text-white flex justify-between items-center">
-            Help
-          </button>
-        </div>
-        <hr />
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
+  return (
+    <div
+      style={{
+        position: "sticky",
+        top: "3rem",
+        maxHeight: "calc(100vh - 4rem)",
+      }}
+      className={`h-[90vh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
+        isCollapsed ? "w-20 " : "pl-2 pr-2 w-56"
+      } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar`}
+    >
+      <div className="rounded-lg flex flex-col justify-center space-y-2 ">
+        {sidebarItems.map(
+          (item, index) =>
+            !isCollapsed && (
+              <SidebarItem key={index} item={item} isCollapsed={isCollapsed} />
+            )
+        )}
+        {isCollapsed && (
+          <>
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "justify-between"
+              } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <span className="w-6 h-6">
+                  <Home />
+                </span>
+                <span className="text-xs">Home</span>
+              </div>
+            </div>
+            <div
+              className={` flex items-center ${
+                isCollapsed ? "justify-center" : "justify-between"
+              } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <span className="w-6 h-6">
+                  <Clapperboard />
+                </span>
+                <span className="text-xs">Shorts</span>
+              </div>
+            </div>
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "justify-between"
+              } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <span className="w-6 h-6">
+                  <PlaySquare />
+                </span>
+                <span className="text-xs">Subscriptions</span>
+              </div>
+            </div>
+            <div
+              className={`flex items-center ${
+                isCollapsed ? "justify-center" : "justify-between"
+              } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <span className="w-6 h-6">
+                  <User />
+                </span>
+                <span className="text-xs">You</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

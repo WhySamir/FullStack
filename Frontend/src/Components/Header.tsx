@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { logout, RootState } from "../Redux/auth.ts";
-
+import { logout } from "../Redux/auth.ts";
+import { RootState } from "../Redux/store.ts";
 import {
   AlignJustify,
   Bell,
@@ -16,9 +16,8 @@ import {
   Upload,
   User,
 } from "lucide-react";
-import { RootState2 } from "../Redux/darkmode.ts";
 import { darkTheme, lightTheme } from "../Theme.ts";
-import UploadVideo from "./VideoComponents/UploadVideo.tsx";
+import UploadVideo from "./VideoComponents/UploadModal.tsx";
 
 interface User {
   _id: string;
@@ -39,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { isAuthenticated, authUser } = useSelector(
     (state: RootState) => state.auth
   );
-  const { darkMode } = useSelector((state: RootState2) => state.theme);
+  const { darkMode } = useSelector((state: RootState) => state.theme);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
@@ -90,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             </button>
 
             <div className="relative inline-block group sm:my-[18px] sm:mx-4">
-              <div className="flex flex-shrink-0 items-center ">
+              <div className="flex flex-shrink-0 items-center caret-transparent ">
                 <img
                   src="./MIcon.svg"
                   alt="YouTube"
@@ -133,10 +132,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           </div>
           {authUser !== null && isAuthenticated ? (
             <div
-              className="relative user ml-1 flex justify-center gap-2 md:gap-4 items-center"
+              className="relative user ml-1 flex justify-center gap-2 md:gap-4 caret-transparent items-center"
               style={darkMode ? darkTheme : lightTheme}
             >
-              <div className="relative " ref={menuRef2}>
+              <div className="relative  " ref={menuRef2}>
                 <div
                   onClick={handleCreateClick}
                   className="cursor-pointer justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600"

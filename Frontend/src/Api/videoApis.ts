@@ -47,7 +47,7 @@ export const postVideo = async(videoData:{
 
 export const userAllvideo = async({ userId }:{userId:string})=>{
     try {
-    const response = await api.get(`/videos/getallvideos?page=1&limit=5&query=${userId}&sortBy=title&sortType=asc`,{
+    const response = await api.get(`/videos/getallvideos?page=1&limit=60&query=${userId}&sortBy=title&sortType=asc`,{
        headers:{ 'Content-Type':'application/json'}
     })
       if(response.data){

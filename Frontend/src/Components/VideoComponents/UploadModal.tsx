@@ -6,17 +6,19 @@ interface setUploadPopupprops {
   setUploadPopup: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const UploadVideo: React.FC<setUploadPopupprops> = ({ setUploadPopup }) => {
+const UploadModal: React.FC<setUploadPopupprops> = ({ setUploadPopup }) => {
   const [video, setVideo] = useState<File | null>(null);
   const [videoURL, setVideoURL] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]; // Get the selected file
+    const file = event.target.files?.[0];
     if (file) {
       setVideo(file);
-      setVideoURL(URL.createObjectURL(file)); // Create preview URL
+      const url = URL.createObjectURL(file);
+      setVideoURL(url);
     }
   };
+
   return (
     <>
       {" "}
@@ -83,4 +85,4 @@ const UploadVideo: React.FC<setUploadPopupprops> = ({ setUploadPopup }) => {
   );
 };
 
-export default UploadVideo;
+export default UploadModal;

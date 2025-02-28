@@ -20,9 +20,7 @@ interface AuthState {
     isAuthenticated: false,
     authUser: null,
   };
-  interface RootState {
-    auth: AuthState;
-  }
+ 
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -49,4 +47,4 @@ const authSlice = createSlice({
   });
   export const { login, logout,setUser,register } = authSlice.actions;
   export default authSlice.reducer;
-  export type { RootState };
+  
