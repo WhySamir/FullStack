@@ -91,8 +91,8 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <div className="relative inline-block group sm:my-[18px] sm:mx-4">
               <div className="flex flex-shrink-0 items-center caret-transparent ">
                 <img
-                  src="./MIcon.svg"
-                  alt="YouTube"
+                  src="/MIcon.svg"
+                  alt="WatchFree"
                   className="h-full w-full"
                 />
               </div>

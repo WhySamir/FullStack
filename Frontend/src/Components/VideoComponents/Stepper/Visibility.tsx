@@ -8,9 +8,13 @@ interface setUploadPopupprops {
 
 const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef2 = useRef<HTMLDivElement | null>(null);
   const optareaRef = useRef<HTMLDivElement | null>(null);
   const [containerHeight, setContainerHeight] = useState<number>(180);
   const [selectedOption, setSelectedOption] = useState<string>("");
+  const descAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [descHeight, setDescHeight] = useState<number>(180);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const updateHeight = () => {
@@ -25,14 +29,38 @@ const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
 
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
+  useEffect(() => {
+    const updateHeight = () => {
+      if (containerRef2.current) {
+        const height2 = containerRef2.current.clientHeight;
+        setDescHeight(height2 * 0.6);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight); // Update on resize
+
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+  useEffect(() => {
+    const adjustTitleHeight = () => {
+      if (descAreaRef.current) {
+        descAreaRef.current.style.height = "auto";
+        const newHeight = Math.max(
+          descHeight,
+          descAreaRef.current.scrollHeight
+        );
+        descAreaRef.current.style.height = `${newHeight}px`;
+      }
+    };
+
+    adjustTitleHeight();
+  }, [description, descHeight]);
 
   return (
     <>
-      <div className="relative mb-4 mx-[3vw]">
-        <h1 className="md:text-2xl font-bold text-white">Visibility</h1>
-        <p className="text-xs sm:text-sm">
-          Choose when to publish and who can see your video
-        </p>
+      <div className="relative  mx-[3vw]">
+        <h1 className="mb-1 md:text-2xl font-bold text-white">Visibility</h1>
       </div>
       <div className="relative grid grid-cols-8 mx-[3vw] gap-4 lg:gap-8 items-start overflow-y-scroll  h-[46vh]">
         <div
@@ -125,18 +153,20 @@ const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
             </div>
           </div>
 
-          <div className="mb-4 relative">
+          <div className="mb-4 relative" ref={containerRef2}>
             <textarea
+              ref={descAreaRef}
+              value={description}
               className="w-full px-2  resize-none pt-9  text-white/90 border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none "
               placeholder=" Tell Viewers about your video."
-              // onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               maxLength={5000}
-              // style={{
-              //   height: `${Math.max(
-              //     150,
-              //     description.split("\n").length * 30
-              //   )}px`,
-              // }}
+              style={{
+                height: `${Math.max(
+                  150,
+                  description.split("\n").length * 30
+                )}px`,
+              }}
             />
 
             <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">

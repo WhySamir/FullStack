@@ -62,7 +62,7 @@ const Signin = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="relative flex items-center justify-center min-h-[90vh] ">
+    <div className=" relative flex items-center justify-center min-h-[90vh] ">
       {/* Glassmorphism Container backdrop-blur-lg */}
       <div
         ref={menuRef}

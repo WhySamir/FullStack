@@ -19,8 +19,6 @@ function App() {
   const dispatch = useDispatch();
   const { darkMode } = useSelector((state: RootState) => state.theme);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { vidId } = useSelector((state: RootState) => state.vid);
-
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   useEffect(() => {
@@ -56,7 +54,7 @@ function App() {
       <div className="flex flex-col px-1 sm:pr-4 md:pr-8 w-full h-[100vh]">
         <Header toggleSidebar={toggleSidebar} />
 
-        <div className=" flex   gap-0.5">
+        <div className="relative flex   gap-0.5">
           <Sidebar isCollapsed={isCollapsed} />
           <div className="w-full px-4 mt-3  ">
             <Routes>
@@ -67,7 +65,7 @@ function App() {
 
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path={`/watch/${vidId}`} element={<WatchVideo />} />
+              <Route path="/watch/:vidId" element={<WatchVideo />} />
             </Routes>
           </div>
         </div>

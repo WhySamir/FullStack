@@ -17,6 +17,7 @@ import {
   Youtube,
   ListVideo,
 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface SidebarItem {
   icon: JSX.Element;
@@ -60,26 +61,29 @@ const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
 );
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
+  const location = useLocation();
+  const isWatchPage = location.pathname.startsWith("/watch/");
   return (
     <div
       style={{
-        position: "sticky",
-        top: "3rem",
+        position: isWatchPage ? "absolute" : "sticky",
+        top: "0rem",
         maxHeight: "calc(100vh - 4rem)",
+        zIndex: isWatchPage ? 50 : "auto",
       }}
       className={`h-[90vh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
-        isCollapsed ? "w-20 " : "pl-2 pr-2 w-56"
+        isCollapsed ? (isWatchPage ? " h-full" : "w-20 ") : "pl-2 pr-2 w-56"
       } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar`}
     >
       <div className="rounded-lg flex flex-col justify-center space-y-2 ">
-        {sidebarItems.map(
-          (item, index) =>
-            !isCollapsed && (
-              <SidebarItem key={index} item={item} isCollapsed={isCollapsed} />
-            )
-        )}
-        {isCollapsed && (
-          <>
+        {!isCollapsed &&
+          sidebarItems.map((item, index) => (
+            <SidebarItem key={index} item={item} isCollapsed={isCollapsed} />
+          ))}
+      </div>
+      {!isWatchPage && isCollapsed && (
+        <>
+          <div className="rounded-lg flex flex-col justify-center space-y-2 ">
             <div
               className={`flex items-center ${
                 isCollapsed ? "justify-center" : "justify-between"
@@ -128,9 +132,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 <span className="text-xs">You</span>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

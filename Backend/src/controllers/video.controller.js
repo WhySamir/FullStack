@@ -51,20 +51,21 @@ const publishaVideo = asyncHandler(async (req, res) => {
       .json(new ApiResponds(200, uploadVideo, "Uploaded video sucessfully."));
   } catch (error) {
     console.error("publishaVideo error:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 });
 const getVideosbyid = asyncHandler(async (req, res) => {
   const { videoById } = req.params;
 
   try {
-    const video = await Video.findById(videoById);
+    const video = await Video.findById(videoById).populate(
+      "owner",
+      "username avatar"
+    );
     return res.status(200).json(new ApiResponds(200, video, "Got Video"));
   } catch (error) {
     throw new ApiError(400, "No videoes found || Invalid Video Id");
@@ -223,6 +224,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     // Fetch videos from the database with filters, pagination, and sorting
     const videos = await Video.find(filter)
+      .populate("owner", "username avatar")
       .sort(sort) // Apply sorting
       .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
       .limit(limitNumber); // Limit the number of documents

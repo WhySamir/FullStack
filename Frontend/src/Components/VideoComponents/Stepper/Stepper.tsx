@@ -125,7 +125,7 @@ const Stepper: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
         {currentStep === 2 && <Checks />}
         {currentStep === 3 && <Visibility video={video} videoURL={videoURL} />}
       </div>
-      <div className="flex mt-1 px-3 sm:px-6 justify-end w-full gap-4 mb-4">
+      <div className="flex mt-3 lg:mt-0 px-3 sm:px-6 justify-end w-full gap-4 mb-2">
         <button
           onClick={prevStep}
           disabled={currentStep === 0}

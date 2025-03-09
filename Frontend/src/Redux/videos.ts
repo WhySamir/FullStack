@@ -7,7 +7,11 @@ interface Video {
     videoFile: string;
     isPublished: boolean;
     views: number|null;
-    owner: string;
+    owner: {
+      _id: string;
+      username: string;
+      avatar: string;
+  };
     updatedAt: string;
     createdAt: string;
     _id: string;

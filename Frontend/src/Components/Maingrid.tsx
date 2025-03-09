@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-import { userAllvideo } from "../Api/videoApis";
+import { getallvideos } from "../Api/videoApis";
 import { upload } from "../Redux/videos";
 
 interface ObjItem {
@@ -72,7 +72,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
     const getAllUserVideos = async () => {
       if (authUser?._id) {
         try {
-          const response = await userAllvideo({ userId: authUser._id });
+          const response = await getallvideos();
           console.log(response.data);
           dispatch(upload(response.data));
         } catch (error) {

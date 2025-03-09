@@ -44,7 +44,7 @@ export const postVideo = async(videoData:{
     return null
    }
 }
-
+   // const response = await userAllvideo({ userId: authUser._id });
 export const userAllvideo = async({ userId }:{userId:string})=>{
     try {
     const response = await api.get(`/videos/getallvideos?page=1&limit=60&query=${userId}&sortBy=title&sortType=asc`,{
@@ -61,6 +61,35 @@ export const userAllvideo = async({ userId }:{userId:string})=>{
       
   } catch (error:any) {
     console.error("Error getting data",error)
+    return null
+  }
+}
+export const getallvideos = async()=>{
+    try {
+    const response = await api.get(`/videos/getallvideos?page=1&limit=60&sortBy=title&sortType=asc`,{
+       headers:{ 'Content-Type':'application/json'}
+    })
+      if(response.data){
+        //   console.log('Got user All videos successfully',response.data.data)
+          return response.data;
+      }
+      else{
+          console.log('Falied getting user data')
+          return null
+      }
+      
+  } catch (error:any) {
+    console.error("Error getting data",error)
+    return null
+  }
+}
+
+export const getVidById = async({vidId}:{vidId:string})=>{
+  try {
+      const response = await api.get(`/videos/vid-id/${vidId}`)
+      return response.data
+  } catch (error) {
+    console.error("Error not found vid Id",error)
     return null
   }
 }

@@ -10,7 +10,7 @@ const VideoStepp = () => {
           </p>
         </div>
 
-        <div className="flex   items-end w-full  space-x-2 sm:space-x-0 justify-between  bg-[#1F1F1F]/50 rounded-lg  py-2 sm:py-4 ">
+        <div className="flex   items-end w-full  space-x-2 sm:space-x-0 justify-between  bg-[#1F1F1F]/50 rounded-lg  py-2 md:py-3 ">
           <div className="icon items-center flex md:space-x-8 space-x-4">
             <div> &copy;</div>
             <div className="text flex flex-col   text-white">
@@ -25,7 +25,7 @@ const VideoStepp = () => {
             <p className="text-sm">Add</p>
           </button>
         </div>
-        <div className="flex   items-end w-full  space-x-2 sm:space-x-0 justify-between bg-[#1F1F1F]/50 rounded-lg py-2 sm:py-4 ">
+        <div className="flex   items-end w-full  space-x-2 sm:space-x-0 justify-between bg-[#1F1F1F]/50 rounded-lg py-2 md:py-3 ">
           <div className="icon items-center flex md:space-x-8 space-x-4">
             <div> &copy;</div>
             <div className="text flex flex-col   text-white">
@@ -40,7 +40,7 @@ const VideoStepp = () => {
             <p className="text-sm">Add</p>
           </button>
         </div>
-        <div className="flex   items-end w-full space-x-2 sm:space-x-0 justify-between bg-[#1F1F1F]/50 rounded-lg py-2 sm:py-4 ">
+        <div className="flex   items-end w-full space-x-2 sm:space-x-0 justify-between bg-[#1F1F1F]/50 rounded-lg py-2 md:py-3 ">
           <div className="icon items-center flex md:space-x-8 space-x-4">
             <div> &copy;</div>
             <div className="text flex flex-col   text-white">

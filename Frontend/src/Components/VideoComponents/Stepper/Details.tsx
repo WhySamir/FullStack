@@ -66,6 +66,8 @@ const Details: React.FC<setUploadPopupprops> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [titleHeight, setTitleHeight] = useState<number>(30);
   const [descHeight, setDescHeight] = useState<number>(180);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const titleTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -80,6 +82,36 @@ const Details: React.FC<setUploadPopupprops> = ({
     window.addEventListener("resize", updateHeight); // Update on resize
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
+
+  useEffect(() => {
+    const adjustTitleHeight = () => {
+      if (titleTextareaRef.current) {
+        titleTextareaRef.current.style.height = "auto";
+        const newHeight = Math.max(
+          titleHeight,
+          titleTextareaRef.current.scrollHeight
+        );
+        titleTextareaRef.current.style.height = `${newHeight}px`;
+      }
+    };
+
+    adjustTitleHeight();
+  }, [videoAttributes.title, titleHeight]);
+
+  useEffect(() => {
+    const adjustTextareaHeight = () => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+        const newHeight = Math.max(
+          descHeight,
+          textareaRef.current.scrollHeight
+        );
+        textareaRef.current.style.height = `${newHeight}px`;
+      }
+    };
+
+    adjustTextareaHeight();
+  }, [videoAttributes.description, descHeight]);
 
   return (
     <>
@@ -126,23 +158,18 @@ const Details: React.FC<setUploadPopupprops> = ({
         <div className="relative  col-span-4 sm:col-span-5 flex flex-col space-y-4 h-full">
           <div className="mb-4 relative">
             <textarea
+              ref={titleTextareaRef}
               className="w-full  px-2 resize-none  leading-4 sm:pt-6 text-white/90 text-sm font-semibold border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none"
               value={videoAttributes.title}
               onChange={(e) => handleChange("title", e.target.value)}
               maxLength={100}
-              style={{
-                height: `${Math.max(
-                  Number(titleHeight),
-                  videoAttributes.title.split("\n").length * 30
-                )}px`,
-              }}
             />
 
             <div className="absolute top-3  left-3 hidden sm:block  text-sm leading-1.5 font-medium sm:text-white pointer-events-none">
               Title (required)
             </div>
           </div>
-          <div className="mb-4 relative">
+          {/* <div className="mb-4 relative">
             <textarea
               className="w-full px-2 resize-none pt-9 text-white/90 border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none"
               value={videoAttributes.description}
@@ -160,8 +187,20 @@ const Details: React.FC<setUploadPopupprops> = ({
             <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">
               Description (&copy;)
             </div>
+          </div> */}
+          <div className="mb-4 relative">
+            <textarea
+              ref={textareaRef}
+              className="w-full px-2 resize-none pt-9 text-white/90 border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none"
+              value={videoAttributes.description}
+              placeholder="Tell Viewers about your video."
+              onChange={(e) => handleChange("description", e.target.value)}
+              maxLength={5000}
+            />
+            <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">
+              Description (&copy;)
+            </div>
           </div>
-
           <div className="ThumbnailSection flex flex-col text-white/90 space-y-3">
             Thumbnail
             <p className="text-sm">

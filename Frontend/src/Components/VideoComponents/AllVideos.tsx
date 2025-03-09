@@ -1,5 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../Redux/store";
+import { useDispatch } from "react-redux";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { selectVid } from "../../Redux/videos";
@@ -7,7 +6,6 @@ import { selectVid } from "../../Redux/videos";
 const Video: React.FC<any> = ({ video }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { authUser } = useSelector((state: RootState) => state.auth);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<number | null>(null);
@@ -76,7 +74,7 @@ const Video: React.FC<any> = ({ video }) => {
         <div className="flex  gap-x-3 items-start w-full">
           <div className="h-9 w-9  sm:h-11 sm:w-11 rounded-full overflow-hidden flex-shrink-0">
             <img
-              src={authUser?.avatar}
+              src={video.owner?.avatar}
               className="object-cover w-full h-full "
               alt=""
             />
@@ -85,7 +83,7 @@ const Video: React.FC<any> = ({ video }) => {
             <h3 className=" text-xs sm:text-sm font-semibold line-clamp-2 sm:line-clamp-3 xl:line-clamp-none   overflow-hidden h-full  w-full min-h-[1.4rem]">
               {video.title}
             </h3>
-            <p className="text-gray-400 text-xs">{authUser?.username}</p>
+            <p className="text-gray-400 text-xs">{video.owner?.username}</p>
             <p className="text-gray-500 text-xs">
               {video.views} views •{new Date(video.createdAt).toDateString()}
             </p>

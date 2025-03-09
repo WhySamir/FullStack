@@ -130,6 +130,11 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
     // Pagination and sorting
     const comments = await Comment.find(filter)
+      .populate("owner", "username avatar")
+      .populate({
+        path: "replies",
+        populate: { path: "owner", select: "username avatar" },
+      })
       .sort({ createdAt: -1 }) // Sort comments by newest first
       .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
       .limit(limitNumber); // Limit the number of documents
@@ -156,4 +161,48 @@ const getVideoComments = asyncHandler(async (req, res) => {
   }
 });
 
-export { createComments, deleteComment, editUserComment, getVideoComments };
+const replyToComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  const { content } = req.body;
+
+  if (!commentId) {
+    throw new ApiError(400, "Comment ID is required.");
+  }
+
+  if (!content) {
+    throw new ApiError(400, "Reply content cannot be empty.");
+  }
+
+  try {
+    // Check if the parent comment exists
+    const parentComment = await Comment.findById(commentId);
+    if (!parentComment) {
+      throw new ApiError(404, "Parent comment not found.");
+    }
+
+    // Create a new reply comment
+    const reply = await Comment.create({
+      content,
+      video: parentComment.video, // Keep the same video ID
+      owner: req.user?._id,
+    });
+
+    // Add the reply to the parent's replies array
+    parentComment.replies.push(reply._id);
+    await parentComment.save();
+
+    return res
+      .status(201)
+      .json(new ApiResponds(201, reply, "Reply added successfully."));
+  } catch (error) {
+    throw new ApiError(500, "An error occurred while adding the reply.");
+  }
+});
+
+export {
+  createComments,
+  deleteComment,
+  editUserComment,
+  getVideoComments,
+  replyToComment,
+};
