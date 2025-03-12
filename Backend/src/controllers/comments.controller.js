@@ -6,7 +6,7 @@ import { ApiResponds } from "../utlis/ApiResponds.js";
 
 const createComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  const { content } = req.body;
+  const { content, parentCommentId } = req.body;
 
   console.log("Video ID:", videoId);
   console.log("Comment Content:", content);
@@ -32,6 +32,7 @@ const createComments = asyncHandler(async (req, res) => {
       content,
       video: videoId,
       owner: req.user?._id,
+      parentComment: parentCommentId || null,
     });
 
     // Retrieve the created comment
@@ -39,6 +40,11 @@ const createComments = asyncHandler(async (req, res) => {
 
     if (!createdComment) {
       throw new ApiError(500, "Failed to retrieve the created comment.");
+    }
+    if (parentCommentId) {
+      await Comment.findByIdAndUpdate(parentCommentId, {
+        $push: { replies: newComment._id },
+      });
     }
 
     // Respond with the created comment
@@ -52,6 +58,15 @@ const createComments = asyncHandler(async (req, res) => {
   }
 });
 
+async function deleteCommentAndChildren(commentId) {
+  // Find and delete direct children
+  const childComments = await Comment.find({ parentComment: commentId });
+  for (const child of childComments) {
+    await deleteCommentAndChildren(child._id); // Recursively delete children of this child
+  }
+  // Delete the comment itself
+  await Comment.findByIdAndDelete(commentId);
+}
 const deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
 
@@ -64,16 +79,12 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   try {
     // Attempt to delete the comment
-    const comment = await Comment.findByIdAndDelete(commentId);
-
-    if (!comment) {
-      throw new ApiError(404, "Comment not found.");
-    }
+    await deleteCommentAndChildren(commentId);
 
     // Respond with success
     return res
       .status(200)
-      .json(new ApiResponds(200, comment, "Comment deleted successfully."));
+      .json(new ApiResponds(200, null, "Comment deleted successfully."));
   } catch (error) {
     throw new ApiError(500, "comment id wrong maybe");
   }
@@ -122,11 +133,11 @@ const getVideoComments = asyncHandler(async (req, res) => {
   if (!videoId) {
     return res
       .status(400)
-      .json(new ApiError(200, "Video ID is required to fetch comments."));
+      .json(new ApiError(400, "Video ID is required to fetch comments."));
   }
 
   try {
-    const filter = { video: videoId };
+    const filter = { video: videoId, parentComment: null };
 
     // Pagination and sorting
     const comments = await Comment.find(filter)
@@ -185,6 +196,7 @@ const replyToComment = asyncHandler(async (req, res) => {
       content,
       video: parentComment.video, // Keep the same video ID
       owner: req.user?._id,
+      parentComment: commentId,
     });
 
     // Add the reply to the parent's replies array

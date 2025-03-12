@@ -15,6 +15,11 @@ const commentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    parentComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+      default: null,
+    },
     replies: [
       {
         type: mongoose.Schema.Types.ObjectId,

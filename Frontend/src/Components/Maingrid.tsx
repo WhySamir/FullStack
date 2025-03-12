@@ -109,10 +109,10 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
         <>
           <div className="relative w-full  caret-transparent  sm:flex hidden">
             {showLeftArrow && (
-              <div className="absolute flex  -left-2 top-1/2  -translate-y-1/2 bg-gradient-to-r from-[#16181b] to-transparent/80 w-20  z-20 ">
+              <div className="absolute flex  -left-2 top-1/2  -translate-y-1/2 bg-gradient-to-r from-[#16181b] to-transparent/80 w-20  h-12 rounded-full z-20 ">
                 <button
                   onClick={scrollLeft}
-                  className=" flex items-center justify-center    text-xl   bg-[#16181b]  text-white h-14 w-14 rounded-full z-10 hover:bg-neutral-600"
+                  className=" flex items-center justify-center    text-xl   bg-[#16181b]  text-white h-12 w-12 rounded-full z-10 hover:bg-neutral-600"
                 >
                   &lt;
                 </button>
@@ -142,7 +142,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
               <div className="absolute -right-2 top-1/2 -translate-y-1/2  bg-gradient-to-l from-[#16181b] to-transparent/80   h-12 w-20 rounded-full z-20 ">
                 <button
                   onClick={scrollRight}
-                  className="absolute right-0 top-1/2  items-center text-2xl -translate-y-1/2 bg-[#16181b] text-white  h-12 w-12 rounded-full z-10 hover:bg-neutral-600"
+                  className="absolute right-0 top-1/2 flex justify-center  items-center text-xl -translate-y-1/2 bg-[#16181b] text-white  h-12 w-12 rounded-full z-10 hover:bg-neutral-600"
                 >
                   &gt;
                 </button>
