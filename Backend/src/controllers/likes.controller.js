@@ -6,141 +6,107 @@ import { Likes } from "../models/likes.model.js";
 import { Tweet } from "../models/tweets.js";
 import { Video } from "../models/video.model.js";
 
-const toggleVideoLike = asyncHandler(async (req, res) => {
-  const { videoId } = req.params;
+const toggleLikeDislike = asyncHandler(async (req, res) => {
+  const { contentId, type } = req.params;
+  const { contentType } = req.body;
 
-  //check video exist or not
-  const video = await Video.findById(videoId);
-  if (!video) {
-    throw new ApiError(404, "Video not found");
+  if (!["like", "dislike"].includes(type)) {
+    throw new ApiError(400, "Invalid type. Must be 'like' or 'dislike'");
   }
 
-  //check already liked or not
-  const existingVideoLike = await Likes.findOne({
-    video: videoId,
-    likedBy: req.user?._id,
+  let content;
+  if (contentType === "Video") content = await Video.findById(contentId);
+  else if (contentType === "Comment")
+    content = await Comment.findById(contentId);
+  else if (contentType === "Tweet") content = await Tweet.findById(contentId);
+
+  if (!content) throw new ApiError(404, `${contentType} not found`);
+
+  const existingEntry = await Likes.findOne({
+    contentId,
+    contentType,
+    user: req.user?._id,
+    type,
   });
 
-  if (existingVideoLike) {
-    // Unsubscribe (delete the subscription)
-    await Likes.findByIdAndDelete(existingVideoLike._id);
-    return res.status(200).json({
-      status: 200,
-      message: "Disliked  video.",
-    });
+  let isLikedByUser = false;
+  let isDislikedByUser = false;
+
+  if (existingEntry) {
+    // If already liked/disliked, remove it (toggle off)
+    await Likes.findByIdAndDelete(existingEntry._id);
   } else {
-    //subscribe
-    const like = new Likes({
-      video: videoId,
-      likedBy: req.user?._id,
+    // Remove opposite action (if exists) before adding a new one
+    const oppositeType = type === "like" ? "dislike" : "like";
+    const oppositeEntry = await Likes.findOneAndDelete({
+      contentId,
+      contentType,
+      user: req.user?._id,
+      type: oppositeType,
     });
-    await like.save();
 
-    return res
-      .status(200)
-      .json(new ApiResponds(200, like, "Like to video sucessfully."));
+    // Add new like/dislike
+    const newEntry = new Likes({
+      contentId,
+      contentType,
+      user: req.user?._id,
+      type,
+    });
+    await newEntry.save();
+
+    // Set user-specific toggling state
+    if (type === "like") {
+      isLikedByUser = true;
+      isDislikedByUser = false; // Since we removed dislike
+    } else {
+      isLikedByUser = false; // Since we removed like
+      isDislikedByUser = true;
+    }
   }
-});
-const toggleCommentsLike = asyncHandler(async (req, res) => {
-  const { commentId } = req.params;
 
-  //check video exist or not
-  const comment = await Comment.findById(commentId);
-  if (!comment) {
-    throw new ApiError(404, "Comment not found");
-  }
-
-  //check already liked comment or not
-  const existingCommentLike = await Likes.findOne({
-    comment: commentId,
-    likedBy: req.user?._id,
+  // Get total likes count
+  const totalLikes = await Likes.countDocuments({
+    contentId,
+    contentType,
+    type: "like",
   });
 
-  if (existingCommentLike) {
-    // Unsubscribe (delete the subscription)
-    await Likes.findByIdAndDelete(existingCommentLike._id);
-    return res.status(200).json({
-      status: 200,
-      message: "Disliked comments.",
-    });
-  } else {
-    //subscribe
-    const comment = new Likes({
-      comment: commentId,
-      likedBy: req.user?._id,
-    });
-    await comment.save();
-
-    return res
-      .status(200)
-      .json(new ApiResponds(200, comment, "Like to video sucessfully."));
-  }
-});
-const toggleTweetLike = asyncHandler(async (req, res) => {
-  const { tweetId } = req.params;
-
-  //check video exist or not
-  const tweet = await Tweet.findById(tweetId);
-  if (!tweet) {
-    throw new ApiError(404, "Tweet not found");
-  }
-
-  //check already liked or not
-  const existingTweetLike = await Likes.findOne({
-    tweet: tweetId,
-    likedBy: req.user?._id,
+  return res.status(200).json({
+    status: 200,
+    message: `${type} toggled successfully.`,
+    totalLikes,
+    isLikedByUser,
+    isDislikedByUser,
   });
-
-  if (existingTweetLike) {
-    // Unsubscribe (delete the subscription)
-    await Likes.findByIdAndDelete(existingTweetLike._id);
-    return res.status(200).json({
-      status: 200,
-      message: "Disliked  tweet.",
-    });
-  } else {
-    //subscribe
-    const like = new Likes({
-      tweet: tweetId,
-      likedBy: req.user?._id,
-    });
-    await like.save();
-
-    return res
-      .status(200)
-      .json(new ApiResponds(200, like, "Like to tweet sucessfully."));
-  }
 });
+
 const getLikedVideos = asyncHandler(async (req, res) => {
   try {
     const filter = {
-      likedBy: req.user?._id,
-      video: { $exists: true, $ne: null },
+      user: req.user?._id,
+      contentType: "Video",
     };
-
-    // Pagination and sorting
     const likes = await Likes.find(filter)
-      .populate("video")
-      .sort({ createdAt: -1 }); // Sort comments by newest first
+      .populate({ path: "contentId", model: "Video" }) // Populate contentId as Video
+      .sort({ createdAt: -1 });
 
-    // Count total documents for pagination metadata
     const totalVideoLikes = await Likes.countDocuments(filter);
-    const likedVideos = likes.map((like) => like.video);
-    // Send the response
+
+    const likedVideos = likes.map((like) => like.contentId);
+
     res.status(200).json({
       success: true,
       data: likedVideos,
       totalVideoLikes,
     });
   } catch (error) {
-    // Handle any errors
-    console.error("Error fetching video comments:", error);
+    console.error("Error fetching liked videos:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch comments for the video.",
+      message: "Failed to fetch liked videos.",
       error: error.message,
     });
   }
 });
 
-export { toggleVideoLike, toggleCommentsLike, toggleTweetLike, getLikedVideos };
+export { toggleLikeDislike, getLikedVideos };

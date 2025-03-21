@@ -35,7 +35,7 @@ app.use("/api/v1/subscriptions", subscriptionRouter); //router,controller
 app.use("/api/v1/playlist", playlistsRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/tweets", tweetsRouter);
-app.use("/api/v1/likes", likesRouter);
+app.use("/api/v1/toggle", likesRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/healthcheck", healthRouter);
 app.use(globalErrorHandler);

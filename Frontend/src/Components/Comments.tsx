@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import {
   EllipsisVertical,
+  FlagOffIcon,
   Pencil,
   Smile,
   ThumbsDown,
@@ -17,9 +18,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { timeAgo } from "../Utilis/FormatDuration";
+import { toggleLike_Dislike } from "../Api/like";
+
 interface Comment {
   _id: string;
   content: string;
+  isLikedByUser: boolean;
+  isDislikedByUser: boolean;
+  likesCount: number;
   video: string;
   owner: {
     _id: string;
@@ -41,59 +47,76 @@ interface CommentResponse {
 const Comments = ({ vidId }: { vidId: string }) => {
   const { authUser } = useSelector((state: RootState) => state.auth);
   const [comment, setComment] = useState("");
-  const [edtComment, setEdtComment] = useState("");
-  const isValidComment2 = edtComment.trim().length >= 4;
+  const [edtComment, setEdtComment] = useState<{ [key: string]: string }>({});
   const [modify, setmodify] = useState<string | null>(null);
-  const [isEditModal, setIsEditModal] = useState<boolean>(false);
-  const isValidComment = comment.trim().length >= 4;
+  const [editStates, setEditStates] = useState<{ [key: string]: boolean }>({});
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement | null>(null);
-  const [isEmojiModalVisible, setIsEmojiModalVisible] = useState(false);
+  const [isEmojiModalVisible, setIsEmojiModalVisible] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [emojiComment, setEmojiComment] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [fetchComment, setfetchComment] = useState<CommentResponse | null>(
     null
   );
 
-  const toggleEmojiModal = () => {
-    setIsEmojiModalVisible(!isEmojiModalVisible);
-  };
-  const handleSelectEmoji = (emoji: any) => {
-    setComment(comment + emoji.native);
-    setIsEmojiModalVisible(false);
-  };
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      pickerRef.current &&
-      !pickerRef.current.contains(event.target as Node)
-    ) {
-      setIsEmojiModalVisible(false); // Close the picker if clicked outside
+  const getVidComments = async () => {
+    if (!vidId) {
+      return;
+    }
+    try {
+      const response = await getVideoComments({ vidId });
+      if (response.data.length === 0) {
+        setfetchComment(null);
+      } else {
+        console.log(response);
+        const sortedResponse = {
+          ...response,
+          data: response.data.sort((a: any, b: any) => {
+            if (a.owner._id === authUser?._id) return -1;
+            if (b.owner._id === authUser?._id) return 1;
+            return 0;
+          }),
+        };
+
+        console.log(sortedResponse);
+        setfetchComment(sortedResponse);
+      }
+    } catch (error) {
+      console.log("error fetching vidcomments", error);
     }
   };
   useEffect(() => {
+    getVidComments();
+  }, [vidId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
+        setEmojiComment(false);
+        setIsEmojiModalVisible((prev) => {
+          const newState = { ...prev };
+          Object.keys(prev).forEach((key) => {
+            if (!pickerRef.current?.contains(event.target as Node)) {
+              delete newState[key];
+            }
+          });
+          return newState;
+        });
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  useEffect(() => {
-    const getVidComments = async () => {
-      if (!vidId) {
-        return;
-      }
-      try {
-        const response = await getVideoComments({ vidId });
-        if (response.data.length === 0) {
-          setfetchComment(null);
-        } else {
-          setfetchComment(response);
-        }
-      } catch (error) {
-        console.log("error fetching vidcomments", error);
-      }
-    };
-    getVidComments();
-  }, [vidId]);
+
   //comment text
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
@@ -103,38 +126,40 @@ const Comments = ({ vidId }: { vidId: string }) => {
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
-  const handleEditChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEdtComment(e.target.value);
+  const handleEditChange = (
+    commentId: string,
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setEdtComment((prev) => ({ ...prev, [commentId]: e.target.value }));
   };
   //post comment
   const handleComment = async () => {
-    if (!vidId || !isValidComment) return;
+    if (!vidId || comment.trim().length < 4) return;
 
-    console.log("Comment Submitted:", comment.trim());
-    console.log("Sending request to backend:", {
-      vidId,
-      content: comment.trim(),
-    });
     try {
       await createComment({ vidId }, { content: comment.trim() });
       console.log("Created Comment Sucess");
       setIsFocused(false);
       setComment("");
+      getVidComments();
     } catch (error) {
       console.log(error);
     }
   };
-  const handleEditComment = async (commentId: string, edtComment: string) => {
-    console.log("Edit Comment:", commentId);
+  const handleEditComment = async (commentId: string) => {
+    if (!edtComment[commentId] || edtComment[commentId].trim().length < 4)
+      return;
+
     try {
-      await editComment({ commentId }, { content: edtComment });
-      setmodify(null);
+      await editComment({ commentId }, { content: edtComment[commentId] });
+      setEditStates((prev) => ({ ...prev, [commentId]: false }));
+      setEdtComment((prev) => ({ ...prev, [commentId]: "" }));
+      getVidComments();
     } catch (error) {
       console.log(error);
     }
   };
   const handleDeleteComment = async (commentId: string) => {
-    console.log("Delete Comment:", commentId);
     const conf = confirm("Delete comment");
     if (conf) {
       try {
@@ -142,9 +167,120 @@ const Comments = ({ vidId }: { vidId: string }) => {
       } catch (error) {
         console.log(error);
       }
-    }
-    setmodify(null);
+    } else return;
+    getVidComments();
   };
+
+  const handleCommentLike = async (commentId: string) => {
+    setfetchComment((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        data: prev.data.map((comment) => {
+          if (comment._id === commentId) {
+            return {
+              ...comment,
+              isLikedByUser: !comment.isLikedByUser,
+              isDislikedByUser: false,
+              likesCount: comment.isLikedByUser
+                ? comment.likesCount - 1
+                : comment.likesCount + 1,
+            };
+          }
+          return comment;
+        }),
+      };
+    });
+
+    try {
+      await toggleLike_Dislike({
+        ObjId: commentId,
+        type: "like",
+        contentType: "Comment",
+      });
+    } catch (error) {
+      console.log("Error liking comment", error);
+      // Revert if API fails
+      setfetchComment((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          data: prev.data.map((comment) => {
+            if (comment._id === commentId) {
+              return {
+                ...comment,
+                isLikedByUser: !comment.isLikedByUser, // Revert change
+                likesCount: comment.isLikedByUser
+                  ? comment.likesCount + 1
+                  : comment.likesCount - 1,
+              };
+            }
+            return comment;
+          }),
+        };
+      });
+    }
+  };
+
+  const handleCommentDisLike = async (commentId: string) => {
+    setfetchComment((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        data: prev.data.map((comment) => {
+          if (comment._id === commentId) {
+            return {
+              ...comment,
+              isDislikedByUser: !comment.isDislikedByUser,
+              isLikedByUser: false,
+              likesCount: comment.isLikedByUser
+                ? comment.likesCount - 1
+                : comment.likesCount,
+            };
+          }
+          return comment;
+        }),
+      };
+    });
+
+    try {
+      await toggleLike_Dislike({
+        ObjId: commentId,
+        type: "dislike",
+        contentType: "Comment",
+      });
+    } catch (error) {
+      console.log("Error disliking comment", error);
+      // Revert if API fails
+      setfetchComment((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          data: prev.data.map((comment) => {
+            if (comment._id === commentId) {
+              return {
+                ...comment,
+                isDislikedByUser: !comment.isDislikedByUser, // Revert change
+              };
+            }
+            return comment;
+          }),
+        };
+      });
+    }
+  };
+
+  const toggleEmojiPicker = (commentId: string) => {
+    setIsEmojiModalVisible((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+
   return (
     <div className="comments text-white  w-full mt-6">
       <h3 className="text-xl font-semibold">
@@ -154,42 +290,46 @@ const Comments = ({ vidId }: { vidId: string }) => {
         <img
           src={authUser?.avatar}
           alt="Uploader Avatar"
-          className="w-10 h-10 rounded-full object-cover"
+          className="sm:w-10 w-8 h-8 sm:h-10 rounded-full object-cover"
         />
         <div className="h-full  w-full">
           <textarea
             ref={textareaRef}
+            value={comment}
+            onChange={handleChange}
+            placeholder="Add a comment..."
             style={{
               resize: "none",
               overflow: "hidden",
               height: "24px",
             }}
-            value={comment}
-            placeholder="Add a comment..."
             className="peer px-4 bg-transparent w-full focus:outline-none"
             onClick={() => setIsFocused(true)}
-            onChange={handleChange}
           />
 
           <hr className="mx-3 mt-1 text-gray-500  peer-focus:text-white " />
           {isFocused && (
             <div className="flex justify-between w-full  pl-3">
-              <div
+              <button
                 className="emoji relative  hover:bg-neutral-700 mt-1 rounded-full h-10 w-10  flex items-center justify-center "
-                onClick={toggleEmojiModal}
+                onClick={() => setEmojiComment(!emojiComment)}
               >
                 <Smile />
-                {isEmojiModalVisible && (
+                {emojiComment && (
                   <div
                     className="absolute top-full left-4 mb-2 z-50"
                     ref={pickerRef}
                   >
                     <div className="overflow-y-auto  max-w-fit max-h-70 w-full border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800 scrollbar-thin">
-                      <Picker onEmojiSelect={handleSelectEmoji} />
+                      <Picker
+                        onEmojiSelect={(e: any) =>
+                          setComment((c) => c + e.native)
+                        }
+                      />
                     </div>
                   </div>
                 )}
-              </div>
+              </button>
               <div className="flex gap-2 mt-3">
                 <button
                   className="py-1.5  px-3 font-bold hover:bg-neutral-700 rounded-2xl"
@@ -201,9 +341,9 @@ const Comments = ({ vidId }: { vidId: string }) => {
                   Cancel
                 </button>
                 <button
-                  disabled={!isValidComment}
+                  disabled={comment.trim().length < 4}
                   className={`py-1.5 px-3   ${
-                    isValidComment
+                    comment.trim().length >= 4
                       ? "bg-neutral-800 hover:bg-neutral-700"
                       : "bg-neutral-600 opacity-50 cursor-not-allowed"
                   }  rounded-2xl`}
@@ -223,16 +363,16 @@ const Comments = ({ vidId }: { vidId: string }) => {
             className="relative mt-4 flex items-start justify-between"
           >
             <div className="flex space-x-3 w-full">
-              <div className="w-10 h-10 rounded-full  flex-shrink-0 flex items-center justify-center text-white font-bold">
+              <div className="sm:w-10 w-8 h-8 sm:h-10 rounded-full  flex-shrink-0 flex items-center justify-center text-white font-bold">
                 <img
                   src={`${comment.owner.avatar}`}
-                  className="rounded-full w-10 h-10 object-cover"
+                  className="rounded-full sm:w-10 w-8 h-8 sm:h-10 object-cover"
                   alt=""
                 />
               </div>
 
               <div className="w-full">
-                {!isEditModal && (
+                {!editStates[comment._id] && (
                   <p className="text-sm font-semibold">
                     {comment.owner.username}
                     <span className="text-gray-400 text-xs ml-3">
@@ -240,18 +380,18 @@ const Comments = ({ vidId }: { vidId: string }) => {
                     </span>
                   </p>
                 )}
-                {isEditModal ? (
+                {editStates[comment._id] ? (
                   <div className=" relative   mt-1 ">
                     <textarea
+                      value={edtComment[comment._id] || ""}
+                      placeholder={"Edit comment..."}
+                      onChange={(e) => handleEditChange(comment._id, e)}
                       style={{
                         resize: "none",
                         overflow: "hidden",
                         height: "25px",
                       }}
-                      value={edtComment}
-                      placeholder={edtComment}
                       className="peer px-4 bg-transparent w-full focus:outline-none"
-                      onChange={handleEditChange}
                     />
 
                     <hr className="mx-3 mt-1 text-gray-500  peer-focus:text-white " />
@@ -259,16 +399,25 @@ const Comments = ({ vidId }: { vidId: string }) => {
                     <div className="flex justify-between w-full  pl-3">
                       <div
                         className="emoji relative  hover:bg-neutral-700 mt-1 rounded-full h-10 w-10  flex items-center justify-center "
-                        onClick={toggleEmojiModal}
+                        onClick={() =>
+                          toggleEmojiPicker(comment._id || "comment")
+                        }
                       >
                         <Smile />
-                        {isEmojiModalVisible && (
+                        {isEmojiModalVisible[comment._id] && (
                           <div
-                            className="absolute top-full left-4 mb-2 z-50"
+                            className="absolute top-full left-1 mb-2 z-50"
                             ref={pickerRef}
                           >
                             <div className="overflow-y-auto  max-w-fit max-h-70 w-full border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800 scrollbar-thin">
-                              <Picker onEmojiSelect={handleSelectEmoji} />
+                              <Picker
+                                onEmojiSelect={(e: any) =>
+                                  setEdtComment((prev) => ({
+                                    ...prev,
+                                    [comment._id]: prev[comment._id] + e.native,
+                                  }))
+                                }
+                              />
                             </div>
                           </div>
                         )}
@@ -277,22 +426,30 @@ const Comments = ({ vidId }: { vidId: string }) => {
                         <button
                           className="py-1.5  px-3 font-bold hover:bg-neutral-700 rounded-2xl"
                           onClick={() => {
-                            setIsEditModal(false);
-                            setEdtComment("");
+                            setIsFocused(false);
+                            setEdtComment((prev) => ({
+                              ...prev,
+                              [comment._id]: "",
+                            }));
+
+                            setEditStates((prev) => ({
+                              ...prev,
+                              [comment._id]: false,
+                            }));
                           }}
                         >
                           Cancel
                         </button>
                         <button
-                          disabled={!isValidComment2}
+                          disabled={
+                            (edtComment[comment._id]?.trim() || "").length < 4
+                          }
                           className={`py-1.5 px-3   ${
-                            isValidComment2
+                            edtComment[comment._id]?.trim().length >= 4
                               ? "bg-neutral-800 hover:bg-neutral-700"
                               : "bg-neutral-600 opacity-50 cursor-not-allowed"
                           }  rounded-2xl`}
-                          onClick={() =>
-                            handleEditComment(comment._id, edtComment)
-                          }
+                          onClick={() => handleEditComment(comment._id)}
                         >
                           Save
                         </button>
@@ -303,10 +460,24 @@ const Comments = ({ vidId }: { vidId: string }) => {
                   <p className="mt-1">{comment.content}</p>
                 )}
                 <div className="flex items-center space-x-4 mt-2 text-gray-400">
-                  <button className="flex items-center space-x-1 hover:text-white">
-                    <ThumbsUp /> <span>15</span>
+                  <button
+                    onClick={() => handleCommentLike(comment._id)}
+                    className={` flex items-center gap-1 ${
+                      comment.isLikedByUser
+                        ? "text-blue-500"
+                        : "hover:text-white"
+                    }`}
+                  >
+                    <ThumbsUp /> <span>{comment.likesCount}</span>
                   </button>
-                  <button className="flex items-center space-x-1 hover:text-white">
+                  <button
+                    onClick={() => handleCommentDisLike(comment._id)}
+                    className={` ${
+                      comment.isDislikedByUser
+                        ? "text-blue-500 "
+                        : "hover:text-white"
+                    }`}
+                  >
                     <ThumbsDown />
                   </button>
                   <button className="hover:text-white">Tweet</button>
@@ -315,39 +486,52 @@ const Comments = ({ vidId }: { vidId: string }) => {
               </div>
             </div>
             <div
-              className={`${isEditModal ? "hidden" : "block"} editordelete`}
+              className={`${
+                editStates[comment._id] ? "hidden" : "block"
+              } editordelete`}
               onClick={() => {
                 setmodify(comment._id);
-
-                console.log(comment._id);
               }}
             >
               <EllipsisVertical />
             </div>
-            {modify === comment._id && (
-              <div
-                className={` absolute right-0  w-32 bg-neutral-700 text-white rounded-lg shadow-lg `}
-              >
-                <button
-                  className="flex items-center  gap-4 w-full px-3 py-2 hover:bg-neutral-600 rounded"
-                  onClick={() => {
-                    setIsEditModal(true);
-                    setmodify(null);
-                    setEdtComment(comment.content);
-                  }}
-                >
-                  <Pencil className="w-4 h-4" /> Edit
-                </button>
-                <button
-                  className="flex items-center gap-4 w-full px-3 py-2 hover:bg-neutral-600 rounded"
-                  onClick={() => {
-                    handleDeleteComment(comment._id);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" /> Delete
-                </button>
+            {modify === comment._id ? (
+              <div className="absolute right-0 w-32 bg-neutral-700 text-white rounded-lg shadow-lg">
+                {authUser?._id === comment.owner._id ? (
+                  <>
+                    <button
+                      className="flex items-center gap-4 w-full px-3 py-2 hover:bg-neutral-600 rounded"
+                      onClick={() => {
+                        setEditStates((prev) => ({
+                          ...prev,
+                          [comment._id]: true, // Set only this comment to edit mode
+                        }));
+                        setEdtComment((prev) => ({
+                          ...prev,
+                          [comment._id]: comment.content,
+                        }));
+                        setmodify(null);
+                      }}
+                    >
+                      <Pencil className="w-4 h-4" /> Edit
+                    </button>
+                    <button
+                      className="flex items-center gap-4 w-full px-3 py-2 hover:bg-neutral-600 rounded"
+                      onClick={() => handleDeleteComment(comment._id)}
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setmodify(null)}
+                    className="flex items-center gap-4 w-full px-3 py-2 hover:bg-neutral-600 rounded"
+                  >
+                    <FlagOffIcon className="w-4 h-4" /> Report
+                  </button>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
         ))
       ) : (

@@ -66,7 +66,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
         container.removeEventListener("scroll", checkScroll);
       }
     };
-  }, []);
+  }, [containerRef.current]);
 
   useEffect(() => {
     const getAllUserVideos = async () => {
@@ -107,7 +107,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
     <>
       {isAuthenticated ? (
         <>
-          <div className="relative w-full  caret-transparent  sm:flex hidden">
+          <div className="relative  sm:mt-14 w-full  caret-transparent  sm:flex hidden">
             {showLeftArrow && (
               <div className="absolute flex  -left-2 top-1/2  -translate-y-1/2 bg-gradient-to-r from-[#16181b] to-transparent/80 w-20  h-12 rounded-full z-20 ">
                 <button
@@ -139,7 +139,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
               ))}
             </div>
             {showRightArrow && (
-              <div className="absolute -right-2 top-1/2 -translate-y-1/2  bg-gradient-to-l from-[#16181b] to-transparent/80   h-12 w-20 rounded-full z-20 ">
+              <div className="absolute right-1 top-1/2 -translate-y-1/2  bg-gradient-to-l from-[#16181b] to-transparent/80   h-12 w-20 rounded-full z-20 ">
                 <button
                   onClick={scrollRight}
                   className="absolute right-0 top-1/2 flex justify-center  items-center text-xl -translate-y-1/2 bg-[#16181b] text-white  h-12 w-12 rounded-full z-10 hover:bg-neutral-600"
@@ -149,7 +149,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
               </div>
             )}
           </div>
-          <div className="mt-8  transition-all duration-500 flex flex-col sm:grid grid-cols-12 gap-2  ">
+          <div className="mt-12 sm:mt-5  transition-all duration-500 flex flex-col sm:grid grid-cols-12 gap-y-2  ">
             {videos != null
               ? videos.map((video, i) => (
                   <div
@@ -165,7 +165,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
           </div>
         </>
       ) : (
-        <div className="flex w-full h-full flex-col justify-center my-[8vh] sm:mt-0 space-y-6 items-center">
+        <div className="flex w-full h-[90vh] flex-col justify-center my-[8vh] sm:mt-0 space-y-6 items-center">
           <div className="icon text-white">
             <PlaySquare size={100} />
           </div>

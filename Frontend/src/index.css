@@ -3,6 +3,11 @@
   --breakpoint-xs: 30rem;
   --breakpoint-2xl: 110rem;
   --breakpoint-3xl: 120rem;
+  --spacing-128: 32rem;
+  --spacing-144: 36rem;
+  --border-radius-xl: 1rem;
+  --border-radius-2xl: 2rem;
+  --text-xxs: 0.625rem;
 }
 
 * {
@@ -39,4 +44,7 @@ body {
 /* Hide scrollbar for Firefox */
 .scrollbar-hidden {
   scrollbar-width: none;
+}
+button:focus {
+  outline: none;
 }

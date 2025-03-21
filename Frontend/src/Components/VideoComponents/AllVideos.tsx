@@ -42,11 +42,11 @@ const Video: React.FC<any> = ({ video }) => {
   return (
     <>
       <div
-        className="p-2 max-w-full w-full  flex  flex-col items-start "
+        className="pb-3 sm:p-2 max-w-full w-full  flex  flex-col items-start cursor-pointer"
         onClick={handleVid}
       >
         <div
-          className="relative  w-full rounded-lg  mb-2  aspect-video  overflow-hidden"
+          className="relative  w-full sm:rounded-lg  mb-2  aspect-video  overflow-hidden"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -54,7 +54,7 @@ const Video: React.FC<any> = ({ video }) => {
           {!isHovered && (
             <img
               src={video.thumbnail}
-              className="h-full w-full object-cover rounded-lg"
+              className="h-full w-full object-cover sm:rounded-lg"
               alt="video thumbnail"
             />
           )}
@@ -66,13 +66,13 @@ const Video: React.FC<any> = ({ video }) => {
             className="w-full h-full object-cover rounded-lg"
             controls
           />
-          <span className="absolute bottom-1 right-2 bg-black/50 bg-opacity-75 text-white text-xs font-semibold px-1  rounded">
+          <span className="absolute bottom-2 right-2 bg-black/50 bg-opacity-75 text-white text-xs font-semibold px-1  rounded">
             {formatDuration(video.duration)}
           </span>
         </div>
 
-        <div className="flex  gap-x-3 items-start w-full">
-          <div className="h-9 w-9  sm:h-11 sm:w-11 rounded-full overflow-hidden flex-shrink-0">
+        <div className="pl-2 flex  gap-x-2.5 items-start w-full">
+          <div className="h-9 w-9   rounded-full overflow-hidden flex-shrink-0">
             <img
               src={video.owner?.avatar}
               className="object-cover w-full h-full "

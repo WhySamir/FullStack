@@ -3,6 +3,7 @@ import { asyncHandler } from "../utlis/asyncHandler.js";
 import { Comment } from "../models/comments.model.js";
 import { Video } from "../models/video.model.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
+import { Likes } from "../models/likes.model.js";
 
 const createComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -123,10 +124,8 @@ const editUserComment = asyncHandler(async (req, res) => {
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
+  const userId = req.user?._id;
 
-  console.log("Video ID:", videoId);
-
-  // Parse query parameters
   const pageNumber = parseInt(page, 10);
   const limitNumber = parseInt(limit, 10);
 
@@ -148,25 +147,115 @@ const getVideoComments = asyncHandler(async (req, res) => {
       })
       .sort({ createdAt: -1 }) // Sort comments by newest first
       .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
-      .limit(limitNumber); // Limit the number of documents
+      .limit(limitNumber);
 
-    // Count total documents for pagination metadata
+    const commentIds = comments.map((comment) => comment._id);
+
+    // Get likes and dislikes for comments
+    const likes = await Likes.find({
+      contentId: { $in: commentIds },
+      contentType: "Comment",
+    });
+
+    // Separate likes and dislikes
+    const likesByComment = likes.filter((like) => like.type === "like");
+    const dislikesByComment = likes.filter((like) => like.type === "dislike");
+
+    // Associate likes and dislikes with comments
+    const commentsWithLikesAndDislikes = comments.map((comment) => {
+      const commentLikes = likesByComment.filter((like) =>
+        like.contentId.equals(comment._id)
+      );
+      const commentDislikes = dislikesByComment.filter((dislike) =>
+        dislike.contentId.equals(comment._id)
+      );
+
+      const isLikedByUser = commentLikes.some(
+        (like) => like.user.toString() === userId?.toString()
+      );
+
+      const isDislikedByUser = commentDislikes.some(
+        (dislike) => dislike.user.toString() === userId?.toString()
+      );
+
+      return {
+        ...comment.toObject(),
+        likesCount: commentLikes.length,
+        isLikedByUser,
+        // dislikesCount: commentDislikes.length,
+        isDislikedByUser,
+      };
+    });
+
     const totalComments = await Comment.countDocuments(filter);
 
-    // Send the response
     res.status(200).json({
       success: true,
-      data: comments,
+      data: commentsWithLikesAndDislikes,
       totalPages: Math.ceil(totalComments / limitNumber),
       currentPage: pageNumber,
       totalComments,
     });
   } catch (error) {
-    // Handle any errors
     console.error("Error fetching video comments:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch comments for the video.",
+      error: error.message,
+    });
+  }
+});
+const getCommentById = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  const userId = req.user?._id; // Assuming you have the user ID available from req.user
+
+  if (!commentId) {
+    return res
+      .status(400)
+      .json(new ApiError(400, "Comment ID is required to fetch comments."));
+  }
+
+  try {
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res
+        .status(404)
+        .json(new ApiError(404, "Comment not found or invalid comment id"));
+    }
+
+    // Get likes and dislikes for this comment
+    const likes = await Likes.find({
+      contentId: commentId,
+      contentType: "Comment",
+    });
+
+    const likesByComment = likes.filter((like) => like.type === "like");
+    const dislikesByComment = likes.filter((like) => like.type === "dislike");
+
+    const likesCount = likesByComment.length;
+    const isLikedByUser = likesByComment.some(
+      (like) => like.user.toString() === userId?.toString()
+    );
+    const isDislikedByUser = dislikesByComment.some(
+      (dislike) => dislike.user.toString() === userId?.toString()
+    );
+
+    // Return only relevant fields (likesCount, isLikedByUser, isDislikedByUser)
+    const commentWithLikes = {
+      likesCount,
+      isLikedByUser,
+      isDislikedByUser,
+    };
+
+    return res
+      .status(200)
+      .json(new ApiResponds(200, commentWithLikes, "Comment found"));
+  } catch (error) {
+    console.error("Error fetching video comment:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch comment.",
       error: error.message,
     });
   }
@@ -217,4 +306,5 @@ export {
   editUserComment,
   getVideoComments,
   replyToComment,
+  getCommentById,
 };

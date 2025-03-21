@@ -66,16 +66,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
   return (
     <div
       style={{
-        position: isWatchPage ? "absolute" : "sticky",
-        top: "0rem",
-        maxHeight: "calc(100vh - 4rem)",
+        position: isWatchPage ? "fixed" : "sticky",
+        top: isWatchPage ? "3.4rem" : "0rem",
         zIndex: isWatchPage ? 50 : "auto",
       }}
-      className={`h-[90vh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
-        isCollapsed ? (isWatchPage ? " h-full" : "w-20 ") : "pl-2 pr-2 w-56"
-      } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar`}
+      className={` h-[100dvh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
+        isCollapsed ? (isWatchPage ? " h-full" : "w-18 ") : "pl-2 pr-2 w-56"
+      } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar
+       ${isWatchPage ? "" : "pt-14 xl:pt-[4rem]"} `}
     >
-      <div className="rounded-lg flex flex-col justify-center space-y-2 ">
+      <div className="rounded-lg flex flex-col justify-center space-y-1 ">
         {!isCollapsed &&
           sidebarItems.map((item, index) => (
             <SidebarItem key={index} item={item} isCollapsed={isCollapsed} />
@@ -83,17 +83,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
       </div>
       {!isWatchPage && isCollapsed && (
         <>
-          <div className="rounded-lg flex flex-col justify-center space-y-2 ">
+          <div className="rounded-lg flex flex-col justify-center space-y-1 ">
             <div
               className={`flex items-center ${
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <Home />
                 </span>
-                <span className="text-xs">Home</span>
+                <span className="text-[0.65rem]">Home</span>
               </div>
             </div>
             <div
@@ -101,11 +101,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <Clapperboard />
                 </span>
-                <span className="text-xs">Shorts</span>
+                <span className="text-[0.65rem]">Shorts</span>
               </div>
             </div>
             <div
@@ -113,11 +113,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <PlaySquare />
                 </span>
-                <span className="text-xs">Subscriptions</span>
+                <span className="text-[0.65rem]">Subscriptions</span>
               </div>
             </div>
             <div
@@ -125,11 +125,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <User />
                 </span>
-                <span className="text-xs">You</span>
+                <span className="text-[0.65rem]">You</span>
               </div>
             </div>
           </div>

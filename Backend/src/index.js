@@ -8,7 +8,7 @@ dotenv.config({
 // importing approach
 connectDB()
   .then(() => {
-    app.listen(process.env.PORT || 8000, () => {
+    app.listen(process.env.PORT || 8000, "0.0.0.0", () => {
       console.log(`Server running at Port ${process.env.PORT}`);
     });
   })

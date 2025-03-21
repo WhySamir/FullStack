@@ -4,6 +4,7 @@ import { ApiError } from "../utlis/ApiError.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import { uploadonCloudinary } from "../utlis/cloudinary.js";
 import mongoose from "mongoose";
+import { Likes } from "../models/likes.model.js";
 //getallVideos get all videos based on query, sort, pagination
 // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
 //publishaVid  get video, upload to cloudinary, create video
@@ -60,13 +61,41 @@ const publishaVideo = asyncHandler(async (req, res) => {
 });
 const getVideosbyid = asyncHandler(async (req, res) => {
   const { videoById } = req.params;
-
+  const userId = req.user?._id;
   try {
     const video = await Video.findById(videoById).populate(
       "owner",
       "username avatar"
     );
-    return res.status(200).json(new ApiResponds(200, video, "Got Video"));
+    const likes = await Likes.find({
+      contentId: videoById,
+      contentType: "Video",
+      type: "like",
+    });
+    const dislikes = await Likes.find({
+      contentId: videoById,
+      contentType: "Video",
+      type: "dislike",
+    });
+
+    const isLikedByUser = likes.some(
+      (like) => like.user.toString() === userId.toString()
+    );
+    const isDislikedByUser = dislikes.some(
+      (dislike) => dislike.user.toString() === userId.toString()
+    );
+
+    // Construct the response with the required data
+    const videoWithLikes = {
+      ...video.toObject(),
+      isLikedByUser,
+      isDislikedByUser,
+      likesCount: likes.length,
+      // dislikesCount: dislikes.length,
+    };
+    return res
+      .status(200)
+      .json(new ApiResponds(200, videoWithLikes, "Got Video"));
   } catch (error) {
     throw new ApiError(400, "No videoes found || Invalid Video Id");
   }

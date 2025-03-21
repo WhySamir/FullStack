@@ -51,21 +51,21 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col px-1 sm:pr-4 md:pr-8 w-full h-[100vh]">
+      <div className="flex flex-col  w-full h-full">
         <Header toggleSidebar={toggleSidebar} />
 
-        <div className="relative flex   gap-0.5">
+        <div className="relative  flex   sm:gap-0.5">
           <Sidebar isCollapsed={isCollapsed} />
-          <div className="w-full px-4 mt-3  ">
+          <div className="w-full sm:px-4 relative  lg:pt-[1rem] 2xl:pt-[4rem]">
             <Routes>
               <Route
                 path="/"
                 element={<Maingrid isCollapsed={isCollapsed} />}
               />
 
+              <Route path="/watch/:vidId" element={<WatchVideo />} />
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/watch/:vidId" element={<WatchVideo />} />
             </Routes>
           </div>
         </div>
