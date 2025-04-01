@@ -129,6 +129,45 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
   }
+  const userWithCounts = await User.aggregate([
+    {
+      $match: { _id: findUser._id },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$channel", "$$userId"] },
+            },
+          },
+          { $count: "subscribers" },
+        ],
+        as: "subscribersCount",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: {
+          $ifNull: [{ $arrayElemAt: ["$subscribersCount.subscribers", 0] }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        password: 0,
+        refreshToken: 0,
+        __v: 0,
+        // Add other fields you want to exclude
+      },
+    },
+  ]);
+
+  if (!userWithCounts.length) {
+    throw new ApiError(500, "Failed to fetch user details");
+  }
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     findUser._id
   );
@@ -148,7 +187,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponds(
         200,
-        { user: loggedInUser, accessToken, refreshToken },
+        { user: userWithCounts[0], accessToken, refreshToken },
 
         "User logged in successfully"
       )

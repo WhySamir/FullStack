@@ -1,4 +1,4 @@
-import Stepper from "./Stepper/Stepper";
+import Stepper from "./Create Stepper/Stepper";
 
 interface setUploadPopupprops {
   setUploadPopup: React.Dispatch<React.SetStateAction<boolean>>;

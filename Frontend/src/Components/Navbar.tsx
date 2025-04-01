@@ -137,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             style={darkMode ? darkTheme : lightTheme}
           >
             <div className="relative  " ref={menuRef2}>
-              <div
+              <button
                 onClick={handleCreateClick}
                 className="cursor-pointer justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600"
               >
@@ -145,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 <span className=" flex text-white/90 text-xs md:font-medium">
                   Create
                 </span>
-              </div>
+              </button>
               {isOpen2 && (
                 <div
                   className=" absolute cursor-pointer -right-[4vw]  top-[6.2vh] w-[11rem] shadow-lg rounded-lg  bg-[#282828]  z-50"

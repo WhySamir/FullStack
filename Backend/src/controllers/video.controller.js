@@ -5,6 +5,7 @@ import { ApiResponds } from "../utlis/ApiResponds.js";
 import { uploadonCloudinary } from "../utlis/cloudinary.js";
 import mongoose from "mongoose";
 import { Likes } from "../models/likes.model.js";
+import { Subscription } from "../models/subscriptions.model.js";
 //getallVideos get all videos based on query, sort, pagination
 // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
 //publishaVid  get video, upload to cloudinary, create video
@@ -67,6 +68,10 @@ const getVideosbyid = asyncHandler(async (req, res) => {
       "owner",
       "username avatar"
     );
+    if (!video) {
+      return new ApiError(404, "Video not found");
+    }
+
     const likes = await Likes.find({
       contentId: videoById,
       contentType: "Video",
@@ -84,14 +89,18 @@ const getVideosbyid = asyncHandler(async (req, res) => {
     const isDislikedByUser = dislikes.some(
       (dislike) => dislike.user.toString() === userId.toString()
     );
-
-    // Construct the response with the required data
+    const existingSubscription = await Subscription.findOne({
+      subscribers: userId,
+      channel: video.owner._id,
+    });
+    const isSubscribedByUser = !!existingSubscription;
     const videoWithLikes = {
       ...video.toObject(),
       isLikedByUser,
       isDislikedByUser,
       likesCount: likes.length,
-      // dislikesCount: dislikes.length,
+      isSubscribedByUser,
+      // // dislikesCount: dislikes.length,
     };
     return res
       .status(200)

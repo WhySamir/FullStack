@@ -9,6 +9,7 @@ interface User {
     createdAt: string;
     updatedAt: string;
     watchHistory: any[];
+    subscribersCount:number;
     __v: number;
   }
 interface AuthState {
@@ -31,7 +32,10 @@ const authSlice = createSlice({
       },
       login(state, action:PayloadAction<User>) {
         state.isAuthenticated = true;
-        state.authUser = action.payload;
+        state.authUser ={
+          ...action.payload,
+          subscribersCount: action.payload.subscribersCount || 0
+        };
       },
       logout(state) {
         state.isAuthenticated = false;

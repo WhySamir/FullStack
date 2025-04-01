@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "./Theme.ts";
 import "./index.css";
@@ -7,13 +7,14 @@ import "./index.css";
 import { setUser } from "./Redux/auth.ts";
 import { RootState } from "./Redux/store.ts";
 
-import Header from "./Components/Header.tsx";
-import Maingrid from "./Components/Maingrid.tsx";
+import Header from "./Components/Navbar.tsx";
+import Maingrid from "./Components/LandingVidoes.tsx";
 import Sidebar from "./Components/Sidebar.tsx";
 import Signin from "./Components/User/Signin.tsx";
 import Signup from "./Components/User/Signup.tsx";
 import api from "./Api/axios.ts";
 import WatchVideo from "./Components/WatchVideo.tsx";
+import ChannelProfile from "./Components/ChannelProfile.tsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -64,6 +65,7 @@ function App() {
               />
 
               <Route path="/watch/:vidId" element={<WatchVideo />} />
+              <Route path="/username" element={<ChannelProfile />} />
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
             </Routes>

@@ -24,7 +24,7 @@ const toggleSubscribe = asyncHandler(async (req, res) => {
   if (channelId === String(subscriberId)) {
     throw new ApiError(400, "Cannot subscribe to your own channel");
   }
-
+  let isSubscribed = false;
   //check already subscribed or not
   const existingSubscription = await Subscription.findOne({
     subscribers: subscriberId,
@@ -34,22 +34,33 @@ const toggleSubscribe = asyncHandler(async (req, res) => {
   if (existingSubscription) {
     // Unsubscribe (delete the subscription)
     await Subscription.findByIdAndDelete(existingSubscription._id);
-    return res.status(200).json({
-      status: 200,
-      message: "Unsubscribed from the channel successfully",
-    });
+    return res
+      .status(200)
+      .json(
+        new ApiResponds(
+          200,
+          { isSubscribed },
+          "Subcribed to channel sucessfully."
+        )
+      );
   } else {
     //subscribe
     const subscription = new Subscription({
       subscribers: subscriberId,
       channel: channelId,
     });
+
     await subscription.save();
+    isSubscribed = true;
 
     return res
       .status(200)
       .json(
-        new ApiResponds(200, subscription, "Subcribed to channel sucessfully.")
+        new ApiResponds(
+          200,
+          { isSubscribed, subscription },
+          "Subcribed to channel sucessfully."
+        )
       );
   }
 });

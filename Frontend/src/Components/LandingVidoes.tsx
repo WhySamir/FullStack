@@ -165,14 +165,16 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
           </div>
         </>
       ) : (
-        <div className="flex w-full h-[90vh] flex-col justify-center my-[8vh] sm:mt-0 space-y-6 items-center">
+        <div className="flex h-[calc(96vh)] flex-col justify-center items-center space-y-6 ">
           <div className="icon text-white">
             <PlaySquare size={100} />
           </div>
-          <h1 className="text-white text-center align-middle text-2xl">
+          <h1 className="text-white text-center align-middle sm:text-2xl">
             Enjoy your favorite videos
           </h1>
-          <h2>Sign in to access videos that you’ve liked or saved</h2>
+          <h2 className="text-sm">
+            Sign in to access videos that you’ve liked or saved
+          </h2>
           <Link
             to="/signin"
             className="signin cursor-pointer gap-1 hover:bg-blue-400 rounded-full border-[0.1px] flex items-center px-3 py-1 border-gray-600"
