@@ -40,6 +40,7 @@ interface VideoProps {
   isDislikedByUser: boolean;
   likesCount: number;
   isSubscribedByUser: boolean;
+  subscribersCount: number;
   updatedAt: string;
   createdAt: string;
   _id: string;
@@ -64,7 +65,7 @@ interface Video {
 
 const WatchVideo = () => {
   const { authUser } = useSelector((state: RootState) => state.auth);
-  console.log(authUser);
+  console.log(authUser?.subscribersCount);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -96,8 +97,6 @@ const WatchVideo = () => {
     }
     try {
       const response = await getVidById({ vidId });
-
-      // console.log(response.data);
       setVideo(response.data);
       setLikes({ [vidId]: response.data.isLikedByUser });
       setDislikes({ [vidId]: response.data.isDislikedByUser });
@@ -109,16 +108,25 @@ const WatchVideo = () => {
 
   useEffect(() => {
     getVideoById();
-  }, []);
+  }, [vidId]);
 
   const handleSubscribe = async (videoId: string) => {
     if (!video || !authUser) return;
     console.log(authUser);
     try {
       const response = await toggleSubscribe(video.owner._id);
+      const isNowSubscribed = !subscribed[videoId];
       console.log(response);
-      setSubscribed((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
-
+      setSubscribed((prev) => ({ ...prev, [videoId]: isNowSubscribed }));
+      setVideo((prev) =>
+        prev
+          ? {
+              ...prev,
+              subscribersCount:
+                prev.subscribersCount + (isNowSubscribed ? 1 : -1),
+            }
+          : prev
+      );
       // setSubscribed((prev) => !prev);
     } catch (error) {
       console.error("Subscription failed:", error);
@@ -297,7 +305,7 @@ const WatchVideo = () => {
               />
             </div>
 
-            <div className=" w-full mt-3 caret-transparent ">
+            <div className="pl-1 w-full mt-3 caret-transparent ">
               <div className="w-full px-2.5 xs:px-3 sm:px-0">
                 <h1 className="font-bold text-lg sm:leading-6">
                   {video.title}
@@ -313,7 +321,7 @@ const WatchVideo = () => {
                       <div>
                         <p className=" font-semibold">{video.owner.username}</p>
                         <p className="text-xxs">
-                          {authUser?.subscribersCount} Subscribers
+                          {video.subscribersCount} Subscribers
                         </p>
                       </div>
                     </div>
@@ -430,7 +438,7 @@ const WatchVideo = () => {
               <div className="flex flex-col ">
                 <div className="flex gap-3 font-semibold">
                   {video.views} views
-                  <p>{timeAgo(video.updatedAt)}</p>
+                  <p>{timeAgo(video.createdAt)}</p>
                 </div>
                 <div className="text-sm line-clamp-3">{video.description}</div>
                 <div
@@ -457,7 +465,9 @@ const WatchVideo = () => {
                             <p className="leading-4 font-semibold">
                               {video.owner.username}
                             </p>
-                            <p className="text-sm">Subscribers</p>
+                            <p className="text-sm mt-1">
+                              {video.subscribersCount} Subscribers
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -479,7 +489,7 @@ const WatchVideo = () => {
               <Comments vidId={vidId || ""} />
             </div>
           </div>
-          <div className=" flex flex-col lg:col-span-4  mt-8 lg:mt-0 space-y-6 ">
+          <div className=" flex flex-col lg:col-span-4  mt-8 lg:mt-0 space-y-4 ">
             {playOpen ? (
               <div
                 className=" bg-black  border border-white/40 rounded-xl w-full  overflow-hidden "
@@ -489,7 +499,7 @@ const WatchVideo = () => {
               </div>
             ) : (
               <div
-                className="  border border-white/40 rounded-xl w-full overflow-hidden flex items-center justify-between py-4 pr-4 rounded-t-xl bg-[#212121]"
+                className="  border border-white/40 rounded-xl w-full overflow-hidden flex items-center justify-between  pr-4 rounded-t-xl bg-[#212121]"
                 style={{ height: " 4rem" }}
                 onClick={handlePlaylistToggle}
               >
@@ -502,7 +512,7 @@ const WatchVideo = () => {
                 </div>
               </div>
             )}
-            <div className=" flex flex-col justify-items-start mt-3 ">
+            <div className=" flex flex-col justify-items-start mt-4 lg:mt-0 ">
               <RecommendVid />
             </div>
           </div>
@@ -534,8 +544,8 @@ const Playlists: React.FC<PlaylistsProps> = ({ handlePlaylistToggle }) => {
     handlePlaylist();
   }, []);
   const handleVid = (videoId: string) => {
-    navigate(`/watch/${videoId}`);
     dispatch(selectVid(videoId));
+    navigate(`/watch/${videoId}`);
   };
 
   return (
@@ -639,7 +649,7 @@ const RecommendVid = () => {
                   </p>
                   <div className="flex gap-2 sm:gap-1 md:gap-2 sm:text-xs md:text-sm">
                     <p>{video.views} views</p>
-                    {timeAgo(video.updatedAt)}
+                    {timeAgo(video.createdAt)}
                   </div>
                 </div>
               </div>

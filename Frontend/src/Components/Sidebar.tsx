@@ -4,7 +4,6 @@ import {
   Clapperboard,
   History,
   PlaySquare,
-  Clock,
   ThumbsUp,
   Flame,
   Music,
@@ -22,6 +21,7 @@ import { useLocation } from "react-router-dom";
 interface SidebarItem {
   icon: JSX.Element;
   text: string;
+  to: string;
 }
 
 interface SidebarProps {
@@ -29,26 +29,26 @@ interface SidebarProps {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { icon: <Home />, text: "Home" },
-  { icon: <Clapperboard />, text: "Shorts" },
-  { icon: <Compass />, text: "Explore" },
-  { icon: <Youtube />, text: "Subscriptions" },
-  { icon: <ListVideo />, text: "All Subscriptions" },
-  { icon: <History />, text: "History" },
-  { icon: <PlaySquare />, text: "Playlist" },
-  { icon: <Clock />, text: "Watch Later" },
-  { icon: <ThumbsUp />, text: "Liked Videos" },
-  { icon: <Flame />, text: "Trending" },
-  { icon: <Music />, text: "Music" },
-  { icon: <Gamepad2 />, text: "Gaming" },
-  { icon: <Trophy />, text: "Sports" },
-  { icon: <Settings />, text: "Settings" },
-  { icon: <HelpCircle />, text: "Help" },
+  { icon: <Home />, text: "Home", to: "/" },
+  // { icon: <Clapperboard />, text: "Shorts" },
+  { icon: <Compass />, text: "Explore", to: "/" },
+  { icon: <Youtube />, text: "Subscriptions", to: "/" },
+  { icon: <ListVideo />, text: "All Subscriptions", to: "/" },
+  { icon: <History />, text: "History", to: "/" },
+  { icon: <PlaySquare />, text: "Playlist", to: "/" },
+  { icon: <ThumbsUp />, text: "Liked Videos", to: "/" },
+  { icon: <Flame />, text: "Trending", to: "/" },
+  { icon: <Music />, text: "Music", to: "/" },
+  { icon: <Gamepad2 />, text: "Gaming", to: "/" },
+  { icon: <Trophy />, text: "Sports", to: "/" },
+  { icon: <Settings />, text: "Settings", to: "/" },
+  { icon: <HelpCircle />, text: "Help", to: "/" },
 ];
 
 const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
   ({ item }) => (
-    <div
+    <a
+      href={item.to}
       className={` flex items-center py-2  hover:bg-neutral-800 rounded-lg cursor-pointer transition-all duration-300 justify-center" 
         `}
     >
@@ -56,7 +56,7 @@ const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
         <span className="w-6 h-6">{item.icon}</span>
         <span className="w-32">{item.text}</span>
       </div>
-    </div>
+    </a>
   )
 );
 
@@ -67,13 +67,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
     <div
       style={{
         position: isWatchPage ? "fixed" : "sticky",
-        top: isWatchPage ? "3.4rem" : "0rem",
+        top: isWatchPage ? "3.5rem" : "0rem",
         zIndex: isWatchPage ? 50 : "auto",
       }}
-      className={` h-[100dvh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
+      className={`h-[100dvh] hidden sm:flex   flex-col bg-[#16181b] text-white caret-transparent  ${
         isCollapsed ? (isWatchPage ? " h-full" : "w-18 ") : "pl-2 pr-2 w-56"
       } transform transition-transform duration-500 ease-in-out flex-shrink-0   overflow-y-auto  sidebar
-       ${isWatchPage ? "" : "pt-14 xl:pt-[4rem]"} `}
+       ${isWatchPage ? "pt-2" : "pt-14 xl:pt-[4rem]"} `}
     >
       <div className="rounded-lg flex flex-col justify-center space-y-1 ">
         {!isCollapsed &&
@@ -89,12 +89,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <div className="flex flex-col items-center space-y-1">
+              <a href="/" className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <Home />
                 </span>
                 <span className="text-[0.65rem]">Home</span>
-              </div>
+              </a>
             </div>
             <div
               className={` flex items-center ${
@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 <span className="w-6 h-6">
                   <Clapperboard />
                 </span>
-                <span className="text-[0.65rem]">Shorts</span>
+                <span className="text-[0.65rem]">Trending</span>
               </div>
             </div>
             <div

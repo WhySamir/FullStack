@@ -38,7 +38,7 @@ interface MaingridProps {
 const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
   const dispatch = useDispatch();
 
-  const { isAuthenticated, authUser } = useSelector(
+  const { isAuthenticated, authUser, isAuthChecked } = useSelector(
     (state: RootState) => state.auth
   );
   const { videos } = useSelector((state: RootState) => state.vid);
@@ -102,7 +102,9 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
       setTimeout(checkScroll, 300);
     }
   };
-
+  if (!isAuthChecked) {
+    return <div className="text-white text-center mt-14">Loading...</div>;
+  }
   return (
     <>
       {isAuthenticated ? (

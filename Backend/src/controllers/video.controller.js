@@ -93,6 +93,10 @@ const getVideosbyid = asyncHandler(async (req, res) => {
       subscribers: userId,
       channel: video.owner._id,
     });
+    const ownerSubscribers = await Subscription.find({
+      channel: video.owner._id,
+    });
+
     const isSubscribedByUser = !!existingSubscription;
     const videoWithLikes = {
       ...video.toObject(),
@@ -100,6 +104,7 @@ const getVideosbyid = asyncHandler(async (req, res) => {
       isDislikedByUser,
       likesCount: likes.length,
       isSubscribedByUser,
+      subscribersCount: ownerSubscribers.length,
       // // dislikesCount: dislikes.length,
     };
     return res

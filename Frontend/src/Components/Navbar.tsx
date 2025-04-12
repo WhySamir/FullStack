@@ -8,7 +8,7 @@ import { RootState } from "../Redux/store.ts";
 import {
   AlignJustify,
   Bell,
-  LifeBuoy,
+  // LifeBuoy,
   Mic,
   Pencil,
   Plus,
@@ -94,9 +94,12 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           </button>
 
           <div className="relative inline-block group sm:my-[18px] sm:mx-4">
-            <div className="flex flex-shrink-0 items-center caret-transparent ">
+            <a
+              href="/"
+              className="flex flex-shrink-0 items-center caret-transparent "
+            >
               <img src="/MIcon.svg" alt="WatchFree" className="h-full w-full" />
-            </div>
+            </a>
 
             <div
               className="absolute top-0 right-[-1.2rem]  text-[8px] sm:text-[.6em] opacity-80 px-1 rounded-sm"
@@ -160,10 +163,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                       <Upload />
                       <span> Upload video</span>
                     </li>
-                    <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
-                      <LifeBuoy />
+                    {/* <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
+                      // <LifeBuoy />
                       <span>Go live</span>
-                    </li>
+                    </li> */}
                     <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
                       <Pencil />
                       <span className="cursor-pointer"> Create Post </span>

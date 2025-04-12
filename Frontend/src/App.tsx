@@ -4,39 +4,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "./Theme.ts";
 import "./index.css";
 
-import { setUser } from "./Redux/auth.ts";
-import { RootState } from "./Redux/store.ts";
+import { verifyAuth } from "./Redux/auth.ts";
+import { AppDispatch, RootState } from "./Redux/store.ts";
 
 import Header from "./Components/Navbar.tsx";
 import Maingrid from "./Components/LandingVidoes.tsx";
 import Sidebar from "./Components/Sidebar.tsx";
 import Signin from "./Components/User/Signin.tsx";
 import Signup from "./Components/User/Signup.tsx";
-import api from "./Api/axios.ts";
 import WatchVideo from "./Components/WatchVideo.tsx";
 import ChannelProfile from "./Components/ChannelProfile.tsx";
 
 function App() {
-  const dispatch = useDispatch();
-  const { darkMode } = useSelector((state: RootState) => state.theme);
+  const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { darkMode } = useSelector((state: RootState) => state.theme);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const sessionResponse = await api.get("/users/check-session");
-        if (sessionResponse.data.isAuthenticated) {
-          dispatch(setUser(sessionResponse.data.user));
-        }
-      } catch (error: any) {
-        if (error.response?.status !== 401) {
-          console.error("Auth check failed:", error);
-        }
-      }
-    };
-    checkAuth();
-  }, [isAuthenticated, dispatch]);
+    dispatch(verifyAuth());
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     const theme = darkMode ? darkTheme : lightTheme;

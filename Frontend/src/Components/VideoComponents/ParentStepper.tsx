@@ -33,7 +33,11 @@ const StepperforvideoUpload: React.FC<setUploadPopupprops> = ({
               X
             </button>
           </div>
-          <Stepper video={video} videoURL={videoURL} />
+          <Stepper
+            setuploadPopup={setUploadPopup}
+            video={video}
+            videoURL={videoURL}
+          />
         </div>
       </div>
     </>

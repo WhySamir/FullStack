@@ -93,3 +93,18 @@ export const getVidById = async({vidId}:{vidId:string})=>{
     return null
   }
 }
+export const increaseVidViews = async({vidId}:{vidId:string})=>{
+  try {
+      const response = await api.post(`/videos/increaseviews/${vidId}`)
+      if(response.data.success){
+        console.log("Increased views successfully",response.data)
+      }
+      else{
+        console.log("Failed to increase views")
+      }
+      return response.data
+  } catch (error) {
+    console.error("Error not found vid Id",error)
+    return null
+  }
+}

@@ -14,9 +14,14 @@ interface Step {
 interface setUploadPopupprops {
   videoURL: string | null;
   video: File;
+  setuploadPopup: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Stepper: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
+const Stepper: React.FC<setUploadPopupprops> = ({
+  setuploadPopup,
+  video,
+  videoURL,
+}) => {
   const steps = ["Details", "Video", "Checks", "Visibility"];
   const [currentStep, setCurrentStep] = useState(0);
   const [newStep, setNewStep] = useState<Step[]>([]);
@@ -143,7 +148,10 @@ const Stepper: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
           </button>
         ) : (
           <button
-            onClick={submit}
+            onClick={() => {
+              setuploadPopup(false);
+              submit();
+            }}
             className="px-4  py-2 flex justify-between text-white rounded-2xl  bg-neutral-500 hover:bg-neutral-400  focus:outline-none"
           >
             Done

@@ -66,7 +66,7 @@ const Signin = () => {
       {/* Glassmorphism Container backdrop-blur-lg */}
       <div
         ref={menuRef}
-        className="bg-white/10  border border-white/30 shadow-lg rounded-xl p-4 w-[90vw] sm:w-[50vw] lg:w-[48vw]  2xl:w-[50vw] text-white"
+        className="bg-white/10  border border-white/30 shadow-lg rounded-xl p-4 w-[90vw] sm:w-[50vw] lg:w-[30vw]  2xl:w-[36vw] text-white"
       >
         <h1 className="text-2xl font-semibold text-center mb-6">
           Create your new account
@@ -117,7 +117,7 @@ const Signin = () => {
             <input
               type="text"
               required
-              name="fullname"
+              name="fullName"
               id="fullname"
               value={credentials.fullName}
               onChange={onchange}

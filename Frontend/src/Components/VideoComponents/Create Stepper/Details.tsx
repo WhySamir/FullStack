@@ -21,6 +21,7 @@ const Details: React.FC<setUploadPopupprops> = ({
   const [description2, setDescription2] = useState("");
   const [playlistUI, setplaylistUI] = useState(false);
   const [createPlayist, setCreatePlayist] = useState(false);
+  const [thumbnailName, setThumbnailName] = useState<string | null>(null);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuRef2 = useRef<HTMLDivElement | null>(null);
@@ -36,6 +37,7 @@ const Details: React.FC<setUploadPopupprops> = ({
     const file = event.target.files?.[0];
     if (file) {
       console.log("Selected Thumbnail:", file.name); // ✅ Check if file is detected
+      setThumbnailName(file.name);
       handleChange("thumbnail", file);
     }
   };
@@ -206,16 +208,28 @@ const Details: React.FC<setUploadPopupprops> = ({
             <p className="text-sm">
               Set a thumbnail that stands out and draws viewers' attention.
             </p>
-            <label className="items-center  flex-col flex justify-center border-dashed border border-white h-20  lg:w-40">
-              <Upload />
-              Upload file
-              <input
-                type="file"
-                className="hidden"
-                onChange={handleFileChange}
-                accept="image/*"
-              />
-            </label>
+            <div className="items-center  flex-col flex justify-center border-dashed border border-white h-20  lg:w-40">
+              <label className="w-full overflow-hidden">
+                {thumbnailName === null ? (
+                  <>
+                    <Upload />
+                    Upload file
+                  </>
+                ) : (
+                  <p className="mt-2 text-xs  break-words whitespace-normal    w-full  text-white text-center">
+                    {thumbnailName}
+                  </p>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  name="thumbnail"
+                  id="thumbnail"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+              </label>
+            </div>
           </div>
           <div className=" text-white/90 flex flex-col space-y-3">
             Playlists
@@ -225,7 +239,7 @@ const Details: React.FC<setUploadPopupprops> = ({
             </p>
             <div className="flex items-center justify-start relative ">
               <button
-                className="px-4  py-3 flex lg:w-[16vw] justify-between text-white border-1 border-white/50 rounded-lg  hover:border-2 focus:border-2 focus:border-white focus:outline-none"
+                className="px-4 mb-2 py-3 flex lg:w-[16vw] justify-between text-white border-1 border-white/50 rounded-lg  hover:border-2 focus:border-2 focus:border-white focus:outline-none"
                 onClick={() => togglePlaylist()}
               >
                 Select

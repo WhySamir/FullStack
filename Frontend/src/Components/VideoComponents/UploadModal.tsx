@@ -64,7 +64,7 @@ const UploadModal: React.FC<setUploadPopupprops> = ({ setUploadPopup }) => {
               </label>
             </div>
 
-            <div className="mb-[5vh] justify-center flex items-center text-center">
+            <div className="px-0.5 mb-[5vh] justify-center flex items-center text-center">
               <p className="text-xs text-white mt-4">
                 By submitting your videos to WatchFree, you acknowledge that you
                 agree to YouTube's{" "}

@@ -9,7 +9,6 @@ export const loginUser = async (
     const response = await api.post("/users/login", userData);
     if (response.data.success) {
       console.log("Login successful:", response.data);
-      
       return response.data;
     } else {
       setErrorMessage(response.data.message || "Login failed. Please try again.");
