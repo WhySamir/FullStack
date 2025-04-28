@@ -1,5 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 import Navbar from "./Components/Stdio/Navbar";
 import Sidebar from "./Components/Stdio/Sidebar";
@@ -16,11 +16,16 @@ const Community = lazy(() => import("./Components/Stdio/pages/Community"));
 const NotFound = lazy(() => import("./Components/Stdio/pages/NotFound"));
 
 const AppLayout: React.FC = () => {
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      <Navbar />
+      <Navbar toggleSidebar={toggleSidebar} />
       <div className="relative mt-[8vh] flex flex-1 overflow-hidden">
-        <Sidebar />
+        <Sidebar isCollapsed={isCollapsed} />
         <main className="flex-1 overflow-auto  ">
           <Suspense fallback={<LoadingSpinner />}>
             <Outlet />

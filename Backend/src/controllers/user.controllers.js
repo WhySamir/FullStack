@@ -5,7 +5,8 @@ import { uploadonCloudinary } from "../utlis/cloudinary.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -232,10 +233,12 @@ const refreshAcessToken = asyncHandler(async (req, res) => {
     if (incomingRefereshToken !== findUser?.refreshToken) {
       throw new ApiError(401, "Expired referesh token or used");
     }
+    const isProduction = process.env.NODE_ENV === "production";
 
     const options = {
       httpOnly: true,
       secure: true,
+      // sameSite: isProduction ? "None" : "Lax"
       sameSite: "None",
     };
     const { accessToken, newrefreshToken } =
@@ -316,6 +319,8 @@ const checkSession = asyncHandler(async (req, res) => {
         message: "User not found",
       });
     }
+    console.log("accessToken from cookies", req.cookies?.accessToken);
+    console.log("Authorization header", req.header("Authorization"));
 
     // Step 6: Session is valid, return user data
     return res.status(200).json({
@@ -413,21 +418,25 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 });
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
-  const { username } = req.params; //url
+  const { username } = req.params;
 
   if (!username?.trim()) {
     throw new ApiError(401, "Username not found");
   }
-  // User.find({ username });
+
+  // Check if user is logged in and convert their ID to ObjectId
+  const userId = req.user?._id
+    ? new mongoose.Types.ObjectId(req.user._id)
+    : null;
+
   const channel = await User.aggregate([
     {
       $match: {
-        username: username?.toLowerCase(),
+        username: username.toLowerCase(),
       },
     },
     {
       $lookup: {
-        ///total no of subscribers
         from: "subscriptions",
         localField: "_id",
         foreignField: "channel",
@@ -435,7 +444,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       },
     },
     {
-      //total no subsribed channels
       $lookup: {
         from: "subscriptions",
         localField: "_id",
@@ -444,18 +452,38 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: "videos",
+        localField: "_id",
+        foreignField: "owner",
+        as: "videos",
+      },
+    },
+    {
       $addFields: {
-        // users value +additionalinfo
-        subcribersCount: {
-          $size: "$subscribers",
-        },
-        channelsSubsribedCount: {
-          $size: "$subscribedTo",
-        },
+        subscribersCount: { $size: "$subscribers" },
+        channelsSubscribedCount: { $size: "$subscribedTo" },
+        videosCount: { $size: "$videos" },
+        currentUserId: { $literal: userId }, // Inject userId into the pipeline
+      },
+    },
+    {
+      $addFields: {
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user?._id, "$subscribers.subscriber"] }, //in for array&obj
-            then: true,
+            if: { $ne: ["$currentUserId", null] }, // Check if user is logged in
+            then: {
+              $in: [
+                "$currentUserId",
+                {
+                  $map: {
+                    input: "$subscribers",
+                    as: "s",
+                    in: "$$s.subscribers", // Corrected field name
+                  },
+                },
+              ],
+            },
             else: false,
           },
         },
@@ -463,24 +491,29 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     {
       $project: {
-        fullName: 1, //flag 1true
+        fullName: 1,
         username: 1,
-        subcribersCount: 1,
-        channelsSubsribedCount: 1,
+        subscribersCount: 1,
+        channelsSubscribedCount: 1,
         isSubscribed: 1,
         avatar: 1,
         coverImage: 1,
         email: 1,
+        videosCount: 1,
+        createdAt: 1,
       },
     },
   ]);
 
   if (!channel?.length) {
-    throw new ApiError(404, "Channel doesn't exists");
+    throw new ApiError(404, "Channel doesn't exist");
   }
+
   return res
     .status(200)
-    .json(new ApiResponds(200, channel[0], "User channel fetched sucessfully"));
+    .json(
+      new ApiResponds(200, channel[0], "User channel fetched successfully")
+    );
 });
 const getWatchHistory = asyncHandler(async (req, res) => {
   if (!mongoose.isValidObjectId(req.user._id)) {

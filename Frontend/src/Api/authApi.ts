@@ -90,3 +90,13 @@ export const refreshAccessToken = async () => {
     throw error;
   }
 };
+
+export const getUserChannelProfile = async (username: string) => {
+  try {
+    const response = await api.get(`/users/c/${username}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching user channel profile:", error.message);
+    throw error;
+  }
+}

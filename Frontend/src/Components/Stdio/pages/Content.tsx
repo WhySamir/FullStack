@@ -6,35 +6,47 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { userAllvideo } from "../../../Api/videoApis";
+import { formatDate, formatDuration } from "../../../Utilis/FormatDuration";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../Redux/store";
+
+interface Video {
+  thumbnail: string;
+  title: string;
+  description: string | undefined;
+  duration: number;
+  isPublished: boolean;
+  createdAt: string;
+  views: number | undefined;
+  commentCount: number | undefined;
+  likesCount: number | undefined;
+}
+
 const Content = () => {
-  const videos = [
-    {
-      thumbnail: "https://via.placeholder.com/160x90",
-      title: "Ninja Fight",
-      hashtag: "#ninjaaarashi2highlights",
-      duration: "8:14",
-      visibility: "Public",
-      restrictions: "_",
-      date: "23 Mar 2025",
-      views: 30,
-      comments: 0,
-      likes: "-",
-    },
-    {
-      thumbnail: "https://via.placeholder.com/160x90",
-      title: "6 Never Trust A Stranger Reddit Creepy Story Y...",
-      duration: "0:04",
-      visibility: "Draft",
-      restrictions: "_",
-      isDraft: true,
-    },
-  ];
+  const { authUser } = useSelector((state: RootState) => state.auth);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [selectedTab, setSelectedTab] = useState("Videos");
   const [hoveredVideo, setHoveredVideo] = useState<Number | null>(null);
 
   const tabs = ["Videos", "Posts", "Playlists"];
 
+  useEffect(() => {
+    const fetchVideos = async () => {
+      if (authUser) {
+        const response = await userAllvideo({
+          userId: authUser._id,
+        });
+        if (response) {
+          setVideos(response.data);
+        } else {
+          console.log("Error fetching videos");
+        }
+      }
+    };
+    fetchVideos();
+  }, [authUser]);
   return (
     <>
       <div className="pl-6 pr-4 flex justify-between  items-center h-[12vh]">
@@ -69,37 +81,46 @@ const Content = () => {
         {selectedTab === "Videos" && (
           <>
             <div className=" rounded">
-              <div className="pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
-                <div className="col-span-5">Video</div>
-                <div className="col-span-2 ">Visibility</div>
-                <div className="col-span-1">Date</div>
-                <div className="col-span-1">Views</div>
-                <div className="col-span-2">Comments</div>
+              <div className="sm:text-xs lg:text-sm pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
+                <div className="col-span-3  md:col-span-5">Video</div>
+                <div className="col-span-2 flex justify-center items-center">
+                  isPublished
+                </div>
+                <div className="col-span-2 md:col-span-1 ">Date</div>
+                <div className="col-span-1 ">Views</div>
+                <div className="col-span-3 md:col-span-2 sm:text-xxs lg:text-sm flex justify-center items-center ">
+                  Comments
+                </div>
                 <div className="col-span-1">Likes</div>
               </div>
               {videos.map((video, index) => (
                 <div
                   key={index}
-                  className={`pl-6 pr-4 grid grid-cols-12 items-start p-3 hover:bg-gray-900 ${
-                    video.isDraft ? "opacity-70" : ""
-                  }`}
+                  className={`sm:text-xs text-sm pl-6 pr-4  grid grid-cols-12 items-start p-3 hover:bg-gray-900 `}
                   onMouseEnter={() => setHoveredVideo(index)}
                   onMouseLeave={() => setHoveredVideo(null)}
                 >
-                  <div className="col-span-5 flex items-start">
-                    <div className="col-span-4 relative mr-4">
+                  <div className="col-span-3  md:col-span-5 flex items-start">
+                    <div className="md:col-span-4 relative md:mr-2 lg:mr-3">
                       <img
                         src={video.thumbnail}
                         alt={video.title}
-                        className="w-32 h-16 object-cover rounded"
+                        className="w-30 md:w-32 h-16 object-cover rounded"
                       />
 
                       <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
-                        {video.duration}
+                        {formatDuration(video?.duration)}
                       </span>
                     </div>
-                    <div className="col-span-1">
-                      <h1 className=" text-xs "> {video.title}</h1>
+                    <div
+                      className={`hidden md:block md:col-span-1  w-[10vw] md:w-[40%] lg:w-[80%] flex-wrap h-full ${
+                        video.isPublished ? "opacity-70" : ""
+                      }`}
+                    >
+                      <h1 className=" text-xs w-full max-w-full overflow-hidden text-ellipsis break-words line-clamp-1 ">
+                        {" "}
+                        {video.title}
+                      </h1>
                       <div className="font-medium text-xs relative">
                         {hoveredVideo === index && (
                           <div
@@ -122,33 +143,33 @@ const Content = () => {
                         )}
                       </div>
 
-                      <div
-                        className={`text-xs mt-1 ${
+                      <h1
+                        className={`text-xs max-w-full flex-wrap h-full  overflow-hidden text-ellipsis break-words line-clamp-2  mt-1 ${
                           hoveredVideo === index ? "invisible" : "visible"
                         }`}
                       >
-                        {video?.hashtag}
-                      </div>
+                        {video?.description}
+                      </h1>
                     </div>
                   </div>
-                  <div className="col-span-2 text-sm cc ">
-                    {video.visibility || "Draft"}
+                  <div className="col-span-2  flex justify-center items-center ">
+                    {video.isPublished === true ? "Published" : "Draft"}
                   </div>
-                  <div className="col-span-1 text-sm ">
-                    {video.date || "Draft"}
+                  <div className="col-span-2 md:col-span-1  ">
+                    {formatDate(video.createdAt)}
                   </div>
-                  <div className="col-span-1  text-sm font-[500] flex items-center">
+                  <div className="col-span-1   font-[500] flex justify-center items-center">
                     {video.views !== undefined ? (
                       video.views
                     ) : (
                       <Edit2 className="w-4 h-4 text-gray-500" />
                     )}
                   </div>
-                  <div className="col-span-2 text-sm font-[500]">
-                    {video?.comments}
+                  <div className="col-span-3 md:col-span-2 flex justify-center items-center font-[500]">
+                    {video?.commentCount}
                   </div>
-                  <div className="col-span-1 text-sm font-semibold">
-                    {video.restrictions || "/-"}
+                  <div className="col-span-1  font-semibold">
+                    {video.likesCount}
                   </div>
                 </div>
               ))}
@@ -158,9 +179,9 @@ const Content = () => {
         {selectedTab === "Posts" && (
           <>
             <div className=" rounded">
-              <div className="pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
+              <div className="pl-6 pr-4 flex justify-between md:grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
                 <div className="col-span-5">Posts</div>
-                <div className="col-span-2 ">Visibility</div>
+                <div className="col-span-2 ">isPublished</div>
                 <div className="col-span-1">Date</div>
                 <div className="col-span-1">Responses</div>
                 <div className="col-span-2">Comments</div>
@@ -196,34 +217,37 @@ const Content = () => {
           <>
             <div className=" rounded">
               <div className="pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
-                <div className="col-span-5">Playlist</div>
+                <div className="col-span-4 md:col-span-5 ">Playlist</div>
                 <div className="col-span-2">Type</div>
-                <div className="col-span-2 ">Visibility</div>
-                <div className="col-span-2">Last Updated</div>
-                <div className="col-span-1">Video count</div>
+                <div className="col-span-2 text-xs md:text-sm">isPublished</div>
+                <div className="col-span-3 md:col-span-2 text-xs md:text-sm">
+                  Last Updated
+                </div>
+                <div className="col-span-1 text-xs md:text-sm">Video Count</div>
               </div>
               {videos.map((video, index) => (
                 <div
                   key={index}
                   className={`pl-6 pr-4 grid grid-cols-12 items-start p-3 hover:bg-gray-900 ${
-                    video?.isDraft ? "opacity-70" : ""
+                    video?.isPublished ? "opacity-70" : ""
                   }`}
                   onMouseEnter={() => setHoveredVideo(index)}
                   onMouseLeave={() => setHoveredVideo(null)}
                 >
-                  <div className="col-span-5 flex items-start">
-                    <div className="col-span-4 relative mr-4">
+                  <div className="col-span-4 md:col-span-5 flex items-start">
+                    <div className="col-span-3 md:col-span-4 relative mr-4">
                       <img
+                        loading="eager"
                         src={video.thumbnail}
                         alt={video.title}
-                        className="w-32 h-16 object-cover rounded"
+                        className="w-24 md:w-32 h-16 object-cover rounded"
                       />
 
                       <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
-                        {video.duration}
+                        {formatDuration(video?.duration)}
                       </span>
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1   ">
                       <h1 className=" text-xs "> {video.title}</h1>
                       <div className="font-medium text-xs relative">
                         {hoveredVideo === index && (
@@ -252,20 +276,20 @@ const Content = () => {
                           hoveredVideo === index ? "invisible" : "visible"
                         }`}
                       >
-                        {video?.hashtag}
+                        {video?.description}
                       </div>
                     </div>
                   </div>
                   <div className="col-span-2 text-sm  ">Playlists</div>
                   <div className="col-span-2 text-sm ">
-                    {video?.visibility || "Draft"}
+                    {video.isPublished ? "True" : "False"}
                   </div>
-                  <div className="col-span-2  text-sm font-[500] flex items-center">
-                    {video?.date}
+                  <div className="col-span-3  text-sm font-[500] flex items-center">
+                    {formatDate(video?.createdAt)}
                   </div>
 
-                  <div className="col-span-1 text-sm font-semibold">
-                    {video.restrictions || "/-"}
+                  <div className=" col-span-1 text-sm font-semibold">
+                    {video.isPublished}
                   </div>
                 </div>
               ))}

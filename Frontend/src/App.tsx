@@ -14,15 +14,23 @@ import Signin from "./Components/User/Signin.tsx";
 import Signup from "./Components/User/Signup.tsx";
 import WatchVideo from "./Components/WatchVideo.tsx";
 import ChannelProfile from "./Components/ChannelProfile.tsx";
-
+import UserSubscription from "./Components/UserSubscriptionVid.tsx";
+import UserSubsribedChannels from "./Components/UserSubsribedChannels.tsx";
+import NotAvailableRouteGuard from "./Components/NotAvailableRouteGuard.tsx";
+import RedLoader from "./Components/RedLoader";
 function App() {
   const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState<boolean>(true);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { darkMode } = useSelector((state: RootState) => state.theme);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  const navigationCount = useSelector(
+    (state: RootState) => state.navigation.navigationCount
+  );
 
   useEffect(() => {
     dispatch(verifyAuth());
+    setLoading(false);
   }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
@@ -31,7 +39,6 @@ function App() {
       document.body.style[key as keyof typeof theme] = value;
     }
   }, [darkMode]);
-  // dispatch(setTheme());
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -40,6 +47,7 @@ function App() {
   return (
     <>
       <div className="flex flex-col  w-full h-full">
+        {loading && <RedLoader />}
         <Header toggleSidebar={toggleSidebar} />
 
         <div className="relative  flex   sm:gap-0.5">
@@ -51,10 +59,22 @@ function App() {
                 element={<Maingrid isCollapsed={isCollapsed} />}
               />
 
-              <Route path="/watch/:vidId" element={<WatchVideo />} />
-              <Route path="/username" element={<ChannelProfile />} />
+              <Route
+                path="/watch/:vidId"
+                element={<WatchVideo key={navigationCount} />}
+              />
+              <Route path="/username/:username" element={<ChannelProfile />} />
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
+              <Route
+                path="/userSubscriptions"
+                element={<UserSubscription isCollapsed={isCollapsed} />}
+              />
+              <Route path="/channels" element={<UserSubsribedChannels />} />
+              <Route
+                path="/notAvailableStdio"
+                element={<NotAvailableRouteGuard />}
+              />
             </Routes>
           </div>
         </div>

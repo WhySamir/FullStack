@@ -1,4 +1,5 @@
 import { Video } from "../models/video.model.js";
+import { Comment } from "../models/comments.model.js";
 import { asyncHandler } from "../utlis/asyncHandler.js";
 import { ApiError } from "../utlis/ApiError.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
@@ -272,13 +273,30 @@ const getAllVideos = asyncHandler(async (req, res) => {
       .skip((pageNumber - 1) * limitNumber) // Skip documents for pagination
       .limit(limitNumber); // Limit the number of documents
 
+    const videosWithCommentCount = await Promise.all(
+      videos.map(async (video) => {
+        const commentCount = await Comment.countDocuments({
+          video: video._id,
+        });
+        const likesCount = await Likes.countDocuments({
+          contentId: video._id,
+          contentType: "Video",
+          type: "like",
+        });
+        return {
+          ...video.toObject(),
+          commentCount,
+          likesCount,
+        };
+      })
+    );
     // Count total documents for pagination metadata
     const totalVideos = await Video.countDocuments(filter);
     console.log({ videos, totalVideos, pageNumber });
 
     // Send the response
     res.status(200).json({
-      data: videos,
+      data: videosWithCommentCount,
       totalPages: Math.ceil(totalVideos / limitNumber),
       currentPage: pageNumber,
       totalVideos,

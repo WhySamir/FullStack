@@ -209,7 +209,7 @@ const Details: React.FC<setUploadPopupprops> = ({
               Set a thumbnail that stands out and draws viewers' attention.
             </p>
             <div className="items-center  flex-col flex justify-center border-dashed border border-white h-20  lg:w-40">
-              <label className="w-full overflow-hidden">
+              <label className="w-full justify-center flex flex-col items-center overflow-hidden">
                 {thumbnailName === null ? (
                   <>
                     <Upload />
@@ -280,7 +280,7 @@ const Details: React.FC<setUploadPopupprops> = ({
               )}
               {createPlayist && (
                 <div
-                  className="fixed  inset-0 sm:m-auto my-auto bg-neutral-800 w-[96vw] mx-1 lg:w-[70vw]  z-50 h-[80vh]  flex flex-col justify-between  rounded-lg"
+                  className="fixed  inset-0 sm:m-auto my-auto bg-neutral-700 w-[96vw] mx-1 lg:w-[70vw]  z-50 h-[80vh]  flex flex-col justify-between  rounded-lg"
                   ref={menuRef2}
                 >
                   <div className=" border-b-1 border-neutral-500 flex  justify-between  items-start  px-3 sm:px-6 pt-[17.5px] ">
@@ -297,7 +297,7 @@ const Details: React.FC<setUploadPopupprops> = ({
                     </button>
                   </div>
                   <div className="flex flex-col ">
-                    <div className="mb-4 relative mx-6 overflow-scroll">
+                    <div className="mb-4 relative mx-6 overflow-y-scroll scrollbar-hidden">
                       <textarea
                         className="w-full px-2 resize-none pt-9  text-white border-1 border-white/50 rounded-lg hover:border-2 focus:border-2 focus:border-white focus:outline-none  min-h-[12vh]"
                         value={title2}
@@ -316,7 +316,7 @@ const Details: React.FC<setUploadPopupprops> = ({
                         Title (required)
                       </div>
                     </div>
-                    <div className="mb-4 relative mx-6 overflow-scroll">
+                    <div className="mb-4 relative mx-6 overflow-y-scroll scrollbar-hidden">
                       <textarea
                         className="w-full px-2 resize-none pt-9  text-white border-1 border-white/50 rounded-lg hover:border-2 focus:border-2 focus:border-white focus:outline-none min-h-[14vh]"
                         value={description2}

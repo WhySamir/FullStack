@@ -51,7 +51,6 @@ export const userAllvideo = async({ userId }:{userId:string})=>{
        headers:{ 'Content-Type':'application/json'}
     })
       if(response.data){
-        //   console.log('Got user All videos successfully',response.data.data)
           return response.data;
       }
       else{

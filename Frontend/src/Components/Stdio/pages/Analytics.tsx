@@ -60,7 +60,7 @@ const Analytics = () => {
         ))}
       </div>
 
-      <div className=" pl-6 pr-4 grid grid-cols-[5.9fr_2fr] space-x-9 ">
+      <div className="mb-3 pl-6 pr-4 lg:grid grid-cols-[5.9fr_2fr] space-x-9 space-y-9  lg:space-y-0">
         <div className="">
           <h2 className="text-3xl text-center text-white font-bold my-6">
             Your channel got 30 views in the last 28 days
@@ -87,9 +87,7 @@ const Analytics = () => {
               </button>
               <button
                 onClick={() => setSelectedGraph(2)}
-                className={`${
-                  selectedGraph === 2 && "bg-neutral-800"
-                } border-r border-r-gray-700 p-4 `}
+                className={`${selectedGraph === 2 && "bg-neutral-800"}  p-4 `}
               >
                 <p className="text-neutral-400">Subscribers</p>
                 <p className="text-2xl font-bold text-green-500">+1</p>

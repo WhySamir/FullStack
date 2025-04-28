@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { formatDuration } from "../Utilis/FormatDuration";
 import { getVidById, userAllvideo } from "../Api/videoApis";
@@ -22,6 +22,9 @@ import { toggleLike_Dislike } from "../Api/like";
 import { selectVid } from "../Redux/videos";
 import { toggleSubscribe } from "../Api/subscriber";
 import { ShareModal } from "./ShareVideo";
+import { setNavigating, incrementNavigationCount } from "../Redux/navigations";
+import RedLoader from "./RedLoader";
+import { SkeletonWatchVid } from "./SkeletonWatchVid";
 
 interface VideoProps {
   thumbnail: string;
@@ -64,8 +67,12 @@ interface Video {
 }
 
 const WatchVideo = () => {
+  const dispatch = useDispatch();
+  const { isNavigating } = useSelector((state: RootState) => state.navigation);
+
   const { authUser } = useSelector((state: RootState) => state.auth);
-  console.log(authUser?.subscribersCount);
+
+  const [initialLoad, setInitialLoad] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -78,6 +85,15 @@ const WatchVideo = () => {
   const [likes, setLikes] = useState<{ [key: string]: boolean }>({});
   const [dislikes, setDislikes] = useState<{ [key: string]: boolean }>({});
   const [subscribed, setSubscribed] = useState<{ [key: string]: boolean }>({});
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   const updateHeight = () => {
     if (videoRef.current) {
       const totalHeight = videoRef.current.clientHeight;
@@ -96,6 +112,7 @@ const WatchVideo = () => {
       return;
     }
     try {
+      setInitialLoad(true);
       const response = await getVidById({ vidId });
       setVideo(response.data);
       setLikes({ [vidId]: response.data.isLikedByUser });
@@ -103,6 +120,9 @@ const WatchVideo = () => {
       setSubscribed({ [vidId]: response.data.isSubscribedByUser });
     } catch (error) {
       console.error("Error fetching video:", error);
+    } finally {
+      setInitialLoad(false);
+      dispatch(setNavigating(false));
     }
   };
 
@@ -262,11 +282,17 @@ const WatchVideo = () => {
   const handlePlaylistToggle = () => {
     setplayOpen(!playOpen);
   };
+  const isMounted = useRef(true);
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
   const handleDownload = async () => {
     if (!video || isDownloading) return;
 
+    if (isMounted.current) setIsDownloading(false);
     setIsDownloading(true);
-
     try {
       const response = await fetch(video.videoFile);
       const blob = await response.blob();
@@ -287,241 +313,265 @@ const WatchVideo = () => {
       setTimeout(() => setIsDownloading(false), 2000); // Small delay to ensure UI updates properly
     }
   };
-
+  if (isNavigating || initialLoad)
+    // if (!initialLoad)
+    return (
+      <>
+        <RedLoader />
+        <SkeletonWatchVid />
+      </>
+    );
   if (!video) return <p>Video not found</p>;
 
   return (
-    <div className="mt-14  ">
-      <div className="sm:mx-auto sm:max-w-[1400px] h-full sm:px-6 lg:px-8   text-white">
-        <div className="  flex flex-col lg:grid grid-cols-12  items-start   ">
-          <div className="flex flex-col   lg:col-span-8    lg:mr-6">
-            <div className="sticky top-[3.48rem] z-10 lg:static aspect-video bg-black sm:rounded-xl overflow-hidden shadow-2xl">
-              <video
-                ref={videoRef}
-                src={video.videoFile}
-                onLoadedMetadata={updateHeight}
-                controls
-                className="w-screen lg:w-full h-full object-cover"
-              />
-            </div>
+    <>
+      <div className="mt-14  ">
+        <div className="sm:mx-auto sm:max-w-[1400px] h-full sm:px-6 lg:pl-8   text-white">
+          <div className="  flex flex-col lg:grid grid-cols-12  items-start   ">
+            <div className="flex flex-col   lg:col-span-8    lg:mr-6">
+              <div className="sticky top-[3.42rem] sm:top-[3.48rem] z-10 lg:static aspect-video bg-black sm:rounded-xl overflow-hidden shadow-2xl">
+                <video
+                  ref={videoRef}
+                  src={video.videoFile}
+                  onLoadedMetadata={updateHeight}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-screen  lg:w-full h-full object-cover"
+                />
+              </div>
 
-            <div className="pl-1 w-full mt-3 caret-transparent ">
-              <div className="w-full px-2.5 xs:px-3 sm:px-0">
-                <h1 className="font-bold text-lg sm:leading-6">
-                  {video.title}
-                </h1>
-                <div className="mt-3 space-y-2 md:flex items-start justify-between ">
-                  <div className="flex items-start sm:gap-2 justify-between">
-                    <div className="flex gap-2 items-center">
-                      <img
-                        src={video.owner.avatar}
-                        alt=" Avatar"
-                        className="sm:w-10 sm:h-10 w-8 h-8 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className=" font-semibold">{video.owner.username}</p>
-                        <p className="text-xxs">
-                          {video.subscribersCount} Subscribers
-                        </p>
-                      </div>
-                    </div>
-                    {video.owner._id === authUser?._id ? (
-                      <div className="hidden sm:flex-grow sm:flex gap-1 xl:gap-2 justify-end  lg:ml-3">
-                        <button
-                          onClick={() => handleSubscribe(video._id)}
-                          className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-[#3EA6FF]   hover:bg-[#64B8FF]"
-                        >
-                          <span className="flex tracking-tight text-neutral-900 font-[500] md:font-medium">
-                            Analytics
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => handleSubscribe(video._id)}
-                          className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-[#3EA6FF]   hover:bg-[#64B8FF]"
-                        >
-                          <span className="flex whitespace-nowrap tracking-tight text-neutral-900 font-[500] md:font-medium">
-                            Edit Video
-                          </span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="sm:flex-grow flex justify-center md:ml-[3vw] lg:ml-3">
-                        <button
-                          onClick={() => handleSubscribe(video._id)}
-                          className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-white   hover:bg-neutral-300"
-                        >
-                          <span className="flex tracking-tight text-neutral-900 font-[500] md:font-medium">
-                            {subscribed[video._id] ? "Subscribed" : "Subscribe"}{" "}
-                          </span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex  gap-2 xs:gap-0 xs:justify-normal xs:space-x-6 sm:space-x-2">
-                    <div className="w-24 xs:w-30 md:w-34 h-7 sm:h-9 cursor-pointer  font-semibold items-center  rounded-[2.5rem] flex bg-neutral-600 ">
-                      <button
-                        onClick={() => handleVideoLike(video._id)}
-                        className="w-full  h-full  rounded-l-[2.5rem] hover:bg-neutral-500  px-2 sm:px-3   flex items-center text-white/90 text-xs md:font-medium"
+              <div className="pl-1 w-full mt-3 caret-transparent ">
+                <div className="w-full px-2.5 xs:px-3 sm:px-0">
+                  <h1 className="font-bold text-lg sm:leading-6">
+                    {video.title}
+                  </h1>
+                  <div className="mt-3 space-y-2 md:flex items-start justify-between ">
+                    <div className="flex items-start sm:gap-2 justify-between">
+                      <div
+                        onClick={() =>
+                          navigate(`/username/${video.owner.username}`)
+                        }
+                        className="flex gap-2 items-center"
                       >
-                        <span
-                          className={` ${
-                            likes[video._id] ? "text-blue-500" : ""
-                          }`}
-                        >
-                          <ThumbsUp className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
-                        </span>
-                        <span className="sm:text-sm md:text-[16px] mx-2.5  ">
-                          {video.likesCount ?? 0}
-                        </span>
-                      </button>
-                      <div className="border-r-2 border-white/30 h-[80%] "></div>
-                      <button
-                        onClick={() => handleVideoDisLike(video._id)}
-                        className=" h-full  px-4 text-lg  hover:bg-neutral-500 rounded-r-[2.5rem] flex items-center text-white/90 sm:text-xs md:font-semibold"
-                      >
-                        <span
-                          className={`${
-                            dislikes[video._id] ? "text-blue-500" : ""
-                          }`}
-                        >
-                          <ThumbsDown className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
-                        </span>
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => setShowShareModal(true)}
-                      className=" h-7 sm:h-9 cursor-pointer justify-between font-bold items-center        rounded-[2.5rem] flex bg-neutral-600 "
-                    >
-                      <span className=" w-full  h-full  rounded-[2.5rem] hover:bg-neutral-500  px-3  flex items-center gap-2 text-white/90 text-xs md:font-medium">
-                        <Share2 className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
-                        <p className="text-xs md:text-[16px] font-semibold">
-                          Share
-                        </p>
-                      </span>
-                    </button>
-                    <ShareModal
-                      isOpen={showShareModal}
-                      onClose={() => setShowShareModal(false)}
-                      videoId={video._id} // Pass your actual video ID here
-                    />
-                    <button
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className=" h-7 sm:h-9 cursor-pointer justify-between font-bold items-center        rounded-[2.5rem] flex bg-neutral-600 "
-                    >
-                      <span className="w-full  h-full  rounded-[2.5rem] hover:bg-neutral-500  px-3   flex items-center gap-2 text-white/90 text-xs md:font-medium">
-                        <Download className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
-                        <p className="text-xs md:text-[16px] font-semibold">
-                          Download
-                        </p>
-                      </span>
-                    </button>
-
-                    {isDownloading && (
-                      <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
-                        <div className="flex flex-col items-center p-5 bg-neutral-800 rounded-lg shadow-lg">
-                          <Loader className="w-8 h-8 animate-spin text-blue-400" />
-                          <p className="mt-2 text-sm text-gray-700">
-                            Downloading video...
+                        <img
+                          src={video.owner.avatar}
+                          alt=" Avatar"
+                          className="sm:w-10 sm:h-10 w-8 h-8 rounded-full object-cover"
+                        />
+                        <div>
+                          <p className=" font-semibold">
+                            {video.owner.username}
+                          </p>
+                          <p className="text-xxs">
+                            {video.subscribersCount} Subscribers
                           </p>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div
-              className="mx-2 xs:mx-3 sm:mx-0 mt-3 p-3 bg-[#242828] rounded-lg flex flex-col "
-              style={{ minHeight: "5rem" }}
-            >
-              <div className="flex flex-col ">
-                <div className="flex gap-3 font-semibold">
-                  {video.views} views
-                  <p>{timeAgo(video.createdAt)}</p>
-                </div>
-                <div className="text-sm line-clamp-3">{video.description}</div>
-                <div
-                  onClick={() => {
-                    setMore(true);
-                  }}
-                  className={` ${
-                    more ? "hidden" : "block"
-                  } font-semibold cursor-pointer`}
-                >
-                  ...more
-                </div>
-                {more && (
-                  <>
-                    <div className="cursor-pointer">
-                      <div className="mt-4 flex items-center justify-between ">
-                        <div className="flex">
-                          <img
-                            src={video.owner.avatar}
-                            alt="Uploader Avatar"
-                            className="sm:w-10 sm:h-10 w-8 h-8 rounded-full mr-2 object-cover"
-                          />
-                          <div>
-                            <p className="leading-4 font-semibold">
-                              {video.owner.username}
-                            </p>
-                            <p className="text-sm mt-1">
-                              {video.subscribersCount} Subscribers
+                      {video.owner._id === authUser?._id ? (
+                        <div className="hidden sm:flex-grow sm:flex gap-1 xl:gap-2 justify-end  lg:ml-3">
+                          <button
+                            onClick={() => navigate(`/stdio/channel/analytics`)}
+                            className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-[#3EA6FF]   hover:bg-[#64B8FF]"
+                          >
+                            <span className="flex tracking-tight text-neutral-900 font-[500] md:font-medium">
+                              Analytics
+                            </span>
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/stdio/channel/content/${video._id}`)
+                            }
+                            className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-[#3EA6FF]   hover:bg-[#64B8FF]"
+                          >
+                            <span className="flex whitespace-nowrap tracking-tight text-neutral-900 font-[500] md:font-medium">
+                              Edit Video
+                            </span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="sm:flex-grow flex justify-center sm:justify-end md:ml-[3vw] lg:ml-2 xl:ml-3">
+                          <button
+                            onClick={() => handleSubscribe(video._id)}
+                            className="cursor-pointer h-9   items-center  px-4 py-1    rounded-[2.5rem] flex bg-white   hover:bg-neutral-300"
+                          >
+                            <span className="flex tracking-tight text-neutral-900 font-[500] md:font-medium">
+                              {subscribed[video._id]
+                                ? "Subscribed"
+                                : "Subscribe"}{" "}
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex  gap-2 xs:gap-0 xs:justify-normal xs:space-x-6 sm:space-x-2">
+                      <div className="w-24 xs:w-30 md:w-34 h-7 sm:h-9 cursor-pointer  font-semibold items-center  rounded-[2.5rem] flex bg-neutral-600 ">
+                        <button
+                          onClick={() => handleVideoLike(video._id)}
+                          className="w-full  h-full  rounded-l-[2.5rem] hover:bg-neutral-500  px-2 sm:px-3   flex items-center text-white/90 text-xs md:font-medium"
+                        >
+                          <span
+                            className={` ${
+                              likes[video._id] ? "text-blue-500" : ""
+                            }`}
+                          >
+                            <ThumbsUp className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
+                          </span>
+                          <span className="sm:text-sm md:text-[16px] mx-2.5  ">
+                            {video.likesCount ?? 0}
+                          </span>
+                        </button>
+                        <div className="border-r-2 border-white/30 h-[80%] "></div>
+                        <button
+                          onClick={() => handleVideoDisLike(video._id)}
+                          className=" h-full  px-4 text-lg  hover:bg-neutral-500 rounded-r-[2.5rem] flex items-center text-white/90 sm:text-xs md:font-semibold"
+                        >
+                          <span
+                            className={`${
+                              dislikes[video._id] ? "text-blue-500" : ""
+                            }`}
+                          >
+                            <ThumbsDown className="w-3 h-3 sm:w-4.5 sm:h-4.5" />
+                          </span>
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setShowShareModal(true)}
+                        className=" h-7 sm:h-9 cursor-pointer justify-between font-bold items-center        rounded-[2.5rem] flex bg-neutral-600 "
+                      >
+                        <span className=" w-full  h-full  rounded-[2.5rem] hover:bg-neutral-500  px-3  flex items-center gap-2 text-white/90 text-xs md:font-medium">
+                          <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <p className="text-xs md:text-[16px] font-semibold">
+                            Share
+                          </p>
+                        </span>
+                      </button>
+                      <ShareModal
+                        isOpen={showShareModal}
+                        onClose={() => setShowShareModal(false)}
+                        videoId={video._id} // Pass your actual video ID here
+                      />
+                      <button
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className=" h-7 sm:h-9 cursor-pointer justify-between font-bold items-center        rounded-[2.5rem] flex bg-neutral-600 "
+                      >
+                        <span className="w-full  h-full  rounded-[2.5rem] hover:bg-neutral-500  px-3   flex items-center gap-2 text-white/90 text-xs md:font-medium">
+                          <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <p className="text-xs md:text-[16px] font-semibold">
+                            Download
+                          </p>
+                        </span>
+                      </button>
+
+                      {isDownloading && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md z-50">
+                          <div className="flex flex-col items-center p-5 bg-neutral-800 rounded-lg shadow-lg">
+                            <Loader className="w-8 h-8 animate-spin text-blue-400" />
+                            <p className="mt-2 text-sm text-gray-700">
+                              Downloading video...
                             </p>
                           </div>
                         </div>
-                      </div>
-                      <div
-                        className="mt-6"
-                        onClick={() => {
-                          setMore(false);
-                        }}
-                      >
-                        Show Less
-                      </div>
+                      )}
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
+              </div>
+              <div
+                className="mx-2 xs:mx-3 sm:mx-0 mt-3 p-3 bg-[#242828] rounded-lg flex flex-col "
+                style={{ minHeight: "5rem" }}
+              >
+                <div className="flex flex-col ">
+                  <div className="flex gap-3 font-semibold">
+                    {video.views} views
+                    <p>{timeAgo(video.createdAt)}</p>
+                  </div>
+                  <div className="text-sm line-clamp-3">
+                    {video.description}
+                  </div>
+                  <div
+                    onClick={() => {
+                      setMore(true);
+                    }}
+                    className={` ${
+                      more ? "hidden" : "block"
+                    } font-semibold cursor-pointer`}
+                  >
+                    ...more
+                  </div>
+                  {more && (
+                    <>
+                      <div className="cursor-pointer">
+                        <div className="mt-4 flex items-center justify-between ">
+                          <div className="flex">
+                            <img
+                              src={video.owner.avatar}
+                              alt="Uploader Avatar"
+                              className="sm:w-10 sm:h-10 w-8 h-8 rounded-full mr-2 object-cover"
+                            />
+                            <div>
+                              <p className="leading-4 font-semibold">
+                                {video.owner.username}
+                              </p>
+                              <p className="text-sm mt-1">
+                                {video.subscribersCount} Subscribers
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className="mt-6"
+                          onClick={() => {
+                            setMore(false);
+                          }}
+                        >
+                          Show Less
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="px-2 xs:px-4 sm:px-0 sm:hidden lg:block w-full sm:mb-8">
+                <Comments vidId={vidId || ""} />
               </div>
             </div>
-
-            <div className="px-2 xs:px-4 sm:px-0 sm:hidden lg:block w-full sm:mb-8">
+            <div className=" flex flex-col lg:col-span-4  mt-8 lg:mt-0 space-y-4 ">
+              {playOpen ? (
+                <div
+                  className=" bg-black  border border-white/40 rounded-xl w-full  overflow-hidden "
+                  style={{ height: vidHeight }}
+                >
+                  <Playlists handlePlaylistToggle={handlePlaylistToggle} />
+                </div>
+              ) : (
+                <div
+                  className="  border border-white/40 rounded-xl w-full overflow-hidden flex items-center justify-between  pr-4 rounded-t-xl bg-[#212121]"
+                  style={{ height: " 4rem" }}
+                  onClick={handlePlaylistToggle}
+                >
+                  <div className="text-white flex flex-col  ml-4  caret-transparent ">
+                    <h1 className="font-semibold ">Playlists Name</h1>
+                    <p className="text-sm text-gray-300">WatchFree Mix</p>
+                  </div>
+                  <div className="h-9 w-9 p-1 rounded-full hover:bg-neutral-600 items-center flex">
+                    <ChevronDown strokeWidth={1} size={36} />
+                  </div>
+                </div>
+              )}
+              <div className=" flex flex-col justify-items-start mt-4 lg:mt-0 ">
+                <RecommendVid />
+              </div>
+            </div>
+            <div className="px-2 xs:px-4 sm:px-0 hidden sm:block lg:hidden w-full sm:mb-8">
               <Comments vidId={vidId || ""} />
             </div>
           </div>
-          <div className=" flex flex-col lg:col-span-4  mt-8 lg:mt-0 space-y-4 ">
-            {playOpen ? (
-              <div
-                className=" bg-black  border border-white/40 rounded-xl w-full  overflow-hidden "
-                style={{ height: vidHeight }}
-              >
-                <Playlists handlePlaylistToggle={handlePlaylistToggle} />
-              </div>
-            ) : (
-              <div
-                className="  border border-white/40 rounded-xl w-full overflow-hidden flex items-center justify-between  pr-4 rounded-t-xl bg-[#212121]"
-                style={{ height: " 4rem" }}
-                onClick={handlePlaylistToggle}
-              >
-                <div className="text-white flex flex-col  ml-4  caret-transparent ">
-                  <h1 className="font-semibold ">Playlists Name</h1>
-                  <p className="text-sm text-gray-300">WatchFree Mix</p>
-                </div>
-                <div className="h-9 w-9 p-1 rounded-full hover:bg-neutral-600 items-center flex">
-                  <ChevronDown strokeWidth={1} size={36} />
-                </div>
-              </div>
-            )}
-            <div className=" flex flex-col justify-items-start mt-4 lg:mt-0 ">
-              <RecommendVid />
-            </div>
-          </div>
-          <div className="px-2 xs:px-4 sm:px-0 hidden sm:block lg:hidden w-full sm:mb-8">
-            <Comments vidId={vidId || ""} />
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 interface PlaylistsProps {
@@ -544,6 +594,8 @@ const Playlists: React.FC<PlaylistsProps> = ({ handlePlaylistToggle }) => {
     handlePlaylist();
   }, []);
   const handleVid = (videoId: string) => {
+    dispatch(setNavigating(true));
+    dispatch(incrementNavigationCount());
     dispatch(selectVid(videoId));
     navigate(`/watch/${videoId}`);
   };
@@ -571,7 +623,8 @@ const Playlists: React.FC<PlaylistsProps> = ({ handlePlaylistToggle }) => {
         </div>
         {playlists != null &&
           playlists.map((video, i) => (
-            <div
+            <Link
+              to={`/watch/${video._id}`}
               key={video._id || i}
               className="flex pl-2    hover:bg-[#1D2521] items-center space-x-2 cursor-pointer caret-transparent"
               onClick={() => handleVid(video._id)}
@@ -593,7 +646,7 @@ const Playlists: React.FC<PlaylistsProps> = ({ handlePlaylistToggle }) => {
                 </div>
                 <p className="text-xs text-gray-300 ">{video.owner.username}</p>
               </div>
-            </div>
+            </Link>
           ))}
       </div>
     </>
@@ -616,6 +669,9 @@ const RecommendVid = () => {
     handlePlaylist();
   }, []);
   const handleVid = (videoId: string) => {
+    dispatch(setNavigating(true));
+    dispatch(incrementNavigationCount());
+
     navigate(`/watch/${videoId}`);
     dispatch(selectVid(videoId));
   };
@@ -624,7 +680,8 @@ const RecommendVid = () => {
       <div className="flex flex-col xs:flex-wrap xs:mx-3 xs:justify-between  xs:flex-row lg:flex-row ">
         {playlists != null &&
           playlists.map((video, i) => (
-            <div
+            <Link
+              to={`/watch/${video._id}`}
               key={video._id || i}
               className="w-full xs:w-[48%]     lg:w-full flex flex-col sm:flex-row pl-0.5  items-center space-x-0.5 cursor-pointer caret-transparent"
               onClick={() => handleVid(video?._id)}
@@ -644,7 +701,7 @@ const RecommendVid = () => {
                   {video.title}
                 </div>
                 <div className="flex flex-col ">
-                  <p className="text-xs text-gray-300 ">
+                  <p className="text-xs text-gray-300 lg:w-[16vw] lg:max-w-[20vw] overflow-hidden text-ellipsis break-words line-clamp-2 ">
                     {video.owner.username}
                   </p>
                   <div className="flex gap-2 sm:gap-1 md:gap-2 sm:text-xs md:text-sm">
@@ -653,7 +710,7 @@ const RecommendVid = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
       </div>
     </>

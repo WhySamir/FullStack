@@ -1,15 +1,17 @@
 import { AlignJustify, Plus, Search } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-
-const Navbar = () => {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+const Navbar: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { authUser } = useSelector((state: RootState) => state.auth);
   return (
     //shadow-neutral-500
     <nav className="shadow-xl  fixed left-0 right-6 top-0 z-50 border-box h-[8vh]  px-5 w-full flex items-center justify-between   ">
       <div className="flex items-center justify-between gap-2  ">
         <button
-          // onClick={toggleSidebar}
+          onClick={toggleSidebar}
           className="hidden cursor-pointer hover:bg-neutral-800 py-2 px-2 rounded-full  sm:flex"
         >
           <AlignJustify />

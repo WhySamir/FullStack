@@ -7,6 +7,8 @@ import { RootState } from "../Redux/store";
 
 import { getallvideos } from "../Api/videoApis";
 import { upload } from "../Redux/videos";
+import RedLoader from "./RedLoader";
+import SkeletonLandingVid from "./VideoComponents/SkeletonLandingVid";
 
 interface ObjItem {
   text: string;
@@ -38,10 +40,11 @@ interface MaingridProps {
 const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
   const dispatch = useDispatch();
 
-  const { isAuthenticated, authUser, isAuthChecked } = useSelector(
+  const { isAuthenticated, authUser } = useSelector(
     (state: RootState) => state.auth
   );
   const { videos } = useSelector((state: RootState) => state.vid);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState<Boolean>(false);
@@ -50,8 +53,9 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
   const checkScroll = () => {
     if (containerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+      const tolerance = 5;
       setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 1);
+      setShowRightArrow(scrollLeft + clientWidth + tolerance < scrollWidth - 1);
     }
   };
 
@@ -66,9 +70,10 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
         container.removeEventListener("scroll", checkScroll);
       }
     };
-  }, [containerRef.current]);
+  }, []);
 
   useEffect(() => {
+    let loaderTimeout: ReturnType<typeof setTimeout>;
     const getAllUserVideos = async () => {
       if (authUser?._id) {
         try {
@@ -81,6 +86,11 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
       }
     };
     getAllUserVideos();
+    loaderTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 900);
+
+    return () => clearTimeout(loaderTimeout);
   }, [authUser, dispatch]);
 
   const scrollLeft = () => {
@@ -99,15 +109,29 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
         left: 150,
         behavior: "smooth",
       });
-      setTimeout(checkScroll, 300);
+      setTimeout(checkScroll, 500);
     }
   };
-  if (!isAuthChecked) {
-    return <div className="text-white text-center mt-14">Loading...</div>;
-  }
+
   return (
     <>
-      {isAuthenticated ? (
+      {loading && <RedLoader />}
+      {loading ? (
+        <>
+          <div className="mt-12 sm:mt-24 transition-all duration-500 flex flex-col sm:grid grid-cols-12 gap-y-2  ">
+            {Array.from({ length: 12 }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`2xl:col-span-3 ${
+                  isCollapsed ? "xl:col-span-3" : "xl:col-span-4"
+                }  lg:col-span-4  md:col-span-6  col-span-12 cursor-pointer caret-transparent`}
+              >
+                <SkeletonLandingVid />
+              </div>
+            ))}
+          </div>
+        </>
+      ) : isAuthenticated ? (
         <>
           <div className="relative  sm:mt-14 w-full  caret-transparent  sm:flex hidden">
             {showLeftArrow && (
@@ -123,7 +147,8 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
             )}
             <div
               ref={containerRef}
-              className={`relative  flex space-x-4 overflow-x-scroll scrollbar-hidden 
+              onScroll={checkScroll}
+              className={`relative  flex space-x-4 overflow-x-scroll scrollbar-hidden
                 ${
                   isCollapsed
                     ? "sm:max-w-[80vw] md:max-w-[85vw] lg:max-w-[86vw] xl:max-w-[90vw]"
@@ -153,7 +178,7 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
           </div>
           <div className="mt-12 sm:mt-5  transition-all duration-500 flex flex-col sm:grid grid-cols-12 gap-y-2  ">
             {videos != null
-              ? videos.map((video, i) => (
+              ? videos.map((video: any, i) => (
                   <div
                     key={video._id || i}
                     className={`2xl:col-span-3 ${

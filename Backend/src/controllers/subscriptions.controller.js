@@ -3,7 +3,7 @@ import { ApiError } from "../utlis/ApiError.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import { User } from "../models/user.model.js";
 import { Subscription } from "../models/subscriptions.model.js";
-
+import { Video } from "../models/video.model.js";
 //toggle subscribe
 //get user subscribers
 //get user subscribed channel
@@ -95,22 +95,57 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { subscriberId } = req.params;
 
   if (!subscriberId) {
-    throw new ApiError(401, "subscriberid missing");
+    throw new ApiError(401, "subscriberId missing");
   }
-  const subscriber = await Subscription.find({
+
+  // 1. Get all subscriptions where this user is the subscriber
+  const subscriptions = await Subscription.find({
     subscribers: subscriberId,
-  }).populate(
-    "subscribers",
-    "fullName email username avatar coverImage" // Populate specific fields of the subscriber
+  });
+
+  // 2. For each subscription, get channel details, subscriber count, and video count
+  const result = await Promise.all(
+    subscriptions.map(async (sub) => {
+      const channelId = sub.channel;
+
+      // Get channel info
+      const channelInfo = await User.findById(channelId).select(
+        "fullName username avatar email"
+      );
+
+      if (!channelInfo) return null; // Skip if channel user not found
+
+      // Get total number of subscribers this channel has
+      const subscriberCount = await Subscription.countDocuments({
+        channel: channelId,
+      });
+
+      // Get total number of videos this channel has uploaded
+      const videoCount = await Video.countDocuments({
+        owner: channelId,
+      });
+
+      return {
+        channel: channelInfo,
+        subscriberCount,
+        videoCount,
+        isSubscribed: true,
+      };
+    })
   );
+
+  // Filter out nulls in case any channel info was not found
+  const filteredResult = result.filter((r) => r !== null);
 
   return res
     .status(200)
     .json(
       new ApiResponds(
         200,
-        subscriber,
-        subscriber.length > 0 ? "Subscribed channels" : "No channels subscribed"
+        filteredResult,
+        filteredResult.length > 0
+          ? "Subscribed channels"
+          : "No channels subscribed"
       )
     );
 });

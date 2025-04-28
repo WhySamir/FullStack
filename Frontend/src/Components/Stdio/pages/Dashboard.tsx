@@ -1,8 +1,10 @@
 import { Pencil, Upload } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
+  const navigate = useNavigate();
   return (
-    <div className="pl-6 pr-4">
+    <div className="pl-6 pr-4 mb-3">
       <div className="flex justify-between  items-center h-[12vh]">
         <h1 className="text-white font-semibold text-3xl">Channel dashboard</h1>
         <div className="items flex gap-3">
@@ -17,41 +19,39 @@ const Dashboard = () => {
       </div>
       <div className=" text-white  ">
         {/* h-[calc(100vh-21vh)] */}
-        <div className="grid grid-cols-3 space-x-6 h-full">
+        <div className="grid xl:grid-cols-3 space-y-6 xl:space-x-6 h-full">
           {/* Latest Video Performance */}
-          <div className="border border-gray-700 rounded-lg p-6">
+          <div className="border border-gray-700 rounded-lg py-6 px-4 xl:px-6">
             <h2 className="text-xl font-[500] mb-4">
               Latest video performance
             </h2>
-            <div className="relative bg-green-900/50 h-48 rounded-lg overflow-hidden">
+            <div className="relative bg-green-900/50 h-44 xl:h-48 w-48 xl:w-full rounded-lg overflow-hidden">
               <img
                 src="/api/placeholder/400/200"
-                alt="Video Thumbnail"
+                alt="Latest Video"
                 className="w-full h-full object-cover opacity-50"
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-white text-center px-4">
-                  A brief insight into what this video is about
-                </p>
-              </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-4 text-sm text-gray-300">
               <div className="text-center">
                 <span>30</span>
-                <p>Views</p>
+                <p className="text-xs">Views</p>
               </div>
               <div className="text-center">
                 <span>3</span>
-                <p>Likes</p>
+                <p className="text-xs">Likes</p>
               </div>
               <div className="text-center">
                 <span>3</span>
-                <p>Comments</p>
+                <p className="text-xs">Comments</p>
               </div>
             </div>
             <div className="w-full h-[1px] my-4 bg-gray-700"></div>
             <div className="px-4 pt-2">duration</div>
-            <button className="mt-3 w-auto px-4 py-1.5 rounded-[2.5rem] flex items-center justify-center bg-blue-600 hover:bg-blue-700">
+            <button
+              onClick={() => navigate("/stdio/channel/analytics")}
+              className="mt-3 w-auto px-4 py-1.5 rounded-[2.5rem] flex items-center justify-center bg-blue-600 hover:bg-blue-700"
+            >
               <span>Go to video analytics</span>
             </button>
             <button
@@ -91,7 +91,10 @@ const Dashboard = () => {
                   <p>16 Views</p>
                 </div>
               </div>
-              <button className="w-auto px-4 py-1.5 rounded-[2.5rem] flex items-center justify-center bg-blue-600 hover:bg-blue-700">
+              <button
+                onClick={() => navigate("/stdio/channel/analytics")}
+                className="w-auto px-4 py-1.5 rounded-[2.5rem] flex items-center justify-center bg-blue-600 hover:bg-blue-700"
+              >
                 <span>Go to video analytics</span>
               </button>
             </div>

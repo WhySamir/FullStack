@@ -25,3 +25,15 @@ export const timeAgo = (dateString: string) => {
   }
   return "Just now";
 };
+
+export function formatDate(rawDate: string) {
+  const date = new Date(rawDate);
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  };
+
+  return date.toLocaleDateString(undefined, options);
+}

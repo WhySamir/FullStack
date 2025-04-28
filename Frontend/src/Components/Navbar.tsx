@@ -82,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   return (
     <>
       <nav
-        className="  fixed left-0 right-6 top-0 z-50 border-box h-[8vh]  px-5 w-full flex items-center justify-between "
+        className="  fixed left-0 right-6 top-0 z-50 border-box h-[3.4rem] bg-neutral-700  px-5 w-full flex items-center justify-between "
         style={darkTheme}
       >
         <div className="flex items-center justify-between gap-2  ">
@@ -109,7 +109,11 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             </div>
           </div>
         </div>
-        <div className="forinput text-md hidden sm:flex items-center gap-2 ">
+        <div
+          className={`forinput text-md ${
+            !isAuthenticated ? "lg:mr-24" : "lg:mr-0"
+          } hidden sm:flex items-center gap-2`}
+        >
           <div className="relative">
             <input
               type="text"
@@ -142,7 +146,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <div className="relative  " ref={menuRef2}>
               <button
                 onClick={handleCreateClick}
-                className="cursor-pointer justify-center items-center  px-3 py-2 gap-[0.4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600"
+                className="cursor-pointer justify-center items-center   px-3 py-1.5 gap-[4px]  rounded-[2.5rem] hidden sm:flex bg-neutral-700 hover:bg-neutral-600"
               >
                 <Plus />
                 <span className=" flex text-white/90 text-xs md:font-medium">

@@ -137,13 +137,13 @@ const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
                       value={option.value}
                       checked={selectedOption === option.value}
                       onChange={() => setSelectedOption(option.value)}
-                      className="mt-1  sm:w-5 sm:h-5 accent-blue-500"
+                      className="mt-1  sm:w-4 sm:h-4 accent-blue-500"
                     />
                     <div>
                       <p className="text-xs sm:text-sm font-medium">
                         {option.label}
                       </p>
-                      <p className="md:block hidden text-gray-400 text-sm max-w-full whitespace-nowrap">
+                      <p className="sm:block hidden text-gray-400 sm:text-xxs md:text-xs xl:text-sm max-w-full whitespace-nowrap">
                         {option.desc}
                       </p>
                     </div>

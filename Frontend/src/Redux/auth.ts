@@ -28,7 +28,9 @@ export const verifyAuth = createAsyncThunk(
   "auth/verify",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/users/check-session");
+      const response = await api.get("/users/check-session", {
+        withCredentials: true,
+      });
       console.log("Auth response:", response.data);
       return {
         user: response.data.user, 
