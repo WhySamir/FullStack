@@ -18,6 +18,7 @@ import UserSubscription from "./Components/UserSubscriptionVid.tsx";
 import UserSubsribedChannels from "./Components/UserSubsribedChannels.tsx";
 import NotAvailableRouteGuard from "./Components/NotAvailableRouteGuard.tsx";
 import RedLoader from "./Components/RedLoader";
+import { PlaylistPageWrapper } from "./Components/LikedVideos.tsx";
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -75,6 +76,7 @@ function App() {
                 path="/notAvailableStdio"
                 element={<NotAvailableRouteGuard />}
               />
+              <Route path="/likedvideos" element={<PlaylistPageWrapper />} />
             </Routes>
           </div>
         </div>

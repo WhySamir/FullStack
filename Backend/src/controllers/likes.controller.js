@@ -87,17 +87,26 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       contentType: "Video",
     };
     const likes = await Likes.find(filter)
-      .populate({ path: "contentId", model: "Video" }) // Populate contentId as Video
-      .sort({ createdAt: -1 });
-
+      .sort({ updatedAt: -1 })
+      .select("contentId updatedAt")
+      .populate({
+        path: "contentId",
+        model: "Video",
+        populate: {
+          path: "owner",
+          model: "User",
+          select: "username",
+        },
+      });
     const totalVideoLikes = await Likes.countDocuments(filter);
-
+    const lastUpdated = likes.length > 0 ? likes[0].updatedAt : null;
     const likedVideos = likes.map((like) => like.contentId);
 
     res.status(200).json({
       success: true,
       data: likedVideos,
       totalVideoLikes,
+      lastUpdated,
     });
   } catch (error) {
     console.error("Error fetching liked videos:", error);

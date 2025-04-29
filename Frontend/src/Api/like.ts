@@ -8,7 +8,6 @@ export const toggleLike_Dislike = async ({
   if (!ObjId || !type) return;
 
   try {
-    // Make sure you send both the params and the request body
     const response = await api.post(
       `/toggle/like-dislike/${ObjId}/${type}`,
       { contentType } // Send the contentType in the body
@@ -20,3 +19,15 @@ export const toggleLike_Dislike = async ({
   }
 };
 
+
+export const getLikedVideos = async () => {
+  try{
+    const response = await api.get('toggle/getlikedvideos');
+    console.log(response.data)
+    return response.data;
+  }
+catch (error){
+    console.error(error);
+  }
+
+}

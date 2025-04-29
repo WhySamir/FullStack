@@ -37,7 +37,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: <History />, text: "History", to: "/" },
   // { icon: <PlaySquare />, text: "Playlist", to: "/" },
   { icon: <Youtube />, text: "Your Videos", to: "/stdio/channel/content" },
-  { icon: <ThumbsUp />, text: "Liked Videos", to: "/" },
+  { icon: <ThumbsUp />, text: "Liked Videos", to: "/likedvideos" },
   { icon: <Flame />, text: "Trending", to: "/" },
   { icon: <Music />, text: "Music", to: "/" },
   { icon: <Gamepad2 />, text: "Gaming", to: "/" },

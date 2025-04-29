@@ -1,0 +1,3 @@
+npm install framer-motion
+recharts
+npm install color-thief
