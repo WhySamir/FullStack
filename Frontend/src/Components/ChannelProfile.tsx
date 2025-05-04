@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { toggleSubscribe } from "../Api/subscriber";
 import { setNavigating } from "../Redux/navigations";
-import RedLoader from "./RedLoader";
+import RedLoader from "./Common/RedLoader";
+import { VideoProps } from "../types/videosInterface";
 
 interface channelprops {
   avatar: string;
@@ -25,18 +26,6 @@ interface channelprops {
   videosCount: number;
   createdAt: string;
 }
-interface Video {
-  thumbnail: string;
-  title: string;
-  description: string | undefined;
-  duration: number;
-  isPublished: boolean;
-  createdAt: string;
-  views: number | undefined;
-  commentCount: number | undefined;
-  likesCount: number | undefined;
-  _id: string;
-}
 
 const ChannelProfile = () => {
   const navigate = useNavigate();
@@ -48,7 +37,7 @@ const ChannelProfile = () => {
   const { username } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copy, setcopy] = useState<boolean>();
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideoProps[]>([]);
 
   useEffect(() => {
     const fetchChannelAndVideos = async () => {

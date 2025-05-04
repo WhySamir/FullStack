@@ -44,10 +44,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             </button>
           </div>
 
-          <div className="text-center text-sm text-gray-400 mb-6">
-            2 subscribers
-          </div>
-
           <div className="border-t border-zinc-700 pt-3">
             <h3 className="text-white text-lg mb-3">Share</h3>
 

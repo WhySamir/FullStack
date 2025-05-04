@@ -31,30 +31,70 @@ interface SidebarProps {
 
 const sidebarItems: SidebarItem[] = [
   { icon: <Home />, text: "Home", to: "/" },
-  { icon: <Compass />, text: "Explore", to: "/" },
+  {
+    icon: <Compass />,
+    text: "Explore",
+    to: `/search?q=${encodeURIComponent("Explore".toLowerCase())}`,
+  },
   { icon: <Youtube />, text: "Subscriptions", to: "/userSubscriptions" },
   { icon: <ListVideo />, text: "All Subscriptions", to: "/channels" },
   { icon: <History />, text: "History", to: "/" },
   // { icon: <PlaySquare />, text: "Playlist", to: "/" },
   { icon: <Youtube />, text: "Your Videos", to: "/stdio/channel/content" },
   { icon: <ThumbsUp />, text: "Liked Videos", to: "/likedvideos" },
-  { icon: <Flame />, text: "Trending", to: "/" },
-  { icon: <Music />, text: "Music", to: "/" },
-  { icon: <Gamepad2 />, text: "Gaming", to: "/" },
-  { icon: <Trophy />, text: "Sports", to: "/" },
-  { icon: <Settings />, text: "Settings", to: "/" },
-  { icon: <HelpCircle />, text: "Help", to: "/" },
+  {
+    icon: <Flame />,
+    text: "Trending",
+    to: `/search?q=${encodeURIComponent("Trending".toLowerCase())}`,
+  },
+  {
+    icon: <Music />,
+    text: "Music",
+    to: `/search?q=${encodeURIComponent("Music".toLowerCase())}`,
+  },
+  {
+    icon: <Gamepad2 />,
+    text: "Gaming",
+    to: `/search?q=${encodeURIComponent("Gaming".toLowerCase())}`,
+  },
+  {
+    icon: <Trophy />,
+    text: "Sports",
+    to: `/search?q=${encodeURIComponent("Sports".toLowerCase())}`,
+  },
+  { icon: <Settings />, text: "Settings", to: "/commingsoon" },
+  { icon: <HelpCircle />, text: "Help", to: "/commingsoon" },
 ];
 
 const sidebarItemsNotAuthenciated: SidebarItem[] = [
-  { icon: <Home />, text: "Home", to: "/" },
-  { icon: <Compass />, text: "Explore", to: "/" },
-  { icon: <Flame />, text: "Trending", to: "/" },
-  { icon: <Music />, text: "Music", to: "/" },
-  { icon: <Gamepad2 />, text: "Gaming", to: "/" },
-  { icon: <Trophy />, text: "Sports", to: "/" },
-  { icon: <Settings />, text: "Settings", to: "/" },
-  { icon: <HelpCircle />, text: "Help", to: "/" },
+  { icon: <Home />, text: "Home", to: "/home" },
+  {
+    icon: <Compass />,
+    text: "Explore",
+    to: `/search?q=${encodeURIComponent("Explore".toLowerCase())}`,
+  },
+  {
+    icon: <Flame />,
+    text: "Trending",
+    to: `/search?q=${encodeURIComponent("Trending".toLowerCase())}`,
+  },
+  {
+    icon: <Music />,
+    text: "Music",
+    to: `/search?q=${encodeURIComponent("Music".toLowerCase())}`,
+  },
+  {
+    icon: <Gamepad2 />,
+    text: "Gaming",
+    to: `/search?q=${encodeURIComponent("Gaming".toLowerCase())}`,
+  },
+  {
+    icon: <Trophy />,
+    text: "Sports",
+    to: `/search?q=${encodeURIComponent("Sports".toLowerCase())}`,
+  },
+  { icon: <Settings />, text: "Settings", to: "/commingsoon" },
+  { icon: <HelpCircle />, text: "Help", to: "/commingsoon" },
 ];
 
 const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
@@ -144,14 +184,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <Link to="/" className="flex flex-col items-center space-y-1">
+              <Link
+                to={`${isAuthenticated ? "/" : "/home"}`}
+                className="flex flex-col items-center space-y-1"
+              >
                 <span className="w-6 h-6">
                   <Home />
                 </span>
                 <span className="text-[0.65rem]">Home</span>
               </Link>
             </div>
-            <div
+            <button
+              onClick={() =>
+                navigate(
+                  `/search?q=${encodeURIComponent("Trending".toLowerCase())}`
+                )
+              }
               className={` flex items-center ${
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
@@ -162,7 +210,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 </span>
                 <span className="text-[0.65rem]">Trending</span>
               </Link>
-            </div>
+            </button>
             {isAuthenticated ? (
               <>
                 <div
@@ -180,10 +228,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                     <span className="text-[0.65rem]">Subscriptions</span>
                   </Link>
                 </div>
-                <button
-                  onClick={() => {
-                    navigate(`/username/${authUser?.username}`);
-                  }}
+                <Link
+                  to={`/username/${authUser?.username}`}
                   className={`flex items-center ${
                     isCollapsed ? "justify-center" : "justify-between"
                   } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
@@ -194,14 +240,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                     </span>
                     <span className="text-[0.65rem]">You</span>
                   </div>
-                </button>
+                </Link>
               </>
             ) : (
               <>
                 <button
-                  onClick={() => {
-                    navigate(`/username/${authUser?.username}`);
-                  }}
+                  onClick={() =>
+                    navigate(
+                      `/search?q=${encodeURIComponent("Music".toLowerCase())}`
+                    )
+                  }
                   className={`flex items-center ${
                     isCollapsed ? "justify-center" : "justify-between"
                   } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}

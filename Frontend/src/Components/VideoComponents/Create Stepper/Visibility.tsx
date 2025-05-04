@@ -1,12 +1,19 @@
 import { Copy } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
+import { VideoProps } from "../../../types/videosInterface";
 
 interface setUploadPopupprops {
   videoURL: string | null;
   video: File;
+
+  setVideoAttributes: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
+const Visibility: React.FC<setUploadPopupprops> = ({
+  video,
+  videoURL,
+  setVideoAttributes,
+}) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const containerRef2 = useRef<HTMLDivElement | null>(null);
   const optareaRef = useRef<HTMLDivElement | null>(null);
@@ -15,6 +22,16 @@ const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
   const descAreaRef = useRef<HTMLTextAreaElement>(null);
   const [descHeight, setDescHeight] = useState<number>(180);
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (!selectedOption || !description) return;
+
+    setVideoAttributes((prev: VideoProps) => ({
+      ...prev,
+      hashtag: description,
+      isPublished: selectedOption === "public",
+    }));
+  }, [selectedOption, description, setVideoAttributes]);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -170,7 +187,7 @@ const Visibility: React.FC<setUploadPopupprops> = ({ video, videoURL }) => {
             />
 
             <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">
-              Description (&copy;)
+              Hashtag (&copy;)
             </div>
           </div>
         </div>

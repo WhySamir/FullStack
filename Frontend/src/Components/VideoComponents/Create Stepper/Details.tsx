@@ -1,5 +1,6 @@
 import { ArrowDownIcon, Copy, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { VideoProps } from "../../../types/videosInterface";
 
 interface setUploadPopupprops {
   videoURL: string | null;
@@ -27,7 +28,7 @@ const Details: React.FC<setUploadPopupprops> = ({
   const menuRef2 = useRef<HTMLDivElement | null>(null);
 
   const handleChange = (field: keyof typeof videoAttributes, value: any) => {
-    setVideoAttributes((prev: any) => ({
+    setVideoAttributes((prev: VideoProps) => ({
       ...prev,
       [field]: value,
     }));
@@ -254,7 +255,8 @@ const Details: React.FC<setUploadPopupprops> = ({
                 >
                   <p className="text-center text-sm lg:text-lg text-white py-3">
                     {" "}
-                    No playlists available
+                    {/* No playlists available || */}
+                    Comming Soon...
                   </p>
                   <div>
                     <hr />

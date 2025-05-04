@@ -7,6 +7,11 @@ import LoadingSpinner from "./Components/Common/LoadingSpinner";
 import { setUser } from "./Redux/auth";
 import api from "./Api/axios";
 import { useDispatch } from "react-redux";
+import NotAvailableRouteGuard from "./Components/NotAvailableRouteGuard";
+import ResponsiveGuard from "./Components/Stdio/ResponsiveGuard";
+import AuthGuard from "./Components/Stdio/AuthGuard";
+import { fetchVideos } from "./Redux/userallVideos";
+import type { AppDispatch } from "./Redux/store";
 
 // Lazy load route components
 const Dashboard = lazy(() => import("./Components/Stdio/pages/Dashboard"));
@@ -35,16 +40,15 @@ const AppLayout: React.FC = () => {
     </div>
   );
 };
-
 const Stdio: React.FC = () => {
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const sessionResponse = await api.get("/users/check-session");
         if (sessionResponse.data.isAuthenticated) {
           dispatch(setUser(sessionResponse.data.user));
+          dispatch(fetchVideos(sessionResponse.data.user._id));
         }
       } catch (error: any) {
         if (error.response?.status !== 401) {
@@ -54,14 +58,27 @@ const Stdio: React.FC = () => {
     };
     checkAuth();
   }, [dispatch]);
+
   return (
     <Routes>
-      <Route path="/channel" element={<AppLayout />}>
+      {/* This route shows the "not available" message */}
+      <Route path="/notAvailableStdio" element={<NotAvailableRouteGuard />} />
+
+      {/* All /channel routes are protected by ResponsiveGuard */}
+      <Route
+        path="/channel"
+        element={
+          <ResponsiveGuard>
+            <AuthGuard>
+              <AppLayout />
+            </AuthGuard>
+          </ResponsiveGuard>
+        }
+      >
         <Route
           index
           element={<Navigate to="/stdio/channel/dashboard" replace />}
         />
-        {/* using / global routing */}
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="content" element={<Content />} />
         <Route path="analytics" element={<Analytics />} />
@@ -71,5 +88,4 @@ const Stdio: React.FC = () => {
     </Routes>
   );
 };
-
 export default Stdio;

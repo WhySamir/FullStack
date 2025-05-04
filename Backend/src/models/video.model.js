@@ -27,6 +27,10 @@ const videoSchema = new Schema(
       type: Number,
       default: 0,
     },
+    hashtag: {
+      type: String,
+      default: "",
+    },
     isPublished: {
       type: Boolean,
       default: true,

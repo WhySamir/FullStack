@@ -100,7 +100,9 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       });
     const totalVideoLikes = await Likes.countDocuments(filter);
     const lastUpdated = likes.length > 0 ? likes[0].updatedAt : null;
-    const likedVideos = likes.map((like) => like.contentId);
+    const likedVideos = likes
+      .map((like) => like.contentId)
+      .filter((video) => video !== null);
 
     res.status(200).json({
       success: true,

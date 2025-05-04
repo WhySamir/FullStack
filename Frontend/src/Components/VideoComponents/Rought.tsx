@@ -1,10 +1,10 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { formatDuration } from "../Utilis/FormatDuration";
-import { getVidById, userAllvideo } from "../Api/videoApis";
-import { timeAgo } from "../Utilis/FormatDuration";
+import { formatDuration } from "../../Utilis/FormatDuration";
+import { getVidById, userAllvideo } from "../../Api/videoApis";
+import { timeAgo } from "../../Utilis/FormatDuration";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../Redux/store";
+import { RootState } from "../../Redux/store";
 
 import {
   ChevronDown,
@@ -17,13 +17,16 @@ import {
   X,
 } from "lucide-react";
 
-import Comments from "./Comments";
-import { toggleLike_Dislike } from "../Api/like";
-import { selectVid } from "../Redux/videos";
-import { toggleSubscribe } from "../Api/subscriber";
-import { ShareModal } from "./ShareVideo";
-import { setNavigating, incrementNavigationCount } from "../Redux/navigations";
-import RedLoader from "./RedLoader";
+import Comments from "../Comments";
+import { toggleLike_Dislike } from "../../Api/like";
+import { selectVid } from "../../Redux/videos";
+import { toggleSubscribe } from "../../Api/subscriber";
+import { ShareModal } from "../ShareVideo";
+import {
+  setNavigating,
+  incrementNavigationCount,
+} from "../../Redux/navigations";
+import RedLoader from "../Common/RedLoader";
 import { SkeletonWatchVid } from "./SkeletonWatchVid";
 
 interface VideoProps {
@@ -340,13 +343,14 @@ const WatchVideo = () => {
                   className="w-screen  lg:w-full h-full object-cover"
                 />
               </div>
-
+              {/* VideoMetadata */}
               <div className="pl-1 w-full mt-3 caret-transparent ">
                 <div className="w-full px-2.5 xs:px-3 sm:px-0">
                   <h1 className="font-bold text-lg sm:leading-6">
                     {video.title}
                   </h1>
                   <div className="mt-3 space-y-2 md:flex items-start justify-between ">
+                    {/* ChannelInfo */}
                     <div className="flex items-start sm:gap-2 justify-between">
                       <div
                         onClick={() =>
@@ -404,6 +408,7 @@ const WatchVideo = () => {
                         </div>
                       )}
                     </div>
+                    {/* VideoActions */}
                     <div className="flex  gap-2 xs:gap-0 xs:justify-normal xs:space-x-6 sm:space-x-2">
                       <div className="w-24 xs:w-30 md:w-34 h-7 sm:h-9 cursor-pointer  font-semibold items-center  rounded-[2.5rem] flex bg-neutral-600 ">
                         <button
@@ -478,6 +483,7 @@ const WatchVideo = () => {
                   </div>
                 </div>
               </div>
+              {/* VideoDescription */}
               <div
                 className="mx-2 xs:mx-3 sm:mx-0 mt-3 p-3 bg-[#242828] rounded-lg flex flex-col "
                 style={{ minHeight: "5rem" }}

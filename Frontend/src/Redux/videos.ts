@@ -1,24 +1,9 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-interface Video {
-    thumbnail: string;
-    title: string;
-    description: string;
-    duration: number;
-    videoFile: string;
-    isPublished: boolean;
-    views: number|null;
-    owner: {
-      _id: string;
-      username: string;
-      avatar: string;
-  };
-    updatedAt: string;
-    createdAt: string;
-    _id: string;
-  }
+import { VideoProps } from "../types/videosInterface";
+
   
 interface VideoState {
-    videos:Video[],
+    videos:VideoProps[],
     vidId:string
   }
 
@@ -31,7 +16,7 @@ const videoSlice = createSlice({
     name: "vid",
     initialState,
     reducers: {
-      upload(state, action:PayloadAction<Video[]>) {
+      upload(state, action:PayloadAction<VideoProps[]>) {
         state.videos = action.payload;
       },
       selectVid(state, action:PayloadAction<string>) {

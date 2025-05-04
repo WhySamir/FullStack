@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NotAvailableStdio from "./NotAvailableStdio"; // adjust path
 
-const NotAvailableRouteGuard = () => {
+const ResponsiveGuard = ({ children }: { children: JSX.Element }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
   const navigate = useNavigate();
 
@@ -10,23 +9,22 @@ const NotAvailableRouteGuard = () => {
     const handleResize = () => {
       const small = window.innerWidth < 640;
       setIsSmallScreen(small);
-
-      if (!small) {
-        navigate("/stdio/channel", { replace: true });
+      if (small) {
+        navigate("/stdio/notAvailableStdio", { replace: true });
       }
     };
 
     window.addEventListener("resize", handleResize);
 
     // Initial check
-    if (window.innerWidth >= 640) {
-      navigate("/", { replace: true });
+    if (window.innerWidth < 640) {
+      navigate("/stdio/notAvailableStdio", { replace: true });
     }
 
     return () => window.removeEventListener("resize", handleResize);
   }, [navigate]);
 
-  return isSmallScreen ? <NotAvailableStdio /> : null;
+  return !isSmallScreen ? children : null;
 };
 
-export default NotAvailableRouteGuard;
+export default ResponsiveGuard;

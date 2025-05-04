@@ -6,7 +6,7 @@ import { userAllvideo } from "../Api/videoApis";
 import Video from "./VideoComponents/AllVideos";
 import { useNavigate } from "react-router-dom";
 import { setNavigating } from "../Redux/navigations";
-import RedLoader from "./RedLoader";
+import RedLoader from "./Common/RedLoader";
 import SkeletonLandingVid from "./VideoComponents/SkeletonLandingVid";
 
 interface Collapse {
@@ -50,6 +50,9 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
   useEffect(() => {
     if (userSubscribedChannels.length === 0) {
       console.log("no subscribed channels found");
+      setLoadingVideos(false);
+      dispatch(setNavigating(false));
+
       return;
     }
     const fetchVideosFromSubscribedChannels = async () => {
@@ -70,6 +73,7 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
         setSubscribedChannelsVideos(allVideos);
       } catch (error) {
         console.error("Failed to fetch subscribed channel videos", error);
+        setLoadingVideos(false);
       } finally {
         setLoadingVideos(false);
         dispatch(setNavigating(false));
@@ -78,6 +82,9 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
 
     fetchVideosFromSubscribedChannels();
   }, [userSubscribedChannels, dispatch]);
+  if (!loadingVideos && subscribedChannelsVideos.length === 0) {
+    return <div className="hero px-4 mt-3">No Subscribed Videos</div>;
+  }
 
   return (
     <>

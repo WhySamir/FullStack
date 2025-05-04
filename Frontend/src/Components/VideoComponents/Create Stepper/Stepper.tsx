@@ -46,11 +46,16 @@ const Stepper: React.FC<setUploadPopupprops> = ({
     videoFile: video,
     duration: 0,
     isPublished: false,
+    hashtag: "",
   });
   const submit = async () => {
-    console.log("object", videoAttributes);
-    const data = await postVideo(videoAttributes);
-    console.log(data);
+    console.log("Submitting video", videoAttributes);
+    try {
+      const data = await postVideo(videoAttributes);
+      console.log("Upload response:", data);
+    } catch (err) {
+      console.error("Submit error:", err);
+    }
   };
 
   const updateStep = (stepNumber: number, steps: Step[]): Step[] => {
@@ -128,7 +133,13 @@ const Stepper: React.FC<setUploadPopupprops> = ({
         )}
         {currentStep === 1 && <VideoStepp />}
         {currentStep === 2 && <Checks />}
-        {currentStep === 3 && <Visibility video={video} videoURL={videoURL} />}
+        {currentStep === 3 && (
+          <Visibility
+            video={video}
+            videoURL={videoURL}
+            setVideoAttributes={setVideoAttributes}
+          />
+        )}
       </div>
       <div className="flex mt-3 lg:mt-0 px-3 sm:px-6 justify-end w-full gap-4 mb-2">
         <button

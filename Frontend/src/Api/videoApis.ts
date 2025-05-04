@@ -7,7 +7,7 @@ export const postVideo = async(videoData:{
     duration:number;
     videoFile:File|null;
     isPublished:boolean;
-
+    hashtag:string;
 })=>{
     const formData = new FormData()
     // supports only string Blob and files
@@ -20,17 +20,20 @@ export const postVideo = async(videoData:{
         formData.append("videoFile",videoData.videoFile);
     }
     if(videoData.thumbnail){
-        formData.append("thumbnail",videoData.thumbnail);
+      formData.append("thumbnail",videoData.thumbnail);
     }
+    formData.append("hashtag",videoData.hashtag);
     //boolean & number
     formData.append("isPublished",String(videoData.isPublished));
     formData.append("duration",videoData.duration.toString());
 
     //url name getallvideos but works for post and get both
     try {
-   const response =  await api.post('/videos/getallvideos',formData,{
-        headers:{"Content-Type": "multipart/form-data",}
-    })
+   const response =  await api.post('/videos/publishavideo',formData,
+    // {
+    //     headers:{"Content-Type": "multipart/form-data",}
+    // }
+  )
      if(response.data.success){
         console.log("Video uploaded sucessfully",response.data)  
          return response.data
@@ -105,5 +108,16 @@ export const increaseVidViews = async({vidId}:{vidId:string})=>{
   } catch (error) {
     console.error("Error not found vid Id",error)
     return null
+  }
+}
+
+export const deletedVidById = async({vidId}:{vidId:string})=>{
+  try {
+    
+    const response  = await api.delete(`/videos/deletevid/${vidId}`)
+    return response.data
+  } catch (error) {
+    console.error("Error not found vid Id",error)
+    
   }
 }

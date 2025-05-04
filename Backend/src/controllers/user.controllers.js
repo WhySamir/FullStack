@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utlis/asyncHandler.js";
 import { ApiError } from "../utlis/ApiError.js";
 import { User } from "../models/user.model.js";
+import { Subscription } from "../models/subscriptions.model.js";
 import { uploadonCloudinary } from "../utlis/cloudinary.js";
 import { ApiResponds } from "../utlis/ApiResponds.js";
 import jwt from "jsonwebtoken";
@@ -310,7 +311,9 @@ const checkSession = asyncHandler(async (req, res) => {
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
     );
-
+    const subscribersCount = await Subscription.countDocuments({
+      channel: user._id,
+    });
     // Step 5: If user not found, return unauthenticated
     if (!user) {
       return res.status(200).json({
@@ -327,7 +330,10 @@ const checkSession = asyncHandler(async (req, res) => {
       success: true,
       isAuthenticated: true,
       message: "Session is valid",
-      user, // Include user details
+      user: {
+        ...user.toObject(),
+        subscribersCount,
+      }, // Include user details
     });
   } catch (error) {
     // Step 7: Handle token verification errors

@@ -1,52 +1,30 @@
-import {
-  Filter,
-  Edit2,
-  BarChart2,
-  PlayCircle,
-  MoreHorizontal,
-} from "lucide-react";
+import { Filter, Edit2, BarChart2, PlayCircle, Trash } from "lucide-react";
 
-import { useEffect, useState } from "react";
-import { userAllvideo } from "../../../Api/videoApis";
+import { useState } from "react";
+import { deletedVidById } from "../../../Api/videoApis";
 import { formatDate, formatDuration } from "../../../Utilis/FormatDuration";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../Redux/store";
-
-interface Video {
-  thumbnail: string;
-  title: string;
-  description: string | undefined;
-  duration: number;
-  isPublished: boolean;
-  createdAt: string;
-  views: number | undefined;
-  commentCount: number | undefined;
-  likesCount: number | undefined;
-}
+import { deleteVideo } from "../../../Redux/userallVideos";
+import { useNavigate } from "react-router-dom";
 
 const Content = () => {
-  const { authUser } = useSelector((state: RootState) => state.auth);
-  const [videos, setVideos] = useState<Video[]>([]);
+  const dispatch = useDispatch();
+  const { videos } = useSelector((state: RootState) => state.userVideo);
   const [selectedTab, setSelectedTab] = useState("Videos");
   const [hoveredVideo, setHoveredVideo] = useState<Number | null>(null);
 
+  const navigate = useNavigate();
   const tabs = ["Videos", "Posts", "Playlists"];
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      if (authUser) {
-        const response = await userAllvideo({
-          userId: authUser._id,
-        });
-        if (response) {
-          setVideos(response.data);
-        } else {
-          console.log("Error fetching videos");
-        }
-      }
-    };
-    fetchVideos();
-  }, [authUser]);
+  const handleDeleteVideo = async (vidId: string) => {
+    try {
+      await deletedVidById({ vidId });
+      dispatch(deleteVideo(vidId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       <div className="pl-6 pr-4 flex justify-between  items-center h-[12vh]">
@@ -71,7 +49,7 @@ const Content = () => {
         <div className="flex my-1.5 items-center  text-sm  border-b border-gray-700">
           <button className="pl-6 pr-4  flex items-center p-3  mr-4 gap-4 ">
             <Filter className="w-4 h-4 mr-2 " />
-            <span>Filter</span>
+            <span>Lists</span>
           </button>
           <div className="ml-auto mr-5 flex items-center">
             <span className="mr-4">Rows per page: 30</span>
@@ -129,16 +107,29 @@ const Content = () => {
                             <div className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
                               <Edit2 className="w-4 h-4 text-gray-300 hover:text-white" />
                             </div>
-                            <div className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
+                            <button
+                              onClick={() =>
+                                navigate(
+                                  `/stdio/channel/analytics?videoId=${video._id}`
+                                )
+                              }
+                              className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                            >
                               <BarChart2 className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </div>
+                            </button>
 
-                            <div className=" lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
+                            <button
+                              onClick={() => navigate(`/watch/${video._id}`)}
+                              className=" lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                            >
                               <PlayCircle className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </div>
-                            <div className="bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
-                              <MoreHorizontal className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </div>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVideo(video._id)}
+                              className="bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                            >
+                              <Trash className="w-4 h-4 text-gray-300 hover:text-white" />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -152,23 +143,23 @@ const Content = () => {
                       </h1>
                     </div>
                   </div>
-                  <div className="col-span-2  flex justify-center items-center ">
+                  <div className="col-span-2  font-[500] flex justify-center items-center text-xxs lg:text-xs ">
                     {video.isPublished === true ? "Published" : "Draft"}
                   </div>
-                  <div className="col-span-2 md:col-span-1  ">
+                  <div className="col-span-2 md:col-span-1 font-[500] text-xxs lg:text-xs ">
                     {formatDate(video.createdAt)}
                   </div>
-                  <div className="col-span-1   font-[500] flex justify-center items-center">
+                  <div className="col-span-1  text-xxs lg:text-xs font-[500] flex justify-center items-center">
                     {video.views !== undefined ? (
                       video.views
                     ) : (
                       <Edit2 className="w-4 h-4 text-gray-500" />
                     )}
                   </div>
-                  <div className="col-span-3 md:col-span-2 flex justify-center items-center font-[500]">
+                  <div className="col-span-3 text-xxs lg:text-xs  md:col-span-2 flex justify-center items-center font-[500]">
                     {video?.commentCount}
                   </div>
-                  <div className="col-span-1  font-semibold">
+                  <div className="col-span-1  font-[500] text-xxs lg:text-xs">
                     {video.likesCount}
                   </div>
                 </div>
@@ -206,7 +197,8 @@ const Content = () => {
 
                   {/* Button */}
                   <button className="bg-white text-black font-semibold px-4 py-2 rounded-full hover:bg-gray-200">
-                    Create a post
+                    {/* Create a post */}
+                    Coming Soon...
                   </button>
                 </div>
               </div>
@@ -215,7 +207,10 @@ const Content = () => {
         )}
         {selectedTab === "Playlists" && (
           <>
-            <div className=" rounded">
+            <div className="text-center items-center text-lg font-semibold flex justify-center h-[60vh]">
+              Coming Soon...
+            </div>
+            {/* <div className=" rounded">
               <div className="pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
                 <div className="col-span-4 md:col-span-5 ">Playlist</div>
                 <div className="col-span-2">Type</div>
@@ -293,7 +288,7 @@ const Content = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </>
         )}
       </div>

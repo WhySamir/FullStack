@@ -17,7 +17,7 @@ import { Subscription } from "../models/subscriptions.model.js";
 
 const publishaVideo = asyncHandler(async (req, res) => {
   try {
-    const { title, description, duration } = req.body;
+    const { title, description, duration, hashtag } = req.body;
     if (!title || !description || !duration) {
       throw new ApiError(400, "All feild are required");
     }
@@ -45,6 +45,7 @@ const publishaVideo = asyncHandler(async (req, res) => {
       description: description,
       duration: duration,
       isPublished: true,
+      hashtag: hashtag,
       owner: req.user._id,
     });
     const savedVideo = await uploadVideo.save();
@@ -62,8 +63,8 @@ const publishaVideo = asyncHandler(async (req, res) => {
   }
 });
 const getVideosbyid = asyncHandler(async (req, res) => {
-  const { videoById } = req.params;
   const userId = req.user?._id;
+  const { videoById } = req.params;
   try {
     const video = await Video.findById(videoById).populate(
       "owner",
@@ -84,16 +85,20 @@ const getVideosbyid = asyncHandler(async (req, res) => {
       type: "dislike",
     });
 
-    const isLikedByUser = likes.some(
-      (like) => like.user.toString() === userId.toString()
-    );
-    const isDislikedByUser = dislikes.some(
-      (dislike) => dislike.user.toString() === userId.toString()
-    );
-    const existingSubscription = await Subscription.findOne({
-      subscribers: userId,
-      channel: video.owner._id,
-    });
+    const isLikedByUser = userId
+      ? likes.some((like) => like.user.toString() === userId.toString())
+      : false;
+    const isDislikedByUser = userId
+      ? dislikes.some(
+          (dislike) => dislike.user.toString() === userId.toString()
+        )
+      : false;
+    const existingSubscription = userId
+      ? await Subscription.findOne({
+          subscribers: userId,
+          channel: video.owner._id,
+        })
+      : null;
     const ownerSubscribers = await Subscription.find({
       channel: video.owner._id,
     });
@@ -234,19 +239,18 @@ const getAllVideos = asyncHandler(async (req, res) => {
     sortBy = "title",
     sortType = "asc",
   } = req.query;
-  console.log("User ID from request:", req.user._id);
+  console.log("User ID from request:", req.user ? req.user._id : "Guest user");
 
   const pageNumber = parseInt(page, 10);
   const limitNumber = parseInt(limit, 10);
 
   try {
-    // Ensure `req.user._id` is set by authentication middleware
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized access: User ID not provided.",
-      });
-    }
+    // if (!req.user || !req.user._id) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Unauthorized access: User ID not provided.",
+    //   });
+    // }
 
     // Build the search filter
     const filter = {};
@@ -310,6 +314,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     });
   }
 });
+
 const incrementViews = asyncHandler(async (req, res) => {
   const { videoById } = req.params;
 

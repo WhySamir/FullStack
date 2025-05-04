@@ -63,7 +63,7 @@ const Comments = ({ vidId }: { vidId: string }) => {
   );
 
   const getVidComments = async () => {
-    if (!vidId) {
+    if (!vidId || !authUser) {
       return;
     }
     try {
@@ -286,76 +286,78 @@ const Comments = ({ vidId }: { vidId: string }) => {
       <h3 className="text-xl font-semibold">
         {fetchComment?.totalComments} Comments
       </h3>
-      <div className="mt-4 pb-2 flex items-start">
-        <img
-          src={authUser?.avatar}
-          alt="Uploader Avatar"
-          className="sm:w-10 w-8 h-8 sm:h-10 rounded-full object-cover"
-        />
-        <div className="h-full  w-full">
-          <textarea
-            ref={textareaRef}
-            value={comment}
-            onChange={handleChange}
-            placeholder="Add a comment..."
-            style={{
-              resize: "none",
-              overflow: "hidden",
-              height: "24px",
-            }}
-            className="peer px-4 bg-transparent w-full focus:outline-none"
-            onClick={() => setIsFocused(true)}
+      {authUser && (
+        <div className="mt-4 pb-2 flex items-start">
+          <img
+            src={authUser?.avatar}
+            alt="Uploader Avatar"
+            className="sm:w-10 w-8 h-8 sm:h-10 rounded-full object-cover"
           />
+          <div className="h-full  w-full">
+            <textarea
+              ref={textareaRef}
+              value={comment}
+              onChange={handleChange}
+              placeholder="Add a comment..."
+              style={{
+                resize: "none",
+                overflow: "hidden",
+                height: "24px",
+              }}
+              className="peer px-4 bg-transparent w-full focus:outline-none"
+              onClick={() => setIsFocused(true)}
+            />
 
-          <hr className="mx-3 mt-1 text-gray-500  peer-focus:text-white " />
-          {isFocused && (
-            <div className="flex justify-between w-full  pl-3">
-              <button
-                className="emoji relative  hover:bg-neutral-700 mt-1 rounded-full h-10 w-10  flex items-center justify-center "
-                onClick={() => setEmojiComment(!emojiComment)}
-              >
-                <Smile />
-                {emojiComment && (
-                  <div
-                    className="absolute top-full left-4 mb-2 z-50"
-                    ref={pickerRef}
-                  >
-                    <div className="overflow-y-auto  max-w-fit max-h-70 w-full border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800 scrollbar-thin">
-                      <Picker
-                        onEmojiSelect={(e: any) =>
-                          setComment((c) => c + e.native)
-                        }
-                      />
+            <hr className="mx-3 mt-1 text-gray-500  peer-focus:text-white " />
+            {isFocused && (
+              <div className="flex justify-between w-full  pl-3">
+                <button
+                  className="emoji relative  hover:bg-neutral-700 mt-1 rounded-full h-10 w-10  flex items-center justify-center "
+                  onClick={() => setEmojiComment(!emojiComment)}
+                >
+                  <Smile />
+                  {emojiComment && (
+                    <div
+                      className="absolute top-full left-4 mb-2 z-50"
+                      ref={pickerRef}
+                    >
+                      <div className="overflow-y-auto  max-w-fit max-h-70 w-full border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800 scrollbar-thin">
+                        <Picker
+                          onEmojiSelect={(e: any) =>
+                            setComment((c) => c + e.native)
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </button>
-              <div className="flex gap-2 mt-3">
-                <button
-                  className="py-1.5  px-3 font-bold hover:bg-neutral-700 rounded-2xl"
-                  onClick={() => {
-                    setIsFocused(false);
-                    setComment("");
-                  }}
-                >
-                  Cancel
+                  )}
                 </button>
-                <button
-                  disabled={comment.trim().length < 4}
-                  className={`py-1.5 px-3   ${
-                    comment.trim().length >= 4
-                      ? "bg-neutral-800 hover:bg-neutral-700"
-                      : "bg-neutral-600 opacity-50 cursor-not-allowed"
-                  }  rounded-2xl`}
-                  onClick={handleComment}
-                >
-                  Comment
-                </button>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    className="py-1.5  px-3 font-bold hover:bg-neutral-700 rounded-2xl"
+                    onClick={() => {
+                      setIsFocused(false);
+                      setComment("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={comment.trim().length < 4}
+                    className={`py-1.5 px-3   ${
+                      comment.trim().length >= 4
+                        ? "bg-neutral-800 hover:bg-neutral-700"
+                        : "bg-neutral-600 opacity-50 cursor-not-allowed"
+                    }  rounded-2xl`}
+                    onClick={handleComment}
+                  >
+                    Comment
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
       {fetchComment && fetchComment.data.length > 0 ? (
         fetchComment.data.map((comment, _) => (
           <div
@@ -534,8 +536,12 @@ const Comments = ({ vidId }: { vidId: string }) => {
             ) : null}
           </div>
         ))
-      ) : (
+      ) : authUser ? (
         <p className="text-gray-400 mt-4">No comments yet.</p>
+      ) : (
+        <p className="text-gray-400 mt-4  cursor-default">
+          Please signin to see comments.
+        </p>
       )}
     </div>
   );

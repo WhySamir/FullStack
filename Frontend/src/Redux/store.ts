@@ -4,6 +4,7 @@ import themeSlicer from "./darkmode";
 import vidSlicer from "./videos"
 import loaderSlicer from "./loader"
 import navigationSlicer from "./navigations"
+import videoSlicer from "./userallVideos"
 
 const rootReducer = combineReducers({
   auth: authSlicer,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   vid:vidSlicer,
   loader:loaderSlicer,
   navigation:navigationSlicer,
+  userVideo: videoSlicer
 });
 
 export const store = configureStore({

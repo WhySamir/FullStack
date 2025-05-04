@@ -1,33 +1,13 @@
 import { FC, useEffect, useRef, useState } from "react";
-import {
-  Play,
-  Shuffle,
-  Download,
-  MoreVertical,
-  Trash,
-  Share2,
-} from "lucide-react";
+import { Play, Shuffle, MoreVertical, Trash, Share2 } from "lucide-react";
 
-import { getLikedVideos } from "../Api/like";
+import { getLikedVideos, toggleLike_Dislike } from "../Api/like";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { formatDuration, timeAgo } from "../Utilis/FormatDuration";
 import { useNavigate } from "react-router-dom";
 import { FastAverageColor } from "fast-average-color";
-
-interface Video {
-  _id: string;
-  title: string;
-  thumbnail: string;
-  views: string;
-  createdAt: string;
-  owner: ownerprops;
-  duration: number;
-}
-interface ownerprops {
-  username: string;
-  _id: string;
-}
+import { VideoProps } from "../types/videosInterface";
 
 interface PlaylistPageProps {
   playlistTitle: string;
@@ -35,7 +15,7 @@ interface PlaylistPageProps {
   creatorName: string;
   totalVideos: number;
   lastUpdated: string;
-  videos: Video[];
+  videos: VideoProps[];
 }
 
 const PlaylistInfoPanel: FC<{
@@ -75,7 +55,7 @@ const PlaylistInfoPanel: FC<{
 
   return (
     <div
-      className="sm:mt-16 sticky top-20  p-6 rounded-2xl flex flex-col items-start space-y-4 w-full h-[86vh]"
+      className="mx-2 sm:mx-0 mt-14 sm:mt-16 sticky  top-18 sm:top-20  p-6 rounded-2xl flex flex-col items-start space-y-4 w-full h-[86vh]"
       style={{
         backgroundImage: `linear-gradient(to bottom, ${bgColor}, rgba(0,0,0,1))`,
         // Fallback background color
@@ -102,31 +82,45 @@ const PlaylistInfoPanel: FC<{
         <button className="p-2 bg-white bg-opacity-20 rounded-full">
           <Share2 size={20} />
         </button>
-        {/* <button className="p-2 bg-white bg-opacity-20 rounded-full">
-          <MoreVertical size={20} />
-        </button> */}
       </div>
-      <div className="flex items-center space-x-4 w-full">
-        <button className="flex items-center justify-center bg-white text-black text-sm  font-semibold rounded-full px-6 py-2 w-full">
-          <Play className="mr-2" /> Play all
+      <div className="flex flex-row  text-xs sm:text-sm items-center space-x-2 lg:space-x-4 w-full">
+        <button className="flex items-center   justify-center bg-white text-black  font-semibold rounded-full sm:px-6 py-2 w-full">
+          <Play className="mr-2 h-3 w-3 sm:h-6 sm:w-6" /> Play all
         </button>
         <button className="flex items-center justify-center bg-gray-600 text-white font-semibold rounded-full px-6 py-2 w-full">
-          <Shuffle strokeWidth={1} className="mr-2" /> Shuffle
+          <Shuffle strokeWidth={1} className="mr-2 h-3 w-3 sm:h-6 sm:w-6" />{" "}
+          Shuffle
         </button>
       </div>
     </div>
   );
 };
 
-const PlaylistVideoList: FC<{ videos: Video[] }> = ({ videos }) => {
+const PlaylistVideoList: FC<{
+  videos: VideoProps[];
+  onVideoRemoved: () => void;
+}> = ({ videos, onVideoRemoved }) => {
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const navigate = useNavigate();
+  const removeLike = async (videoId: string) => {
+    try {
+      await toggleLike_Dislike({
+        ObjId: videoId,
+        type: "like",
+        contentType: "Video",
+      });
+      onVideoRemoved();
+    } catch (error) {
+      console.error("Like dislike action failed:", error);
+    }
+  };
+
   return (
     <>
-      <div className="sm:mt-20 flex flex-col  w-full h-full overflow-y-auto ">
+      <div className="mt-16 sm:mt-20 flex flex-col  w-full h-full overflow-y-auto ">
         {videos?.map((video, idx: number) => (
           <div
-            onClick={() => navigate(`/watch/${video._id}`)}
+            onClick={() => navigate(`/watch/${video._id}?playlist=liked`)}
             key={video._id || idx}
             className={`  flex items-start space-x-2  rounded-lg  p-2 transition ${
               openModalIndex !== idx ? "hover:bg-neutral-800" : ""
@@ -146,7 +140,7 @@ const PlaylistVideoList: FC<{ videos: Video[] }> = ({ videos }) => {
               </span>
             </div>
             <div className="flex flex-col   text-white w-full">
-              <h3 className="text-sm mb-2 font-semibold cursor-pointer">
+              <h3 className="text-sm mb-2 font-semibold cursor-pointer line-clamp-3 text-ellipsis">
                 {video.title}
               </h3>
               <p className="text-xs text-neutral-400 cursor-pointer">
@@ -156,20 +150,33 @@ const PlaylistVideoList: FC<{ videos: Video[] }> = ({ videos }) => {
             </div>
             <div className="ml-auto relative place-content-center  h-full">
               <div
-                onClick={() =>
-                  setOpenModalIndex(openModalIndex === idx ? null : idx)
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenModalIndex(openModalIndex === idx ? null : idx);
+                }}
                 className="cursor-pointer"
               >
                 <MoreVertical size={20} className="text-neutral-400" />
               </div>
               {openModalIndex === idx && (
                 <div className="absolute top-24 right-2 z-50 bg-neutral-600 flex flex-col items-start rounded-xl w-64 shadow-lg">
-                  <li className="flex items-center px-3 cursor-pointer text-white text-sm font-semibold hover:bg-neutral-500  py-2 w-full mt-2">
+                  <li
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeLike(video._id);
+                      setOpenModalIndex(null);
+                    }}
+                    className="flex items-center px-3 cursor-pointer text-white text-sm font-semibold hover:bg-neutral-500  py-2 w-full mt-2"
+                  >
                     <Trash className="mr-5" />
                     Remove from Liked Videos
                   </li>
-                  <li className="flex items-center mb-2 cursor-pointer px-3 text-white text-sm font-semibold hover:bg-neutral-500 py-2 w-full mt-2">
+                  <li
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="flex items-center mb-2 cursor-pointer px-3 text-white text-sm font-semibold hover:bg-neutral-500 py-2 w-full mt-2"
+                  >
                     <Share2 strokeWidth={1} className="mr-5" />
                     Share
                   </li>
@@ -183,17 +190,18 @@ const PlaylistVideoList: FC<{ videos: Video[] }> = ({ videos }) => {
   );
 };
 
-const PlaylistPage: FC<PlaylistPageProps> = ({
+const PlaylistPage: FC<PlaylistPageProps & { onVideoRemoved: () => void }> = ({
   playlistTitle,
   playlistThumbnail,
   creatorName,
   totalVideos,
   lastUpdated,
   videos,
+  onVideoRemoved,
 }) => {
   return (
-    <div className="flex min-h-screen space-x-1">
-      <div className="w-[30rem]">
+    <div className="flex flex-col lg:flex-row h-[80vh] space-x-1">
+      <div className=" lg:w-[30rem]">
         <PlaylistInfoPanel
           playlistTitle={playlistTitle}
           playlistThumbnail={playlistThumbnail}
@@ -203,35 +211,45 @@ const PlaylistPage: FC<PlaylistPageProps> = ({
         />
       </div>
       <div className="w-full">
-        <PlaylistVideoList videos={videos} />
+        <PlaylistVideoList videos={videos} onVideoRemoved={onVideoRemoved} />
       </div>
     </div>
   );
 };
 interface likedVideosProps {
   totalVideoLikes: number;
-  data: Video[];
+  data: VideoProps[];
   lastUpdated: string;
 }
 const PlaylistPageWrapper = () => {
   const { authUser } = useSelector((state: RootState) => state.auth);
   const [likedVideos, setLikedVideos] = useState<likedVideosProps | null>(null);
+  const getLikedVideo = async () => {
+    try {
+      const response = await getLikedVideos();
+      console.log(response);
+      const { data, totalVideoLikes, lastUpdated } = response;
+      setLikedVideos({ data, totalVideoLikes, lastUpdated });
+
+      console.log(likedVideos);
+    } catch (error) {
+      console.error("Failed to fetch liked videos:", error);
+    }
+  };
   useEffect(() => {
-    const getLikedVideo = async () => {
-      try {
-        const response = await getLikedVideos();
-        console.log(response);
-        setLikedVideos(response);
-      } catch (error) {
-        console.error("Failed to fetch liked videos:", error);
-      }
-    };
-    getLikedVideo();
-  }, []);
-  if (likedVideos) {
-    console.log(likedVideos?.totalVideoLikes);
-  }
+    if (authUser) {
+      getLikedVideo();
+    }
+  }, [authUser]);
+
   if (!likedVideos || !authUser) return <div>Loading...</div>;
+  if (!likedVideos || likedVideos.data.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white text-lg">
+        No liked videos yet.
+      </div>
+    );
+  }
   return (
     <PlaylistPage
       playlistTitle="Liked videos"
@@ -240,6 +258,7 @@ const PlaylistPageWrapper = () => {
       totalVideos={likedVideos.totalVideoLikes}
       lastUpdated={timeAgo(likedVideos.lastUpdated)}
       videos={likedVideos.data}
+      onVideoRemoved={getLikedVideo}
     />
   );
 };

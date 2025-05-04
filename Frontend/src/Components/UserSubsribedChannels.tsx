@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getUserSubcribedChannel, toggleSubscribe } from "../Api/subscriber";
 import { RootState } from "../Redux/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Bell } from "lucide-react";
+import { setNavigating } from "../Redux/navigations";
 
 interface Channel {
   _id: string;
@@ -25,12 +26,16 @@ const UserSubscribedChannels = () => {
   const [userSubscribedChannels, setUserSubscribedChannels] = useState<
     Subscription[]
   >([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!authUser) return;
 
     const fetchUserSubscriptions = async () => {
       try {
+        setLoadingVideos(true);
+        dispatch(setNavigating(true));
         const response = await getUserSubcribedChannel(authUser._id);
         const subscriptionsWithStatus = response.data.map(
           (channel: Subscription) => ({
@@ -38,14 +43,20 @@ const UserSubscribedChannels = () => {
             isSubscribed: true, // Assuming initial state is all subscribed
           })
         );
+
         setUserSubscribedChannels(subscriptionsWithStatus);
       } catch (error) {
         console.error("Failed to fetch subscriptions", error);
+        setLoadingVideos(true);
+        dispatch(setNavigating(false));
+      } finally {
+        setLoadingVideos(true);
+        dispatch(setNavigating(false));
       }
     };
 
     fetchUserSubscriptions();
-  }, [authUser]);
+  }, [authUser, dispatch]);
 
   const handleSubscribe = async (channelId: string) => {
     try {
@@ -66,6 +77,9 @@ const UserSubscribedChannels = () => {
       console.error("Subscription toggle failed:", error);
     }
   };
+  if (!loadingVideos && userSubscribedChannels.length === 0) {
+    return <div className="hero px-4 mt-3">No Subscribed Channels</div>;
+  }
 
   return (
     <div className="mt-12 sm:mt-14 px-4 py-2 w-full flex flex-col items-center justify-center">

@@ -8,17 +8,19 @@ import { verifyAuth } from "./Redux/auth.ts";
 import { AppDispatch, RootState } from "./Redux/store.ts";
 
 import Header from "./Components/Navbar.tsx";
-import Maingrid from "./Components/LandingVidoes.tsx";
+import Maingrid from "./Components/VideoComponents/LandingVidoes.tsx";
 import Sidebar from "./Components/Sidebar.tsx";
 import Signin from "./Components/User/Signin.tsx";
 import Signup from "./Components/User/Signup.tsx";
-import WatchVideo from "./Components/WatchVideo.tsx";
+import WatchVideo from "./Components/VideoComponents/WatchVideo.tsx";
 import ChannelProfile from "./Components/ChannelProfile.tsx";
 import UserSubscription from "./Components/UserSubscriptionVid.tsx";
 import UserSubsribedChannels from "./Components/UserSubsribedChannels.tsx";
-import NotAvailableRouteGuard from "./Components/NotAvailableRouteGuard.tsx";
-import RedLoader from "./Components/RedLoader";
+import RedLoader from "./Components/Common/RedLoader.tsx";
 import { PlaylistPageWrapper } from "./Components/LikedVideos.tsx";
+import SearchedVideos from "./Components/SearchedVideos.tsx";
+import ComingSoon from "./Components/ComingSoon.tsx";
+import NotAUHome from "./Components/VideoComponents/NotAUHome.tsx";
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -59,7 +61,15 @@ function App() {
                 path="/"
                 element={<Maingrid isCollapsed={isCollapsed} />}
               />
+              <Route
+                path="/home"
+                element={<NotAUHome isCollapsed={isCollapsed} />}
+              />
 
+              <Route
+                path="/search"
+                element={<SearchedVideos isCollapsed={isCollapsed} />}
+              />
               <Route
                 path="/watch/:vidId"
                 element={<WatchVideo key={navigationCount} />}
@@ -72,10 +82,7 @@ function App() {
                 element={<UserSubscription isCollapsed={isCollapsed} />}
               />
               <Route path="/channels" element={<UserSubsribedChannels />} />
-              <Route
-                path="/notAvailableStdio"
-                element={<NotAvailableRouteGuard />}
-              />
+              <Route path="/commingsoon" element={<ComingSoon />} />
               <Route path="/likedvideos" element={<PlaylistPageWrapper />} />
             </Routes>
           </div>

@@ -4,12 +4,15 @@ import { loginUser } from "../../Api/authApi.ts";
 
 import { useDispatch } from "react-redux";
 import { login } from "../../Redux/auth.ts";
+import RedLoader from "../Common/RedLoader.tsx";
 
 const Signin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isOpen, setIsOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
@@ -31,6 +34,7 @@ const Signin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     setErrorMessage("");
     e.preventDefault();
+    setLoading(true);
     try {
       const data = await loginUser({ username, password }, setErrorMessage);
       if (data) {
@@ -40,6 +44,8 @@ const Signin = () => {
       }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,6 +55,7 @@ const Signin = () => {
   if (!isOpen) return null;
   return (
     <>
+      {loading && <RedLoader />}
       {/* {isOpen && ( */}
       <div className="relative  flex items-center justify-center min-h-[90vh] mt-12">
         {/* Glassmorphism Container backdrop-blur-lg */}

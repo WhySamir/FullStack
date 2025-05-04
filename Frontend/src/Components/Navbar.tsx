@@ -1,6 +1,7 @@
 import { handleLogout } from "../Api/authApi.ts";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/auth.ts";
@@ -18,6 +19,8 @@ import {
 } from "lucide-react";
 import { darkTheme, lightTheme } from "../Theme.ts";
 import UploadVideo from "./VideoComponents/UploadModal.tsx";
+import RedLoader from "./Common/RedLoader.tsx";
+import { VideoProps } from "../types/videosInterface.ts";
 
 interface User {
   _id: string;
@@ -35,6 +38,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+  const navigate = useNavigate();
   const { isAuthenticated, authUser } = useSelector(
     (state: RootState) => state.auth
   );
@@ -45,7 +49,36 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const [uploadPopup, setUploadPopup] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuRef2 = useRef<HTMLDivElement>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [loader, setloader] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { videos } = useSelector((state: RootState) => state.vid);
+
+  const filteredVideos = videos.filter((video: VideoProps) =>
+    video.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const dispatch = useDispatch();
+  const suggestionRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showSuggestions) setHighlightedIndex(-1);
+  }, [showSuggestions]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,13 +107,46 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   const handlelogout = async () => {
+    setloader(true);
     await handleLogout();
     dispatch(logout());
     setIsOpen(false);
+    setloader(false);
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev < filteredVideos.slice(0, 5).length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev > 0 ? prev - 1 : filteredVideos.slice(0, 5).length - 1
+      );
+    } else if (e.key === "Enter") {
+      if (highlightedIndex >= 0) {
+        const selected = filteredVideos[highlightedIndex];
+        setSearchQuery(selected.title);
+        navigate(`/search?q=${encodeURIComponent(selected.title)}`);
+        setShowSuggestions(false);
+      } else if (searchQuery.trim()) {
+        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        setShowSuggestions(false);
+      }
+    }
+  };
+  const handleSearchClick = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSuggestions(false);
+    }
   };
 
   return (
     <>
+      {loader && <RedLoader />}
       <nav
         className="  fixed left-0 right-6 top-0 z-50 border-box h-[3.4rem] bg-neutral-700  px-5 w-full flex items-center justify-between "
         style={darkTheme}
@@ -117,15 +183,51 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <div className="relative">
             <input
               type="text"
-              className="bg-neutral-800 w-[20vw] sm:w-[36vw]  sm:h-full border border-neutral-700 rounded-4xl mx-2 pl-4 pr-2 py-[0.5rem]   focus:outline-none focus:border-blue-600"
+              value={searchQuery}
+              onChange={(e) => {
+                setShowSuggestions(true);
+                setSearchQuery(e.target.value);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={handleSearch}
+              className="bg-neutral-800 w-[20vw] text-xs md:text-sm pr-14 sm:w-[36vw]  sm:h-full border border-neutral-700 rounded-4xl mx-2 pl-4  py-[0.5rem]   focus:outline-none focus:border-blue-600"
               placeholder={"Search"}
             />
-            <span className="absolute inset-y-0 right-6 sm:right-8 flex items-center pl-2">
+            <button
+              type="button"
+              onClick={handleSearchClick}
+              className="absolute inset-y-0 right-6 sm:right-8 flex items-center pl-2"
+            >
               <Search
-                className={`${darkMode ? "text-white" : "text-black"}`}
+                className={` ${darkMode ? "text-white" : "text-black"}`}
                 size={24}
               />
-            </span>
+            </button>
+
+            {searchQuery && showSuggestions && filteredVideos.length > 0 && (
+              <div
+                ref={suggestionRef}
+                className="absolute z-50 top-full mt-1 w-[90%] ml-5 bg-neutral-800 border border-neutral-700 rounded shadow-lg"
+              >
+                {filteredVideos.slice(0, 5).map((video: VideoProps, index) => (
+                  <div
+                    key={video._id}
+                    onClick={() => {
+                      setSearchQuery(video.title);
+                      navigate(`/search?q=${encodeURIComponent(video.title)}`);
+                      setShowSuggestions(false);
+                    }}
+                    className={`px-4 py-2 cursor-pointer text-white ${
+                      index === highlightedIndex
+                        ? "bg-neutral-600"
+                        : "hover:bg-neutral-700"
+                    }`}
+                  >
+                    {video.title}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div
@@ -212,7 +314,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                       <p className="  text-sm  text-white/90">
                         @{authUser.username}
                       </p>
-                      <p className="text-sm leading-[3] text-blue-400">
+                      <p
+                        onClick={() => {
+                          navigate(`/username/${authUser.username}`);
+                          setIsOpen(false);
+                        }}
+                        className="text-sm leading-[3] text-blue-400"
+                      >
                         View your channel
                       </p>
                     </div>
@@ -232,16 +340,34 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                       Sign Out
                     </li>
                     <hr className="my-2 border-neutral-600" />
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
-                      YouTube Studio
-                    </li>
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                    <div className="py-1 hover:bg-neutral-600 px-2 rounded">
+                      <a
+                        target="_blank"
+                        href="/stdio/channel/content"
+                        rel="noopener noreferrer"
+                      >
+                        WatchFree Studio
+                      </a>
+                    </div>
+                    <li
+                      className="py-1 hover:bg-neutral-600 px-2 rounded cursor-pointer"
+                      onClick={() => {
+                        navigate("/commingsoon");
+                        setIsOpen(false);
+                      }}
+                    >
                       Purchases and Memberships
                     </li>
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                    {/* <li className="py-1 hover:bg-neutral-600 px-2 rounded">
                       Your Data in YouTube
-                    </li>
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                    </li> */}
+                    <li
+                      className="py-1 hover:bg-neutral-600 px-2 rounded cursor-pointer"
+                      onClick={() => {
+                        navigate("/commingsoon");
+                        setIsOpen(false);
+                      }}
+                    >
                       Settings
                     </li>
                   </ul>
@@ -260,7 +386,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           </div>
         ) : (
           <Link
-            to="signin"
+            to="/signin"
             className="signin cursor-pointer hover:bg-blue-400 gap-1 rounded-full border flex items-center px-3 py-1 border-gray-600"
           >
             <div className="border  flex items-center justify-center border-blue-900 text-blue-900 rounded-full circle w-5 h-5">
