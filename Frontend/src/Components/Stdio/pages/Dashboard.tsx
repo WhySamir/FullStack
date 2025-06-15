@@ -1,4 +1,4 @@
-import { Pencil, Upload } from "lucide-react";
+// import { Pencil, Upload } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../../Redux/store";
@@ -47,12 +47,12 @@ const Dashboard = () => {
             Channel dashboard
           </h1>
           <div className="flex gap-3">
-            <div className="h-9 w-9 flex items-center justify-center rounded-full border border-neutral-100">
+            {/* <div className="h-9 w-9 flex items-center justify-center rounded-full border border-neutral-100">
               <Upload />
             </div>
             <div className="h-9 w-9 flex items-center justify-center rounded-full border border-neutral-100">
               <Pencil />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -186,7 +186,7 @@ const Dashboard = () => {
                 <div className="border border-gray-700 border-dashed rounded-xl p-6 flex flex-col items-center text-center">
                   <div className="w-24 h-24 mb-4">
                     <img
-                      src=""
+                      src="/createpost.png"
                       alt="Create Post"
                       className="w-full h-full object-contain"
                     />

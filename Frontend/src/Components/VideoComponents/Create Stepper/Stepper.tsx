@@ -26,6 +26,16 @@ const Stepper: React.FC<setUploadPopupprops> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [newStep, setNewStep] = useState<Step[]>([]);
   const stepRef = useRef<Step[]>([]);
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
+  const [thumbnailRequiredError, setThumbnailRequiredError] = useState<
+    string | null
+  >(null);
+  const [hashtagError, setHashtagError] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<boolean>(false);
+  const [selectedOptionError, setSelectedOptionError] = useState<string | null>(
+    null
+  );
 
   if (video) {
     const url = URL.createObjectURL(video);
@@ -43,6 +53,8 @@ const Stepper: React.FC<setUploadPopupprops> = ({
     title: video?.name || "",
     description: "",
     thumbnail: null,
+    thumbnailName: null,
+    thumbnailSize: null,
     videoFile: video,
     duration: 0,
     isPublished: false,
@@ -129,6 +141,12 @@ const Stepper: React.FC<setUploadPopupprops> = ({
             videoURL={videoURL}
             videoAttributes={videoAttributes}
             setVideoAttributes={setVideoAttributes}
+            titleError={titleError}
+            setTitleError={setTitleError}
+            descriptionError={descriptionError}
+            setDescriptionError={setDescriptionError}
+            thumbnailRequiredError={thumbnailRequiredError}
+            setThumbnailRequiredError={setThumbnailRequiredError}
           />
         )}
         {currentStep === 1 && <VideoStepp />}
@@ -138,6 +156,11 @@ const Stepper: React.FC<setUploadPopupprops> = ({
             video={video}
             videoURL={videoURL}
             setVideoAttributes={setVideoAttributes}
+            setSelectedOptions={setSelectedOption}
+            hashtagError={hashtagError}
+            setHashtagError={setHashtagError}
+            selectedOptionError={selectedOptionError}
+            setSelectedOptionError={setSelectedOptionError}
           />
         )}
       </div>
@@ -145,13 +168,49 @@ const Stepper: React.FC<setUploadPopupprops> = ({
         <button
           onClick={prevStep}
           disabled={currentStep === 0}
-          className="px-4  py-2 flex justify-between text-white rounded-2xl  bg-neutral-500 hover:bg-neutral-400  focus:outline-none"
+          className={`px-4 ${
+            currentStep === 0
+              ? "bg-neutral-600 cursor-not-allowed"
+              : "bg-neutral-500 hover:bg-neutral-400"
+          }  py-2 flex justify-between text-white rounded-2xl    focus:outline-none`}
         >
           Previous
         </button>
         {currentStep < 3 ? (
           <button
-            onClick={nextStep}
+            onClick={() => {
+              if (currentStep === 0) {
+                let isValid = true;
+                const { title, description, thumbnail } = videoAttributes;
+
+                if (!title || title.trim().length < 4) {
+                  setTitleError("Title must be at least 4 characters long.");
+                  isValid = false;
+                } else {
+                  setTitleError(null);
+                }
+
+                if (!description || description.trim().length < 4) {
+                  setDescriptionError(
+                    "Description must be at least 4 characters long."
+                  );
+                  isValid = false;
+                } else {
+                  setDescriptionError(null);
+                }
+
+                if (!thumbnail) {
+                  setThumbnailRequiredError("Thumbnail is required.");
+                  isValid = false;
+                } else {
+                  setThumbnailRequiredError(null);
+                }
+
+                if (!isValid) return;
+              }
+
+              nextStep();
+            }}
             disabled={currentStep === steps.length - 1}
             className="px-4  py-2 flex justify-between text-white rounded-2xl  bg-neutral-500 hover:bg-neutral-400  focus:outline-none"
           >
@@ -160,6 +219,25 @@ const Stepper: React.FC<setUploadPopupprops> = ({
         ) : (
           <button
             onClick={() => {
+              let isValid = true;
+              const { hashtag } = videoAttributes;
+
+              if (!hashtag || hashtag.trim().length < 4) {
+                setHashtagError("Hashtag is required.");
+                isValid = false;
+              } else {
+                setHashtagError(null);
+              }
+
+              if (!selectedOption) {
+                setSelectedOptionError("Visibility is required.");
+                isValid = false;
+              } else {
+                setSelectedOptionError(null);
+              }
+
+              if (!isValid) return;
+
               setuploadPopup(false);
               submit();
             }}

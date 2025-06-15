@@ -27,7 +27,10 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
       try {
         const response = await getallvideos();
         console.log(response.data);
-        dispatch(upload(response.data));
+        const shuffledVideos = [...response.data].sort(
+          () => Math.random() - 0.5
+        );
+        dispatch(upload(shuffledVideos));
       } catch (error) {
         console.error("Error fetching videos:", error);
       }
@@ -60,7 +63,9 @@ const Maingrid: React.FC<MaingridProps> = ({ isCollapsed }) => {
         </>
       ) : isAuthenticated ? (
         <>
+          {/* <div className="relative w-full h-full"> */}
           <ScrollableCategories isCollapsed={isCollapsed} />
+          {/* </div> */}
 
           <div className="mt-12 sm:mt-5  transition-all duration-500 flex flex-col sm:grid grid-cols-12 gap-y-2  ">
             {videos != null

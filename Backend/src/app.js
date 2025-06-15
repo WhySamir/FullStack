@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; //middleware simply creates obj of cookie
 import { globalErrorHandler } from "./middlewares/jsonErrorHandle.js";
+import "./utlis/googleConfig.js"; //for async await error handling
 import dotenv from "dotenv";
 dotenv.config();
 const app = express();
@@ -39,4 +40,5 @@ app.use("/api/v1/toggle", likesRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/healthcheck", healthRouter);
 app.use(globalErrorHandler);
+
 export { app };

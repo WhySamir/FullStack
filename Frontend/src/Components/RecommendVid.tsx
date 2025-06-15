@@ -14,8 +14,8 @@ export const RecommendVid = () => {
   useEffect(() => {
     const handlePlaylist = async () => {
       const response = await getallvideos();
-      console.log(response);
-      setplaylists(response.data);
+      const shuffledVideos = [...response.data].sort(() => Math.random() - 0.5);
+      setplaylists(shuffledVideos);
     };
     handlePlaylist();
   }, []);
@@ -28,13 +28,13 @@ export const RecommendVid = () => {
   };
   return (
     <>
-      <div className="flex flex-col xs:flex-wrap xs:mx-3 xs:justify-between  xs:flex-row lg:flex-row ">
+      <div className="flex flex-col xs:flex-wrap xs:mx-3 xs:justify-between  xs:flex-row lg:flex-row w-full">
         {playlists != null &&
           playlists.map((video, i) => (
             <Link
               to={`/watch/${video._id}`}
               key={video._id || i}
-              className="w-full xs:w-[48%]     lg:w-full flex flex-col sm:flex-row pl-0.5  items-center space-x-0.5 cursor-pointer caret-transparent"
+              className="w-full sm:w-[48%]     lg:w-full flex flex-col sm:flex-row pl-0.5  items-center space-x-0.5 cursor-pointer caret-transparent"
               onClick={() => handleVid(video?._id)}
             >
               <div className="thumbnail relative h-[90%] xs:h-[8rem] sm:h-21 w-full sm:w-auto  xl:h-24 aspect-video  my-2 sm:rounded-xl">
@@ -55,7 +55,7 @@ export const RecommendVid = () => {
                   <p className="text-xs text-gray-300 lg:w-[16vw] lg:max-w-[20vw] overflow-hidden text-ellipsis break-words line-clamp-2 ">
                     {video.owner.username}
                   </p>
-                  <div className="flex gap-2 sm:gap-1 md:gap-2 sm:text-xs md:text-sm">
+                  <div className="lg:flex gap-2 sm:gap-1 md:gap-2 sm:text-xs md:text-sm">
                     <p>{video.views} views</p>
                     {timeAgo(video.createdAt)}
                   </div>

@@ -2,7 +2,6 @@ import { useDispatch } from "react-redux";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { selectVid } from "../../Redux/videos";
-import { increaseVidViews } from "../../Api/videoApis";
 import { setNavigating } from "../../Redux/navigations";
 const Video: React.FC<any> = ({ video }) => {
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ const Video: React.FC<any> = ({ video }) => {
   const handleVid = async () => {
     try {
       dispatch(setNavigating(true));
-      await increaseVidViews({ vidId: video._id });
+      // await increaseVidViews({ vidId: video._id });
       dispatch(selectVid(video._id));
       // setTimeout(() => {
       navigate(`/watch/${video._id}`);

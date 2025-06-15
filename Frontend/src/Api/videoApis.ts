@@ -99,7 +99,7 @@ export const increaseVidViews = async({vidId}:{vidId:string})=>{
   try {
       const response = await api.post(`/videos/increaseviews/${vidId}`)
       if(response.data.success){
-        console.log("Increased views successfully",response.data)
+        // console.log("Increased views successfully",response.data)
       }
       else{
         console.log("Failed to increase views")

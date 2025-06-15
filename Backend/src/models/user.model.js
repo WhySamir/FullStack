@@ -42,10 +42,18 @@ const userSchema = new Schema(
     ],
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        // Require password only if the user is NOT signing up with Google
+        return !this.googleId;
+      },
     },
     refreshToken: {
       type: String,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
   },
   { timestamps: true }

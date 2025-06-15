@@ -7,6 +7,14 @@ interface setUploadPopupprops {
   video: File;
   videoAttributes: any;
   setVideoAttributes: React.Dispatch<React.SetStateAction<any>>;
+  titleError?: string | null;
+  setTitleError: React.Dispatch<React.SetStateAction<string | null>>;
+  descriptionError?: string | null;
+  setDescriptionError: React.Dispatch<React.SetStateAction<string | null>>;
+  thumbnailRequiredError?: string | null;
+  setThumbnailRequiredError: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
 }
 
 const Details: React.FC<setUploadPopupprops> = ({
@@ -14,16 +22,23 @@ const Details: React.FC<setUploadPopupprops> = ({
   videoURL,
   videoAttributes,
   setVideoAttributes,
+  titleError,
+  setTitleError,
+  descriptionError,
+  setDescriptionError,
+  thumbnailRequiredError,
+  setThumbnailRequiredError,
 }) => {
   //for video
-
+  const MAX_FILE_SIZE_MB = 25;
   //for playlist
   const [title2, setTitle2] = useState<string>("");
   const [description2, setDescription2] = useState("");
+
   const [playlistUI, setplaylistUI] = useState(false);
   const [createPlayist, setCreatePlayist] = useState(false);
-  const [thumbnailName, setThumbnailName] = useState<string | null>(null);
 
+  const [thumbnailError, setThumbnailError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuRef2 = useRef<HTMLDivElement | null>(null);
 
@@ -36,11 +51,25 @@ const Details: React.FC<setUploadPopupprops> = ({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      console.log("Selected Thumbnail:", file.name); // ✅ Check if file is detected
-      setThumbnailName(file.name);
-      handleChange("thumbnail", file);
+    if (!file) return;
+    const sizeInMB = file.size / (1024 * 1024);
+    if (sizeInMB > MAX_FILE_SIZE_MB) {
+      setThumbnailError(
+        `File size exceeds ${MAX_FILE_SIZE_MB}MB. Please upload a smaller file.`
+      );
+      handleChange("thumbnail", null);
+      handleChange("thumbnailName", null);
+      handleChange("thumbnailSize", null);
+
+      // Clear file input manually to avoid repeated issue
+      event.target.value = "";
+      return;
     }
+    setThumbnailError(null);
+    setThumbnailRequiredError(null);
+    handleChange("thumbnail", file);
+    handleChange("thumbnailName", file.name);
+    handleChange("thumbnailSize", sizeInMB.toFixed(2));
   };
 
   const togglePlaylist = () => {
@@ -164,13 +193,21 @@ const Details: React.FC<setUploadPopupprops> = ({
               ref={titleTextareaRef}
               className="w-full  px-2 resize-none  leading-4 sm:pt-6 text-white/90 text-sm font-semibold border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none"
               value={videoAttributes.title}
-              onChange={(e) => handleChange("title", e.target.value)}
+              onChange={(e) => {
+                handleChange("title", e.target.value);
+                setTitleError(null);
+              }}
               maxLength={100}
             />
 
             <div className="absolute top-3  left-3 hidden sm:block  text-sm leading-1.5 font-medium sm:text-white pointer-events-none">
               Title (required)
             </div>
+            {titleError && (
+              <p className="text-red-500 text-xs mt-1 text-center px-2">
+                {titleError}
+              </p>
+            )}
           </div>
           {/* <div className="mb-4 relative">
             <textarea
@@ -197,12 +234,20 @@ const Details: React.FC<setUploadPopupprops> = ({
               className="w-full px-2 resize-none pt-9 text-white/90 border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none"
               value={videoAttributes.description}
               placeholder="Tell Viewers about your video."
-              onChange={(e) => handleChange("description", e.target.value)}
+              onChange={(e) => {
+                handleChange("description", e.target.value);
+                setDescriptionError(null);
+              }}
               maxLength={5000}
             />
             <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">
               Description (&copy;)
             </div>
+            {descriptionError && (
+              <p className="text-red-500 text-xs mt-1 text-center px-2">
+                {descriptionError}
+              </p>
+            )}
           </div>
           <div className="ThumbnailSection flex flex-col text-white/90 space-y-3">
             Thumbnail
@@ -211,15 +256,21 @@ const Details: React.FC<setUploadPopupprops> = ({
             </p>
             <div className="items-center  flex-col flex justify-center border-dashed border border-white h-20  lg:w-40">
               <label className="w-full justify-center flex flex-col items-center overflow-hidden">
-                {thumbnailName === null ? (
+                {videoAttributes.thumbnailName === null ? (
                   <>
                     <Upload />
                     Upload file
                   </>
                 ) : (
-                  <p className="mt-2 text-xs  break-words whitespace-normal    w-full  text-white text-center">
-                    {thumbnailName}
-                  </p>
+                  <>
+                    <p className="mt-2 text-xs  break-words whitespace-normal    w-full  text-white text-center">
+                      {videoAttributes.thumbnailName}
+                    </p>
+                    <p className="text-gray-400">
+                      {" "}
+                      ({videoAttributes.thumbnailSize} MB)
+                    </p>
+                  </>
                 )}
                 <input
                   type="file"
@@ -230,6 +281,16 @@ const Details: React.FC<setUploadPopupprops> = ({
                   accept="image/*"
                 />
               </label>
+              {thumbnailRequiredError && (
+                <p className="text-red-500 text-xs mt-1 text-center px-2">
+                  {thumbnailRequiredError}
+                </p>
+              )}
+              {thumbnailError && (
+                <p className="text-red-500 text-xs mt-1 text-center px-2">
+                  {thumbnailError}
+                </p>
+              )}
             </div>
           </div>
           <div className=" text-white/90 flex flex-col space-y-3">

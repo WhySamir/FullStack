@@ -18,6 +18,8 @@ const Content = () => {
   const tabs = ["Videos", "Posts", "Playlists"];
 
   const handleDeleteVideo = async (vidId: string) => {
+    const confirmDel = confirm("Are you sure you want to delete this video?");
+    if (!confirmDel) return;
     try {
       await deletedVidById({ vidId });
       dispatch(deleteVideo(vidId));
@@ -52,13 +54,13 @@ const Content = () => {
             <span>Lists</span>
           </button>
           <div className="ml-auto mr-5 flex items-center">
-            <span className="mr-4">Rows per page: 30</span>
-            <span>1-2 of 2</span>
+            {/* <span className="mr-4">Rows per page: 30</span>
+            <span>1-2 of 2</span> */}
           </div>
         </div>
         {selectedTab === "Videos" && (
           <>
-            <div className=" rounded">
+            <div className=" rounded ">
               <div className="sm:text-xs lg:text-sm pl-6 pr-4 grid grid-cols-12 font-semibold   items-center text-[0.9rem] leading-6 text-gray-400 p-2  border-b border-gray-700">
                 <div className="col-span-3  md:col-span-5">Video</div>
                 <div className="col-span-2 flex justify-center items-center">
@@ -71,99 +73,107 @@ const Content = () => {
                 </div>
                 <div className="col-span-1">Likes</div>
               </div>
-              {videos.map((video, index) => (
-                <div
-                  key={index}
-                  className={`sm:text-xs text-sm pl-6 pr-4  grid grid-cols-12 items-start p-3 hover:bg-gray-900 `}
-                  onMouseEnter={() => setHoveredVideo(index)}
-                  onMouseLeave={() => setHoveredVideo(null)}
-                >
-                  <div className="col-span-3  md:col-span-5 flex items-start">
-                    <div className="md:col-span-4 relative md:mr-2 lg:mr-3">
-                      <img
-                        src={video.thumbnail}
-                        alt={video.title}
-                        className="w-30 md:w-32 h-16 object-cover rounded"
-                      />
+              {videos.length !== 0 ? (
+                videos.map((video, index) => (
+                  <div
+                    key={index}
+                    className={`sm:text-xs text-sm pl-6 pr-4  grid grid-cols-12 items-start p-3 hover:bg-gray-900 scrollbar-hidden `}
+                    onMouseEnter={() => setHoveredVideo(index)}
+                    onMouseLeave={() => setHoveredVideo(null)}
+                  >
+                    <div className="col-span-3  md:col-span-5 flex items-start scrollbar-hidden">
+                      <div className="md:col-span-4 relative md:mr-2 lg:mr-3">
+                        <img
+                          src={video.thumbnail}
+                          alt={video.title}
+                          className="w-30 md:w-32 h-16 object-cover rounded"
+                        />
 
-                      <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
-                        {formatDuration(video?.duration)}
-                      </span>
-                    </div>
-                    <div
-                      className={`hidden md:block md:col-span-1  w-[10vw] md:w-[40%] lg:w-[80%] flex-wrap h-full ${
-                        video.isPublished ? "opacity-70" : ""
-                      }`}
-                    >
-                      <h1 className=" text-xs w-full max-w-full overflow-hidden text-ellipsis break-words line-clamp-1 ">
-                        {" "}
-                        {video.title}
-                      </h1>
-                      <div className="font-medium text-xs relative">
-                        {hoveredVideo === index && (
-                          <div
-                            className={` absolute mt-2 top-full  left-0 flex space-x-2 transition-opacity visible `}
-                          >
-                            <div className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
-                              <Edit2 className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </div>
-                            <button
-                              onClick={() =>
-                                navigate(
-                                  `/stdio/channel/analytics?videoId=${video._id}`
-                                )
-                              }
-                              className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
-                            >
-                              <BarChart2 className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </button>
-
-                            <button
-                              onClick={() => navigate(`/watch/${video._id}`)}
-                              className=" lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
-                            >
-                              <PlayCircle className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteVideo(video._id)}
-                              className="bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
-                            >
-                              <Trash className="w-4 h-4 text-gray-300 hover:text-white" />
-                            </button>
-                          </div>
-                        )}
+                        <span className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
+                          {formatDuration(video?.duration)}
+                        </span>
                       </div>
-
-                      <h1
-                        className={`text-xs max-w-full flex-wrap h-full  overflow-hidden text-ellipsis break-words line-clamp-2  mt-1 ${
-                          hoveredVideo === index ? "invisible" : "visible"
+                      <div
+                        className={`hidden md:block md:col-span-1  w-[10vw] md:w-[40%] lg:w-[80%] flex-wrap h-full ${
+                          video.isPublished ? "opacity-70" : ""
                         }`}
                       >
-                        {video?.description}
-                      </h1>
+                        <h1 className=" text-xs w-full max-w-full overflow-hidden text-ellipsis break-words line-clamp-1 ">
+                          {" "}
+                          {video.title}
+                        </h1>
+                        <div className="font-medium text-xs relative">
+                          {hoveredVideo === index && (
+                            <div
+                              className={` absolute mt-2 top-full  left-0 flex space-x-2 transition-opacity visible `}
+                            >
+                              <div className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer">
+                                <Edit2 className="w-4 h-4 text-gray-300 hover:text-white" />
+                              </div>
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/stdio/channel/analytics?videoId=${video._id}`
+                                  )
+                                }
+                                className="lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                              >
+                                <BarChart2 className="w-4 h-4 text-gray-300 hover:text-white" />
+                              </button>
+
+                              <button
+                                onClick={() => navigate(`/watch/${video._id}`)}
+                                className=" lg:block hidden bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                              >
+                                <PlayCircle className="w-4 h-4 text-gray-300 hover:text-white" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteVideo(video._id)}
+                                className="bg-gray-700 rounded-full p-2 hover:bg-gray-800 cursor-pointer"
+                              >
+                                <Trash className="w-4 h-4 text-gray-300 hover:text-white" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        <h1
+                          className={`text-xs max-w-full flex-wrap h-full  overflow-hidden text-ellipsis break-words line-clamp-2  mt-1 ${
+                            hoveredVideo === index ? "invisible" : "visible"
+                          }`}
+                        >
+                          {video?.description}
+                        </h1>
+                      </div>
+                    </div>
+                    <div className="col-span-2  font-[500] flex justify-center items-center text-xxs lg:text-xs ">
+                      {video.isPublished === true ? "Published" : "Draft"}
+                    </div>
+                    <div className="col-span-2 md:col-span-1 font-[500] text-xxs lg:text-xs ">
+                      {formatDate(video.createdAt)}
+                    </div>
+                    <div className="col-span-1  text-xxs lg:text-xs font-[500] flex justify-center items-center">
+                      {video.views !== undefined ? (
+                        video.views
+                      ) : (
+                        <Edit2 className="w-4 h-4 text-gray-500" />
+                      )}
+                    </div>
+                    <div className="col-span-3 text-xxs lg:text-xs  md:col-span-2 flex justify-center items-center font-[500]">
+                      {video?.commentCount}
+                    </div>
+                    <div className="col-span-1  font-[500] text-xxs lg:text-xs">
+                      {video.likesCount}
                     </div>
                   </div>
-                  <div className="col-span-2  font-[500] flex justify-center items-center text-xxs lg:text-xs ">
-                    {video.isPublished === true ? "Published" : "Draft"}
+                ))
+              ) : (
+                <>
+                  <div className="text-white w-full h-80 flex items-center justify-center text-lg font-semibold">
+                    No videos found
                   </div>
-                  <div className="col-span-2 md:col-span-1 font-[500] text-xxs lg:text-xs ">
-                    {formatDate(video.createdAt)}
-                  </div>
-                  <div className="col-span-1  text-xxs lg:text-xs font-[500] flex justify-center items-center">
-                    {video.views !== undefined ? (
-                      video.views
-                    ) : (
-                      <Edit2 className="w-4 h-4 text-gray-500" />
-                    )}
-                  </div>
-                  <div className="col-span-3 text-xxs lg:text-xs  md:col-span-2 flex justify-center items-center font-[500]">
-                    {video?.commentCount}
-                  </div>
-                  <div className="col-span-1  font-[500] text-xxs lg:text-xs">
-                    {video.likesCount}
-                  </div>
-                </div>
-              ))}
+                </>
+              )}
             </div>
           </>
         )}

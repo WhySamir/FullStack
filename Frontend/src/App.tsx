@@ -21,6 +21,9 @@ import { PlaylistPageWrapper } from "./Components/LikedVideos.tsx";
 import SearchedVideos from "./Components/SearchedVideos.tsx";
 import ComingSoon from "./Components/ComingSoon.tsx";
 import NotAUHome from "./Components/VideoComponents/NotAUHome.tsx";
+import { ProtectedRoute } from "./ProtectedRoute.tsx";
+import { PublicRoute } from "./PublicRoute.tsx";
+import NotFound from "./NotFound.tsx";
 function App() {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,16 +77,56 @@ function App() {
                 path="/watch/:vidId"
                 element={<WatchVideo key={navigationCount} />}
               />
-              <Route path="/username/:username" element={<ChannelProfile />} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route
+                path="/username/:username"
+                element={
+                  <ProtectedRoute>
+                    <ChannelProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/signin"
+                element={
+                  <PublicRoute>
+                    <Signin />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <Signup />
+                  </PublicRoute>
+                }
+              />
               <Route
                 path="/userSubscriptions"
-                element={<UserSubscription isCollapsed={isCollapsed} />}
+                element={
+                  <ProtectedRoute>
+                    <UserSubscription isCollapsed={isCollapsed} />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/channels" element={<UserSubsribedChannels />} />
+              <Route
+                path="/channels"
+                element={
+                  <ProtectedRoute>
+                    <UserSubsribedChannels />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/commingsoon" element={<ComingSoon />} />
-              <Route path="/likedvideos" element={<PlaylistPageWrapper />} />
+              <Route
+                path="/likedvideos"
+                element={
+                  <PublicRoute>
+                    <PlaylistPageWrapper />
+                  </PublicRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </div>

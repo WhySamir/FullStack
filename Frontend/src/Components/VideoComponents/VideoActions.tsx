@@ -67,7 +67,7 @@ export const VideoActions = ({
 
   return (
     <div className="flex gap-2 xs:gap-0 xs:justify-normal xs:space-x-6 sm:space-x-2">
-      <div className="w-24 xs:w-30 md:w-34 h-7 sm:h-9 cursor-pointer font-semibold items-center rounded-[2.5rem] flex bg-neutral-600">
+      <div className=" md:mx-1 w-24 xs:w-30 md:w-34 h-7 sm:h-9 cursor-pointer font-semibold items-center rounded-[2.5rem] flex bg-neutral-600">
         <button
           onClick={onLike}
           className="w-full h-full rounded-l-[2.5rem] hover:bg-neutral-500 px-2 sm:px-3 flex items-center text-white/90 text-xs md:font-medium"
@@ -76,7 +76,7 @@ export const VideoActions = ({
             fill={`${isLiked ? "white" : "transparent"}`}
             className={`w-3 h-3 sm:w-4.5 sm:h-4.5 `}
           />
-          <span className="sm:text-sm md:text-[16px] mx-2.5">
+          <span className="sm:text-sm w-auto md:text-[16px] ml-2.5 ">
             {video.likesCount ?? 0}
           </span>
         </button>
@@ -147,11 +147,13 @@ export const VideoActions = ({
       {/* Download */}
       <button
         onClick={handleDownload}
-        className="h-7 sm:h-9 cursor-pointer justify-between font-bold items-center rounded-[2.5rem] flex lg:hidden xl:flex bg-neutral-600"
+        className="h-7 sm:h-9  cursor-pointer justify-between font-bold items-center rounded-[2.5rem] flex lg:hidden xl:flex bg-neutral-600 "
       >
-        <span className="w-full h-full rounded-[2.5rem] hover:bg-neutral-500 px-3 flex items-center gap-2 text-white/90 text-xs md:font-medium">
-          <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-          <p className="text-xs md:text-[16px] font-semibold">Download</p>
+        <span className="w-full h-full rounded-[2.5rem] hover:bg-neutral-500 px-3 flex items-center gap-2 text-white/90 text-xs md:font-medium overflow-hidden whitespace-nowrap text-ellipsis ">
+          <Download className="w-3 h-3 sm:w-6 sm:h-6" />
+          <p className="text-xs md:text-[16px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis w-full ">
+            Download
+          </p>
         </span>
       </button>
 

@@ -7,12 +7,22 @@ interface setUploadPopupprops {
   video: File;
 
   setVideoAttributes: React.Dispatch<React.SetStateAction<any>>;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<boolean>>;
+  hashtagError: string | null;
+  setHashtagError: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedOptionError: string | null;
+  setSelectedOptionError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const Visibility: React.FC<setUploadPopupprops> = ({
   video,
   videoURL,
   setVideoAttributes,
+  hashtagError,
+  setHashtagError,
+  selectedOptionError,
+  setSelectedOptionError,
+  setSelectedOptions,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const containerRef2 = useRef<HTMLDivElement | null>(null);
@@ -153,7 +163,12 @@ const Visibility: React.FC<setUploadPopupprops> = ({
                       name="visibility"
                       value={option.value}
                       checked={selectedOption === option.value}
-                      onChange={() => setSelectedOption(option.value)}
+                      onChange={() => {
+                        setSelectedOptionError(null);
+
+                        setSelectedOptions(true);
+                        setSelectedOption(option.value);
+                      }}
                       className="mt-1  sm:w-4 sm:h-4 accent-blue-500"
                     />
                     <div>
@@ -166,6 +181,11 @@ const Visibility: React.FC<setUploadPopupprops> = ({
                     </div>
                   </label>
                 ))}
+                {selectedOptionError && (
+                  <p className="text-red-500 text-xs  text-center px-2">
+                    {selectedOptionError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -176,7 +196,10 @@ const Visibility: React.FC<setUploadPopupprops> = ({
               value={description}
               className="w-full px-2  resize-none pt-9  text-white/90 border-1 border-white/50 rounded-lg hover:border-2 hover:border-white/80 focus:border-2 focus:border-white focus:outline-none "
               placeholder=" Tell Viewers about your video."
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setHashtagError(null);
+                setDescription(e.target.value);
+              }}
               maxLength={5000}
               style={{
                 height: `${Math.max(
@@ -189,6 +212,11 @@ const Visibility: React.FC<setUploadPopupprops> = ({
             <div className="absolute top-3 text-sm sm:text-lg left-3 text-white pointer-events-none">
               Hashtag (&copy;)
             </div>
+            {hashtagError && (
+              <p className="text-red-500 text-xs mt-1 text-center px-2">
+                {hashtagError}
+              </p>
+            )}
           </div>
         </div>
       </div>

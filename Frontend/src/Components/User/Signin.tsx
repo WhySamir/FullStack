@@ -5,6 +5,8 @@ import { loginUser } from "../../Api/authApi.ts";
 import { useDispatch } from "react-redux";
 import { login } from "../../Redux/auth.ts";
 import RedLoader from "../Common/RedLoader.tsx";
+// import axios from "axios";
+// import { GoogleLogin } from "@react-oauth/google";
 
 const Signin = () => {
   const [username, setUsername] = useState("");
@@ -49,9 +51,21 @@ const Signin = () => {
     }
   };
 
-  const handleGoogle = () => {
-    console.log("Handled");
+  const handleGoogleLogin = () => {
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
+      {
+        client_id:
+          "497046002750-ht9ln4orhqfrfeidjt4mh23bfntpt6kn.apps.googleusercontent.com",
+        redirect_uri: "http://localhost:8000/api/v1/users/google/login",
+        response_type: "code",
+        scope: "email profile",
+        access_type: "offline",
+        prompt: "consent",
+        state: "login",
+      }
+    )}`;
   };
+
   if (!isOpen) return null;
   return (
     <>
@@ -119,13 +133,30 @@ const Signin = () => {
 
             <p className="text-center text-gray-300">or</p>
 
-            <div
+            {/* <div
               onClick={handleGoogle}
               className="flex items-center justify-center space-x-3 bg-white/20 hover:bg-white/30 transition-all text-white border border-gray-400 py-3 rounded-lg w-full shadow-md"
+            > */}
+            {/* <span className="font-bold">LOG IN WITH GOOGLE</span> */}
+
+            {/* <GoogleLogin
+              onSuccess={handleLoginSuccess}
+              onError={() => console.log("Login Failed")}
+              useOneTap
+              theme="outline"
+              size="large"
+              text="signin_with"
+              shape="rectangular"
+            /> */}
+            <button
+              onClick={handleGoogleLogin}
+              className="flex items-center justify-center space-x-3 bg-white/20 hover:bg-white/30 transition-all text-white border border-gray-400 py-3 rounded-lg w-full shadow-md"
             >
-              <img src="./MIcon.svg" alt="Google Icon" className="w-6 h-6" />
-              <span className="font-bold">LOG IN WITH GOOGLE</span>
-            </div>
+              <span className="font-bold cursor-default">
+                Sign In With Google
+              </span>
+            </button>
+            {/* </div> */}
 
             <p className="text-center mt-4 text-gray-300">
               New to WatchFree?{" "}

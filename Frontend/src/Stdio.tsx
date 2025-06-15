@@ -11,6 +11,7 @@ import NotAvailableRouteGuard from "./Components/NotAvailableRouteGuard";
 import ResponsiveGuard from "./Components/Stdio/ResponsiveGuard";
 import AuthGuard from "./Components/Stdio/AuthGuard";
 import { fetchVideos } from "./Redux/userallVideos";
+import "./index.css";
 import type { AppDispatch } from "./Redux/store";
 
 // Lazy load route components

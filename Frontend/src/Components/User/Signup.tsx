@@ -56,9 +56,21 @@ const Signin = () => {
       [name]: files ? files[0] : value, // Handles both text input and file upload
     }));
   };
-  const handleGoogle = () => {
-    console.log("Handled");
+  const handleGoogleSignup = () => {
+    const isSignup = true; // or true if this is the signup button
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
+      {
+        client_id: `${import.meta.env.VITE_GOOGLE_CLIENT_ID}`,
+        redirect_uri: "http://localhost:8000/api/v1/users/google/login",
+        response_type: "code",
+        scope: "email profile",
+        access_type: "offline",
+        prompt: "consent",
+        state: isSignup ? "signup" : "login", //  THIS IS IMPORTANT
+      }
+    )}`;
   };
+
   if (!isOpen) return null;
 
   return (
@@ -177,13 +189,14 @@ const Signin = () => {
 
           <p className="text-center text-gray-300">or</p>
 
-          <div
-            onClick={handleGoogle}
+          <button
+            onClick={handleGoogleSignup}
             className="flex items-center justify-center space-x-3 bg-white/20 hover:bg-white/30 transition-all text-white border border-gray-400 py-3 rounded-lg w-full shadow-md"
           >
-            <img src="./MIcon.svg" alt="Google Icon" className="w-6 h-6" />
-            <span className="font-bold">Sign Up With Google</span>
-          </div>
+            <span className="font-bold cursor-default">
+              Sign Up With Google
+            </span>
+          </button>
 
           <p className="text-center mt-4 text-gray-300">
             Already have an account on WatchFree?{" "}

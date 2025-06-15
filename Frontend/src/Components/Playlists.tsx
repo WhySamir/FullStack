@@ -36,10 +36,10 @@ export const Playlists: React.FC<PlaylistsProps> = ({
   return (
     <>
       <div
-        className="bg-black border border-white/40 rounded-xl w-full overflow-hidden"
+        className="bg-black border border-white/40 rounded-xl w-full overflow-hidden "
         style={{ height: vidHeight }}
       >
-        <div className="flex flex-col w-full h-full overflow-y-auto ">
+        <div className="flex flex-col w-full h-full overflow-y-auto scrollbar-hidden">
           <div
             className=" flex items-start justify-between py-3 pr-4 pb-3  rounded-t-xl bg-[#212121]"
             style={{

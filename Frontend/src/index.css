@@ -75,9 +75,9 @@ body {
   -ms-overflow-style: none;
 }
 
-button:focus {
+/* button:focus {
   outline: none;
-}
+} */
 html {
   overflow-y: scroll;
 }

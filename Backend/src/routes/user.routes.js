@@ -15,6 +15,7 @@ import {
 } from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { googleLogin } from "../controllers/auth.controller.js";
 const router = Router();
 router.route("/register").post(
   upload.fields([
@@ -24,6 +25,7 @@ router.route("/register").post(
   registerUser
 );
 router.route("/login").post(loginUser);
+router.route("/google/login").get(googleLogin);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/check-session").get(checkSession);
 router.route("/refresh-token").post(refreshAcessToken);

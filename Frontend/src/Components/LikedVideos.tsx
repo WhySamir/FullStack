@@ -117,7 +117,7 @@ const PlaylistVideoList: FC<{
 
   return (
     <>
-      <div className="mt-16 sm:mt-20 flex flex-col  w-full h-full overflow-y-auto ">
+      <div className="mt-16 sm:mt-20 flex flex-col  w-full h-full overflow-y-auto scrollbar-hidden">
         {videos?.map((video, idx: number) => (
           <div
             onClick={() => navigate(`/watch/${video._id}?playlist=liked`)}

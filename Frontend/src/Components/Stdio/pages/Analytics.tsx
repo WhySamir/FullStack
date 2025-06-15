@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -9,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { RootState } from "../../../Redux/store";
 
 const Analytics = () => {
   const [searchParams] = useSearchParams();
@@ -46,6 +48,7 @@ const Analytics = () => {
     { date: "23 Mar", watchTime: 15 },
     { date: "27 Mar", watchTime: 5 },
   ];
+  const { videos } = useSelector((state: RootState) => state.userVideo);
 
   return (
     <>
@@ -67,7 +70,11 @@ const Analytics = () => {
           </button>
         ))}
       </div>
-      {selectedTab === "Overview" ? (
+      {videos.length === 0 ? (
+        <div className="text-white w-full h-80 flex items-center justify-center text-lg font-semibold">
+          No videos found
+        </div>
+      ) : selectedTab === "Overview" ? (
         <div className="mb-3 pl-6 pr-4 lg:grid grid-cols-[5.9fr_2fr] space-x-9 space-y-9  lg:space-y-0">
           <div className="">
             <h2 className="text-3xl text-center text-white font-bold my-6">

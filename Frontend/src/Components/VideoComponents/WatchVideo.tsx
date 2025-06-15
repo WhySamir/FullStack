@@ -17,6 +17,7 @@ import { SkeletonWatchVid } from "./SkeletonWatchVid";
 import RedLoader from "../Common/RedLoader";
 import { VideoProps } from "../../types/videosInterface";
 import { ChevronDown } from "lucide-react";
+import { increaseVidViews } from "../../Api/videoApis";
 
 const WatchVideo = () => {
   const { vidId } = useParams();
@@ -62,6 +63,7 @@ const WatchVideo = () => {
   useEffect(() => {
     if (fetchedVideo) {
       // console.log(fetchedVideo);
+      increaseVidViews({ vidId: fetchedVideo._id });
       setLocalVideo(fetchedVideo);
       setLikes({ [fetchedVideo._id]: fetchedVideo.isLikedByUser });
       setDislikes({ [fetchedVideo._id]: fetchedVideo.isDislikedByUser });
@@ -310,8 +312,10 @@ const ChannelInfo = ({
           alt=" Avatar"
           className="sm:w-10 sm:h-10 w-8 h-8 rounded-full object-cover"
         />
-        <div className="cursor-default">
-          <h3 className="font-semibold">{video.owner.username}</h3>
+        <div className="cursor-default md:w-20 lg:w-full overflow-hidden whitespace-nowrap text-ellipsis">
+          <h3 className="font-semibold w-full overflow-hidden whitespace-nowrap text-ellipsis">
+            {video.owner.username}
+          </h3>
           <p className="text-xs">{video.subscribersCount} subscribers</p>
         </div>
       </div>

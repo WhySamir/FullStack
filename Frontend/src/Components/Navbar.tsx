@@ -8,7 +8,7 @@ import { logout } from "../Redux/auth.ts";
 import { RootState } from "../Redux/store.ts";
 import {
   AlignJustify,
-  Bell,
+
   // LifeBuoy,
   Mic,
   Pencil,
@@ -54,6 +54,12 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const [loader, setloader] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { videos } = useSelector((state: RootState) => state.vid);
+  const [avatarError, setAvatarError] = useState(false);
+  const avatarUrl = authUser?.avatar;
+
+  useEffect(() => {
+    setAvatarError(false); // Reset error when avatar changes
+  }, [avatarUrl]);
 
   const filteredVideos = videos.filter((video: VideoProps) =>
     video.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -102,6 +108,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     setIsOpen2((prev) => !prev);
   };
   const handleAvatarClick = (event: React.MouseEvent) => {
+    console.log("Avatar", authUser?.avatar);
     event.stopPropagation(); // Stop event propagation
     setIsOpen((prev) => !prev);
   };
@@ -209,29 +216,33 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 ref={suggestionRef}
                 className="absolute z-50 top-full mt-1 w-[90%] ml-5 bg-neutral-800 border border-neutral-700 rounded shadow-lg"
               >
-                {filteredVideos.slice(0, 5).map((video: VideoProps, index) => (
-                  <div
-                    key={video._id}
-                    onClick={() => {
-                      setSearchQuery(video.title);
-                      navigate(`/search?q=${encodeURIComponent(video.title)}`);
-                      setShowSuggestions(false);
-                    }}
-                    className={`px-4 py-2 cursor-pointer text-white ${
-                      index === highlightedIndex
-                        ? "bg-neutral-600"
-                        : "hover:bg-neutral-700"
-                    }`}
-                  >
-                    {video.title}
-                  </div>
-                ))}
+                {filteredVideos
+                  .slice(0, 5)
+                  .map((video: VideoProps, index: Number) => (
+                    <div
+                      key={video._id}
+                      onClick={() => {
+                        setSearchQuery(video.title);
+                        navigate(
+                          `/search?q=${encodeURIComponent(video.title)}`
+                        );
+                        setShowSuggestions(false);
+                      }}
+                      className={`px-4 py-2 cursor-pointer text-white ${
+                        index === highlightedIndex
+                          ? "bg-neutral-600"
+                          : "hover:bg-neutral-700"
+                      }`}
+                    >
+                      {video.title}
+                    </div>
+                  ))}
               </div>
             )}
           </div>
 
           <div
-            className={`relative microphone w-8  h-8 items-center flex justify-center rounded-full   ${
+            className={`relative hidden microphone w-8  h-8 items-center  justify-center rounded-full   ${
               darkMode
                 ? "text-white border-0 bg-neutral-700"
                 : "text-black border-2"
@@ -262,37 +273,48 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 >
                   {" "}
                   <ul className="cursor-pointer hidden sm:flex flex-col  space-y-3 py-2">
-                    <li
+                    <button
                       onClick={() => setUploadPopup(!uploadPopup)}
                       className="mt-1 py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded"
                     >
                       <Upload />
                       <span> Upload video</span>
-                    </li>
+                    </button>
                     {/* <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
                       // <LifeBuoy />
                       <span>Go live</span>
                     </li> */}
-                    <li className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
+                    <button className="py-1 flex space-x-3 text-white/90 hover:bg-neutral-600 px-4 rounded">
                       <Pencil />
                       <span className="cursor-pointer"> Create Post </span>
-                    </li>
+                    </button>
                   </ul>
                 </div>
               )}
             </div>
-            <Bell />
+            {/* <Bell /> */}
             <div className="relative" ref={menuRef}>
-              <div
+              <button
                 onClick={handleAvatarClick}
-                className="md:ml-3 relative microphone  w-9 h-9 items-center hidden sm:flex justify-center rounded-full bg-neutral-700"
+                className="md:ml-3 relative  w-9 h-9 items-center hidden sm:flex justify-center rounded-full bg-neutral-700"
               >
-                <img
-                  className="rounded-full object-cover w-full h-full"
-                  src={authUser?.avatar}
-                  alt=""
-                />
-              </div>
+                {avatarError || !avatarUrl ? (
+                  <div className="bg-gray-500 rounded-full w-9 h-9 flex items-center justify-center">
+                    <User className="text-white" size={24} />
+                  </div>
+                ) : (
+                  <img
+                    src={
+                      avatarError
+                        ? "https://eu.ui-avatars.com/api/?name=User"
+                        : avatarUrl
+                    }
+                    onError={() => setAvatarError(true)}
+                    alt="user avatar"
+                    className="rounded-full object-cover w-full h-full"
+                  />
+                )}
+              </button>
               {isOpen && (
                 <div
                   className=" absolute cursor-pointer right-[4vw]  top-0 w-64 bg-[#282828] shadow-lg rounded-lg p-4 z-50"
@@ -327,12 +349,38 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   </div>
                   <hr className="my-2 border-gray-600" />
                   <ul className="cursor-pointer text-white/90">
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                    <li
+                      className="py-1 hover:bg-neutral-600 px-2 rounded cursor-pointer"
+                      onClick={() =>
+                        window.open(
+                          `https://myaccount.google.com?authuser=${authUser.email}`,
+                          "_blank"
+                        )
+                      }
+                    >
                       Google Account
                     </li>
-                    <li className="py-1 hover:bg-neutral-600 px-2 rounded">
+                    <li
+                      className="py-1 hover:bg-neutral-600 px-2 rounded cursor-pointer"
+                      onClick={() => {
+                        window.location.href =
+                          "https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount" +
+                          `?client_id=${
+                            import.meta.env.VITE_GOOGLE_CLIENT_ID
+                          }` +
+                          "&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fv1%2Fusers%2Fgoogle%2Flogin" +
+                          "&response_type=code" +
+                          "&scope=email%20profile" +
+                          "&access_type=offline" +
+                          "&prompt=consent" +
+                          "&service=lso" +
+                          "&o2v=2" +
+                          "&flowName=GeneralOAuthFlow";
+                      }}
+                    >
                       Switch Account
                     </li>
+
                     <li
                       onClick={handlelogout}
                       className="py-1 hover:bg-neutral-600 px-2 rounded"
@@ -341,13 +389,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                     </li>
                     <hr className="my-2 border-neutral-600" />
                     <div className="py-1 hover:bg-neutral-600 px-2 rounded">
-                      <a
+                      <Link
                         target="_blank"
-                        href="/stdio/channel/content"
+                        to="/stdio/channel/content"
                         rel="noopener noreferrer"
                       >
                         WatchFree Studio
-                      </a>
+                      </Link>
                     </div>
                     <li
                       className="py-1 hover:bg-neutral-600 px-2 rounded cursor-pointer"

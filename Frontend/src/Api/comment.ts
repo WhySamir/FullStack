@@ -54,3 +54,12 @@ export const editComment = async({commentId}:{commentId:string}, content: { cont
     }
 }
 
+export const replytoComment= async({commentId}:{commentId:string}, content: { content: string})=>{
+try {
+     await api.post(`/comments/replycomment/u/${commentId}`, content);
+} catch (error:any) {
+    console.log("cannot reply to video comments", error.response?.data || error.message);
+    return null;
+    
+}
+}

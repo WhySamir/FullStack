@@ -22,26 +22,21 @@ const SearchedVideos: React.FC<Collape> = ({ isCollapsed }) => {
     new URLSearchParams(location.search).get("q")?.toLowerCase() || "";
 
   const { videos } = useSelector((state: RootState) => state.vid);
-
   useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true);
       try {
         const res = await getallvideos();
         dispatch(upload(res.data));
       } catch (err) {
         console.error("Failed to fetch videos on refresh:", err);
       } finally {
-        // Delay a bit for a smoother UI (optional)
         setTimeout(() => setLoading(false), 800);
       }
     };
 
-    if (!videos || videos.length === 0) {
-      fetchVideos();
-    } else {
-      setLoading(false);
-    }
-  }, [dispatch, videos]);
+    fetchVideos();
+  }, [dispatch, query]); // 👈 WATCH `query` here!
 
   const filteredVideos = videos.filter(
     (video) =>

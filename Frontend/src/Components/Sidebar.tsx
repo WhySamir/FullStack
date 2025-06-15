@@ -179,21 +179,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
       {!isWatchPage && isCollapsed && (
         <>
           <div className="rounded-lg flex flex-col justify-center space-y-1 ">
-            <div
+            <Link
+              to={`${isAuthenticated ? "/" : "/home"}`}
               className={`flex items-center ${
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <Link
-                to={`${isAuthenticated ? "/" : "/home"}`}
-                className="flex flex-col items-center space-y-1"
-              >
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <Home />
                 </span>
                 <span className="text-[0.65rem]">Home</span>
-              </Link>
-            </div>
+              </div>
+            </Link>
             <button
               onClick={() =>
                 navigate(
@@ -204,30 +202,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
                 isCollapsed ? "justify-center" : "justify-between"
               } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
             >
-              <Link to="/" className="flex flex-col items-center space-y-1">
+              <div className="flex flex-col items-center space-y-1">
                 <span className="w-6 h-6">
                   <Flame />
                 </span>
                 <span className="text-[0.65rem]">Trending</span>
-              </Link>
+              </div>
             </button>
             {isAuthenticated ? (
               <>
-                <div
+                <Link
+                  to="/userSubscriptions"
                   className={`flex items-center ${
                     isCollapsed ? "justify-center" : "justify-between"
                   } py-4 hover:bg-neutral-800 rounded-lg cursor-pointer transition ease-in-out delay-150  duration-200`}
                 >
-                  <Link
-                    to="/userSubscriptions"
-                    className="flex flex-col items-center space-y-1"
-                  >
+                  <div className="flex flex-col items-center space-y-1">
                     <span className="w-6 h-6">
                       <PlaySquare />
                     </span>
                     <span className="text-[0.65rem]">Subscriptions</span>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
                 <Link
                   to={`/username/${authUser?.username}`}
                   className={`flex items-center ${

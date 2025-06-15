@@ -190,7 +190,7 @@ const ChannelProfile = () => {
               ) : (
                 <div className="mt-3 sm:mt-0 px-3 sm:px-0 flex-grow  flex space-x-2 justify-start w-full sm:w-full">
                   <button
-                    //   onClick={() => handleSubscribe(video._id)}
+                    onClick={() => navigate(`/stdio/channel/dashboard`)}
                     className="overflow-hidden whitespace-nowrap text-ellipsis text-sm font-medium cursor-pointer h-9   w-1/2 sm:w-auto  justify-center items-center  px-3 py-1    rounded-[2.5rem] flex bg-[#222222] hover:bg-[#333333] "
                   >
                     <span className=" w-full overflow-hidden whitespace-nowrap text-ellipsis">
@@ -250,63 +250,67 @@ const ChannelProfile = () => {
           >
             Videos
           </button>
-          <button
+          {/* <button
             onClick={() => handleTab(1)}
             className={`pb-2 ${
               tab === 1 ? "border-b-2" : "text-gray-400"
             } border-white`}
           >
             Playlists
-          </button>
-          <button
+          </button> */}
+          {/* <button
             onClick={() => handleTab(2)}
             className={`pb-2 ${
               tab === 2 ? "border-b-2" : "text-gray-400"
             } border-white`}
           >
             Posts
-          </button>
-          <button
+          </button> */}
+          {/* <button
             onClick={() => handleTab(3)}
             className={`pb-2 ${
               tab === 3 ? "border-b-2" : "text-gray-400"
             } border-white`}
           >
             Search
-          </button>
+          </button> */}
         </div>
 
         {/* Video List */}
         <div className="px-4 sm:pl-16 mt-6">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 place-items-center sm:place-items-start">
-            {videos.map((video, idx) => (
-              <div
-                onClick={() => handleVid(video?._id)}
-                key={video._id || idx}
-                className="flex flex-col space-y-2 max-w-70 sm:w-full md:w-72 lg:w-80 xl:w-96 cursor-pointer"
-              >
-                <div className="aspect-video bg-gray-700 rounded-md  h-38   ">
-                  <img
-                    src={video.thumbnail}
-                    className="w-full h-full object-cover rounded-md"
-                    alt="Video Thumbnail"
-                  />
-                </div>
-                <div className="flex justify-between items-start">
-                  <div className="space-y-0.5 flex flex-col">
-                    <h3 className=" text-xs sm:text-sm font-semibold line-clamp-2 sm:line-clamp-3 xl:line-clamp-none   overflow-hidden h-full  w-full min-h-[1.4rem]">
-                      {video.title}
-                    </h3>
-                    <p className="text-xs text-gray-400">
-                      {video.views || 0} views • {timeAgo(video.createdAt)}
-                    </p>
+            {videos.length > 0 ? (
+              videos.map((video, idx) => (
+                <div
+                  onClick={() => handleVid(video?._id)}
+                  key={video._id || idx}
+                  className="flex flex-col space-y-2 max-w-70 sm:w-full md:w-72 lg:w-80 xl:w-96 cursor-pointer"
+                >
+                  <div className="aspect-video bg-gray-700 rounded-md  h-38   ">
+                    <img
+                      src={video.thumbnail}
+                      className="w-full h-full object-cover rounded-md"
+                      alt="Video Thumbnail"
+                    />
                   </div>
-                  <div className="h-5 w-5 flex items-center justify-center">
-                    <EllipsisVertical />
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-0.5 flex flex-col">
+                      <h3 className=" text-xs sm:text-sm font-semibold line-clamp-2 sm:line-clamp-3 xl:line-clamp-none   overflow-hidden h-full  w-full min-h-[1.4rem]">
+                        {video.title}
+                      </h3>
+                      <p className="text-xs text-gray-400">
+                        {video.views || 0} views • {timeAgo(video.createdAt)}
+                      </p>
+                    </div>
+                    <div className="h-5 w-5 flex items-center justify-center">
+                      <EllipsisVertical />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center">No videos yet.</div>
+            )}
           </div>
         </div>
 

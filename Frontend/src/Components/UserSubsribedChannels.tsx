@@ -86,7 +86,7 @@ const UserSubscribedChannels = () => {
       <div className="w-[60vw] items-start flex flex-col justify-center text-white">
         <h1 className="text-4xl my-3 font-bold mb-6">All subscriptions</h1>
 
-        {userSubscribedChannels.length > 0 &&
+        {userSubscribedChannels.length > 0 ? (
           userSubscribedChannels.map((channel) => (
             <div
               key={channel.channel._id}
@@ -124,7 +124,12 @@ const UserSubscribedChannels = () => {
                 {channel.isSubscribed ? "Subscribed" : "Subscribe"}
               </button>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="flex items-center w-full justify-center h-100 relative text-white text-lg">
+            No subscriptions found
+          </div>
+        )}
       </div>
     </div>
   );
