@@ -7,9 +7,14 @@ import dotenv from "dotenv";
 dotenv.config();
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://wawatchfree.netlify.app",
+];
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5174",
+    origin: allowedOrigins,
     credentials: true,
   })
 ); //middleware or configuration
