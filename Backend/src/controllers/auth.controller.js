@@ -2,19 +2,21 @@ import { handleGoogleAuth } from "../utlis/googleAuthHelper.js";
 import { ApiError } from "../utlis/ApiError.js";
 import { User } from "../models/user.model.js";
 
+const frontendURL = process.env.CLIENT_URL || "http://localhost:5173";
+
 export const googleLogin = async (req, res) => {
   try {
     const { code, state } = req.query;
 
     if (!code) {
-      return res.redirect("http://localhost:5173/signin");
+      return res.redirect(`${frontendURL}/signin`);
     }
 
     const { user, accessToken, refreshToken, needsSignup } =
       await handleGoogleAuth(code, state);
 
     if (needsSignup) {
-      return res.redirect("http://localhost:5173/signup");
+      return res.redirect(`${frontendURL}/signup`);
     }
 
     const userWithCounts = await User.aggregate([
@@ -67,7 +69,7 @@ export const googleLogin = async (req, res) => {
     res
       .cookie("accessToken", accessToken, cookieOptions)
       .cookie("refreshToken", refreshToken, cookieOptions)
-      .redirect("http://localhost:5173");
+      .redirect(frontendURL);
   } catch (error) {
     console.error("Google login failed:", error);
     return res.status(error.statusCode || 500).json({
