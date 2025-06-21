@@ -1,3 +1,8 @@
 npm install framer-motion
 recharts
 npm install color-thief
+oauth
+
+
+made changes in siginsigout axios channelprofile navbar sharevideo
+wait authorize url javascript origin of ouath ma netlify url add and in channelprofile

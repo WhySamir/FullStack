@@ -14,7 +14,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
   if (!isOpen) return null;
 
-  const shareUrl = `http://localhost:5173/watch/${videoId}`;
+  const shareUrl = `${import.meta.env.VITE_FRONTEND_BASE_URL}/watch/${videoId}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);

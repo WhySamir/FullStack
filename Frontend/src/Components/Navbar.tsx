@@ -368,7 +368,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                           `?client_id=${
                             import.meta.env.VITE_GOOGLE_CLIENT_ID
                           }` +
-                          "&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fv1%2Fusers%2Fgoogle%2Flogin" +
+                          `&redirect_uri=${encodeURIComponent(
+                            import.meta.env.VITE_REDIRECT_URI
+                          )}` +
                           "&response_type=code" +
                           "&scope=email%20profile" +
                           "&access_type=offline" +

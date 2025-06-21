@@ -332,9 +332,13 @@ const ChannelProfile = () => {
                   🌐{" "}
                   <a
                     className="pl-2"
-                    href={`http://localhost:5173/username/${channelData?.username}`}
+                    href={`${import.meta.env.VITE_FRONTEND_BASE_URL}/username/${
+                      channelData?.username
+                    }`}
                   >
-                    www.watchfree.com/username/{channelData?.username}
+                    {`${import.meta.env.VITE_FRONTEND_BASE_URL}/username/${
+                      channelData?.username
+                    }`}{" "}
                   </a>
                 </p>
                 <p>
@@ -365,7 +369,9 @@ const ChannelProfile = () => {
               <button
                 onClick={() =>
                   handleShare(
-                    `http://localhost:5173/username/${channelData?.username}`
+                    `${import.meta.env.VITE_FRONTEND_BASE_URL}/username/${
+                      channelData?.username
+                    }`
                   )
                 }
                 className="mt-6 flex  space-x-1.5 overflow-hidden whitespace-nowrap text-ellipsis text-sm font-medium cursor-pointer h-9   w-1/2 sm:w-[110px]  justify-center items-center  px-3 py-1    rounded-[2.5rem]  bg-neutral-600 hover:bg-[#333333] "

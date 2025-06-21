@@ -61,7 +61,7 @@ const Signin = () => {
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
       {
         client_id: `${import.meta.env.VITE_GOOGLE_CLIENT_ID}`,
-        redirect_uri: "http://localhost:8000/api/v1/users/google/login",
+        redirect_uri: import.meta.env.VITE_REDIRECT_URI,
         response_type: "code",
         scope: "email profile",
         access_type: "offline",
