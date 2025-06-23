@@ -2,7 +2,8 @@ import { handleGoogleAuth } from "../utlis/googleAuthHelper.js";
 import { ApiError } from "../utlis/ApiError.js";
 import { User } from "../models/user.model.js";
 
-const frontendURL = process.env.CLIENT_URL || "http://localhost:5173";
+const frontendURL = process.env.CLIENT_URL;
+// || "http://localhost:5173";
 
 export const googleLogin = async (req, res) => {
   try {
