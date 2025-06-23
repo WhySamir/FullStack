@@ -40,6 +40,9 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
         setUserSubscribedChannels(response.data);
       } catch (error) {
         console.error("Failed to fetch subscriptions", error);
+      } finally {
+        setLoadingVideos(false);
+        dispatch(setNavigating(false));
       }
     };
 

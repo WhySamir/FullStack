@@ -38,20 +38,21 @@ const UserSubscribedChannels = () => {
         setLoadingVideos(true);
         dispatch(setNavigating(true));
         const response = await getUserSubcribedChannel(authUser._id);
+        await new Promise((resolve) => setTimeout(resolve, 800));
         const subscriptionsWithStatus = response.data.map(
           (channel: Subscription) => ({
             ...channel,
-            isSubscribed: true, // Assuming initial state is all subscribed
+            isSubscribed: true,
           })
         );
 
         setUserSubscribedChannels(subscriptionsWithStatus);
       } catch (error) {
         console.error("Failed to fetch subscriptions", error);
-        setLoadingVideos(true);
+        setLoadingVideos(false);
         dispatch(setNavigating(false));
       } finally {
-        setLoadingVideos(true);
+        setLoadingVideos(false);
         dispatch(setNavigating(false));
       }
     };
