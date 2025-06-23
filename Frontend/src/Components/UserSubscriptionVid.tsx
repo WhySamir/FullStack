@@ -92,7 +92,7 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
     if (!loadingVideos && subscribedChannelsVideos.length === 0) {
       const timer = setTimeout(() => {
         setShowEmpty(true);
-      }, 1000); // 1 second delay
+      }, 2000); // 1 second delay
 
       return () => clearTimeout(timer);
     } else {
