@@ -16,6 +16,8 @@ interface Collapse {
 const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showEmpty, setShowEmpty] = useState(false);
+
   const { authUser } = useSelector((state: RootState) => state.auth);
   const [userSubscribedChannels, setUserSubscribedChannels] = useState<any[]>(
     []
@@ -86,6 +88,18 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
     fetchVideosFromSubscribedChannels();
   }, [userSubscribedChannels, dispatch]);
 
+  useEffect(() => {
+    if (!loadingVideos && subscribedChannelsVideos.length === 0) {
+      const timer = setTimeout(() => {
+        setShowEmpty(true);
+      }, 1000); // 1 second delay
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowEmpty(false);
+    }
+  }, [loadingVideos, subscribedChannelsVideos]);
+
   return (
     <>
       {isNavigating || loadingVideos ? (
@@ -104,7 +118,7 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
             ))}
           </div>
         </>
-      ) : subscribedChannelsVideos.length === 0 ? (
+      ) : showEmpty ? (
         <div className="hero px-4 mt-3 text-white flex items-center justify-center h-[calc(96vh)]">
           No Subscribed Videos
         </div>
