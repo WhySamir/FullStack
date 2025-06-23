@@ -6,7 +6,7 @@ import { userAllvideo } from "../Api/videoApis";
 import Video from "./VideoComponents/AllVideos";
 import { useNavigate } from "react-router-dom";
 import { setNavigating } from "../Redux/navigations";
-import RedLoader from "./Common/RedLoader";
+import RedLoader from "./Stdio/Common/RedLoader";
 import SkeletonLandingVid from "./VideoComponents/SkeletonLandingVid";
 
 interface Collapse {

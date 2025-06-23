@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { getallvideos } from "../Api/videoApis";
 import { upload } from "../Redux/videos";
-import RedLoader from "./Common/RedLoader";
+import RedLoader from "./Stdio/Common/RedLoader";
 import SkeletonLandingVid from "./VideoComponents/SkeletonLandingVid";
 
 interface Collape {

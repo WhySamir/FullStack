@@ -26,7 +26,7 @@ import {
   setNavigating,
   incrementNavigationCount,
 } from "../../Redux/navigations";
-import RedLoader from "../Common/RedLoader";
+import RedLoader from "../Stdio/Common/RedLoader";
 import { SkeletonWatchVid } from "./SkeletonWatchVid";
 
 interface VideoProps {

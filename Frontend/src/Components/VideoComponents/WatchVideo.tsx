@@ -14,7 +14,7 @@ import { toggleSubscribe } from "../../Api/subscriber";
 import { getLikedVideos, toggleLike_Dislike } from "../../Api/like";
 
 import { SkeletonWatchVid } from "./SkeletonWatchVid";
-import RedLoader from "../Common/RedLoader";
+import RedLoader from "../Stdio/Common/RedLoader";
 import { VideoProps } from "../../types/videosInterface";
 import { ChevronDown } from "lucide-react";
 import { increaseVidViews } from "../../Api/videoApis";

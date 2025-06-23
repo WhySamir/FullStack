@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { darkTheme, lightTheme } from "../Theme.ts";
 import UploadVideo from "./VideoComponents/UploadModal.tsx";
-import RedLoader from "./Common/RedLoader.tsx";
+import RedLoader from "./Stdio/Common/RedLoader.tsx";
 import { VideoProps } from "../types/videosInterface.ts";
 
 interface User {

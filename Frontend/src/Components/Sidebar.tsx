@@ -104,16 +104,17 @@ const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
     return (
       <>
         {isExternal ? (
-          <Link
-            to={item.to}
+          <a
+            href={item.to}
             target="_blank"
+            rel="noopener noreferrer"
             className="flex  items-center py-2 hover:bg-neutral-800 rounded-lg cursor-pointer transition-all duration-300 justify-start"
           >
             <div className="pl-4  flex items-center space-x-6">
               <span className="w-4 h-4">{item.icon}</span>
               {<span className="w-32">{item.text}</span>}
             </div>
-          </Link>
+          </a>
         ) : (
           <Link
             to={item.to}

@@ -16,7 +16,7 @@ import WatchVideo from "./Components/VideoComponents/WatchVideo.tsx";
 import ChannelProfile from "./Components/ChannelProfile.tsx";
 import UserSubscription from "./Components/UserSubscriptionVid.tsx";
 import UserSubsribedChannels from "./Components/UserSubsribedChannels.tsx";
-import RedLoader from "./Components/Common/RedLoader.tsx";
+import RedLoader from "./Components/Stdio/Common/RedLoader.tsx";
 import { PlaylistPageWrapper } from "./Components/LikedVideos.tsx";
 import SearchedVideos from "./Components/SearchedVideos.tsx";
 import ComingSoon from "./Components/ComingSoon.tsx";

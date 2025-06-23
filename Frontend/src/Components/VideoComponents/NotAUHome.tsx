@@ -5,7 +5,7 @@ import { getallvideos } from "../../Api/videoApis";
 import { upload } from "../../Redux/videos";
 import Video from "./AllVideos";
 import SkeletonLandingVid from "./SkeletonLandingVid";
-import RedLoader from "../Common/RedLoader";
+import RedLoader from "../Stdio/Common/RedLoader";
 
 interface MaingridProps {
   isCollapsed: boolean;

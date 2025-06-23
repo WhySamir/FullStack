@@ -4,7 +4,7 @@ import { loginUser } from "../../Api/authApi.ts";
 
 import { useDispatch } from "react-redux";
 import { login } from "../../Redux/auth.ts";
-import RedLoader from "../Common/RedLoader.tsx";
+import RedLoader from "../Stdio/Common/RedLoader.tsx";
 // import axios from "axios";
 // import { GoogleLogin } from "@react-oauth/google";
 

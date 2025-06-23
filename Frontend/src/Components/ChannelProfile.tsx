@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { toggleSubscribe } from "../Api/subscriber";
 import { setNavigating } from "../Redux/navigations";
-import RedLoader from "./Common/RedLoader";
+import RedLoader from "./Stdio/Common/RedLoader";
 import { VideoProps } from "../types/videosInterface";
 
 interface channelprops {

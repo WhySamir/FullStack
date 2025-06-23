@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 
 import Navbar from "./Components/Stdio/Navbar";
 import Sidebar from "./Components/Stdio/Sidebar";
-import LoadingSpinner from "./Components/Common/LoadingSpinner";
+import LoadingSpinner from "./Components/Stdio/Common/LoadingSpinner";
 import { setUser } from "./Redux/auth";
 import api from "./Api/axios";
 import { useDispatch } from "react-redux";

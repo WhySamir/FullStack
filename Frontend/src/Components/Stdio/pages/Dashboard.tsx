@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../../../Redux/store";
 import { formatDuration } from "../../../Utilis/FormatDuration";
 import { useEffect, useState } from "react";
-import RedLoader from "../../Common/RedLoader";
+import RedLoader from "../Common/RedLoader";
 
 // ✅ Simple Skeleton Component
 const SkeletonBox = ({ className = "" }) => (
