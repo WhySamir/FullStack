@@ -56,7 +56,9 @@ const Signin = () => {
       {
         client_id:
           "497046002750-ht9ln4orhqfrfeidjt4mh23bfntpt6kn.apps.googleusercontent.com",
-        redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+        // redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+        redirect_uri:
+          "https://fullstack-8kac.onrender.com/api/v1/users/google/login",
         response_type: "code",
         scope: "email profile",
         access_type: "offline",
