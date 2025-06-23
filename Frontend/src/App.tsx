@@ -121,9 +121,9 @@ function App() {
               <Route
                 path="/likedvideos"
                 element={
-                  <PublicRoute>
+                  <ProtectedRoute>
                     <PlaylistPageWrapper />
-                  </PublicRoute>
+                  </ProtectedRoute>
                 }
               />
               <Route path="*" element={<NotFound />} />

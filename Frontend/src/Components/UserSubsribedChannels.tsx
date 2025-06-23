@@ -4,6 +4,7 @@ import { RootState } from "../Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { Bell } from "lucide-react";
 import { setNavigating } from "../Redux/navigations";
+import RedLoader from "./Stdio/Common/RedLoader";
 
 interface Channel {
   _id: string;
@@ -77,16 +78,20 @@ const UserSubscribedChannels = () => {
       console.error("Subscription toggle failed:", error);
     }
   };
-  if (!loadingVideos && userSubscribedChannels.length === 0) {
-    return <div className="hero px-4 mt-3">No Subscribed Channels</div>;
-  }
+  // if (!loadingVideos && userSubscribedChannels.length === 0) {
+  //   return <div className="hero px-4 mt-3">No Subscribed Channels</div>;
+  // }
 
   return (
     <div className="mt-12 sm:mt-14 px-4 py-2 w-full flex flex-col items-center justify-center">
       <div className="w-[60vw] items-start flex flex-col justify-center text-white">
         <h1 className="text-4xl my-3 font-bold mb-6">All subscriptions</h1>
 
-        {userSubscribedChannels.length > 0 ? (
+        {loadingVideos ? (
+          <div className="w-full">
+            <RedLoader />
+          </div>
+        ) : userSubscribedChannels.length > 0 ? (
           userSubscribedChannels.map((channel) => (
             <div
               key={channel.channel._id}

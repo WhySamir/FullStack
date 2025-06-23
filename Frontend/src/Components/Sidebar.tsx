@@ -105,7 +105,7 @@ const SidebarItem: React.FC<{ item: SidebarItem; isCollapsed: boolean }> = memo(
       <>
         {isExternal ? (
           <a
-            href={item.to}
+            href={`${window.location.origin}${item.to}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex  items-center py-2 hover:bg-neutral-800 rounded-lg cursor-pointer transition-all duration-300 justify-start"

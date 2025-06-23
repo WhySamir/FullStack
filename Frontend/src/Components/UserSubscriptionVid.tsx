@@ -82,13 +82,6 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
 
     fetchVideosFromSubscribedChannels();
   }, [userSubscribedChannels, dispatch]);
-  if (!loadingVideos && subscribedChannelsVideos.length === 0) {
-    return (
-      <div className="hero px-4 mt-3 text-white  flex items-center justify-center h-[calc(96vh)]">
-        No Subscribed Videos
-      </div>
-    );
-  }
 
   return (
     <>
@@ -108,6 +101,10 @@ const UserSubscription: React.FC<Collapse> = ({ isCollapsed }) => {
             ))}
           </div>
         </>
+      ) : subscribedChannelsVideos.length === 0 ? (
+        <div className="hero px-4 mt-3 text-white flex items-center justify-center h-[calc(96vh)]">
+          No Subscribed Videos
+        </div>
       ) : (
         <>
           <div className="mt-12 sm:mt-14 flex items-center justify-between  px-4 py-2">
