@@ -5,7 +5,9 @@ import { User } from "../models/user.model.js";
 import { uploadFromUrlToCloudinary } from "./cloudinary.js";
 
 export const handleGoogleAuth = async (code, state) => {
-  const redirectUri = "http://localhost:8000/api/v1/users/google/login";
+  // const redirectUri = "http://localhost:8000/api/v1/users/google/login";
+  const redirectUri =
+    "https://fullstack-8kac.onrender.com/api/v1/users/google/login";
 
   const tokenResponse = await axios.post(
     "https://oauth2.googleapis.com/token",
