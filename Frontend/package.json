@@ -13,7 +13,7 @@
     "@emoji-mart/react": "^1.1.1",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.5.1",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "emoji-mart": "^5.6.0",
     "fast-average-color": "^9.5.0",
     "framer-motion": "^12.9.2",
@@ -37,6 +37,6 @@
     "tailwindcss": "^4.0.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"
+    "vite": "^6.3.5"
   }
 }
