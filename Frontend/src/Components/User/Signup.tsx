@@ -57,7 +57,7 @@ const Signin = () => {
     }));
   };
   const handleGoogleSignup = () => {
-    const isSignup = true; // or true if this is the signup button
+    // const isSignup = true; // or true if this is the signup button
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
       {
         client_id: `${import.meta.env.VITE_GOOGLE_CLIENT_ID}`,
@@ -66,7 +66,7 @@ const Signin = () => {
         scope: "email profile",
         access_type: "offline",
         prompt: "consent",
-        state: isSignup ? "signup" : "login", //  THIS IS IMPORTANT
+        // state: isSignup ? "signup" : "login", //  THIS IS IMPORTANT
       }
     )}`;
   };

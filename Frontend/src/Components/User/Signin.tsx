@@ -63,7 +63,6 @@ const Signin = () => {
         scope: "email profile",
         access_type: "offline",
         prompt: "consent",
-        state: "login",
       }
     )}`;
   };

@@ -7,18 +7,13 @@ const frontendURL = process.env.CLIENT_URL;
 
 export const googleLogin = async (req, res) => {
   try {
-    const { code, state } = req.query;
+    const { code } = req.query;
 
     if (!code) {
       return res.redirect(`${frontendURL}/signin`);
     }
 
-    const { user, accessToken, refreshToken, needsSignup } =
-      await handleGoogleAuth(code, state);
-
-    if (needsSignup) {
-      return res.redirect(`${frontendURL}/signup`);
-    }
+    const { user, accessToken, refreshToken } = await handleGoogleAuth(code);
 
     const userWithCounts = await User.aggregate([
       { $match: { _id: user._id } },

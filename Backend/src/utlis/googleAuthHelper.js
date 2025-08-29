@@ -34,7 +34,7 @@ export const handleGoogleAuth = async (code, state) => {
 
   let user = await User.findOne({ email });
 
-  if (!user && state === "signup") {
+  if (!user) {
     let avatarUrl = picture;
     try {
       if (picture) {
@@ -54,15 +54,15 @@ export const handleGoogleAuth = async (code, state) => {
     });
   }
 
-  if (!user) {
-    return {
-      needsSignup: true,
-      email,
-      name,
-      picture,
-      googleId: userInfo.data.id,
-    };
-  }
+  // if (!user) {
+  //   return {
+  //     needsSignup: true,
+  //     email,
+  //     name,
+  //     picture,
+  //     googleId: userInfo.data.id,
+  //   };
+  // }
 
   const accessToken = jwt.sign(
     { _id: user._id },
@@ -83,5 +83,5 @@ export const handleGoogleAuth = async (code, state) => {
   user.refreshToken = refreshToken;
   await user.save();
 
-  return { user, accessToken, refreshToken, needsSignup: false };
+  return { user, accessToken, refreshToken };
 };
