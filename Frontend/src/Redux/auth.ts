@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice,PayloadAction } from "@reduxjs/toolkit";
 import api from "../Api/axios";
-import { refreshAuth } from "./refreshAuth";
 interface User {
     _id: string;
     username: string;
@@ -67,15 +66,15 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
       builder
-        .addCase(refreshAuth.pending, (state) => {
+        .addCase(verifyAuth.pending, (state) => {
           state.isAuthChecked = false;
         })
-        .addCase(refreshAuth.fulfilled, (state, action) => {
+        .addCase(verifyAuth.fulfilled, (state, action) => {
           state.isAuthenticated = action.payload.isAuthenticated; // Use server's flag
           state.authUser = action.payload.user; // Assign extracted user
           state.isAuthChecked = true;
         })
-        .addCase(refreshAuth.rejected, (state) => {
+        .addCase(verifyAuth.rejected, (state) => {
           state.isAuthenticated = false;
           state.authUser = null;
           state.isAuthChecked = true;
