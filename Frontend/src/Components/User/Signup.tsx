@@ -56,20 +56,20 @@ const Signin = () => {
       [name]: files ? files[0] : value, // Handles both text input and file upload
     }));
   };
-  const handleGoogleSignup = () => {
-    // const isSignup = true; // or true if this is the signup button
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
-      {
-        client_id: `${import.meta.env.VITE_GOOGLE_CLIENT_ID}`,
-        redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-        response_type: "code",
-        scope: "email profile",
-        access_type: "offline",
-        prompt: "consent",
-        // state: isSignup ? "signup" : "login", //  THIS IS IMPORTANT
-      }
-    )}`;
-  };
+  // const handleGoogleSignup = () => {
+  //   // const isSignup = true; // or true if this is the signup button
+  //   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
+  //     {
+  //       client_id: `${import.meta.env.VITE_GOOGLE_CLIENT_ID}`,
+  //       redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+  //       response_type: "code",
+  //       scope: "email profile",
+  //       access_type: "offline",
+  //       prompt: "consent",
+  //       // state: isSignup ? "signup" : "login", //  THIS IS IMPORTANT
+  //     }
+  //   )}`;
+  // };
 
   if (!isOpen) return null;
 
@@ -187,21 +187,21 @@ const Signin = () => {
             Sign Up
           </button>
 
-          <p className="text-center text-gray-300">or</p>
+          {/* <p className="text-center text-gray-300">or</p> */}
 
-          <button
+          {/* <button
             onClick={handleGoogleSignup}
             className="flex items-center justify-center space-x-3 bg-white/20 hover:bg-white/30 transition-all text-white border border-gray-400 py-3 rounded-lg w-full shadow-md"
           >
             <span className="font-bold cursor-default">
               Sign Up With Google
             </span>
-          </button>
+          </button> */}
 
           <p className="text-center mt-4 text-gray-300">
             Already have an account on WatchFree?{" "}
             <Link
-              to="signin"
+              to="/signin"
               className="text-blue-400 hover:text-blue-500 font-medium"
             >
               Sign In
